@@ -70,7 +70,7 @@ const ProductSection = () => {
       rating: 4.8,
       reviews: 124,
       image:
-        "https://images.unsplash.com/photo-1534367507877-0edd93bd013b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "/image/powerback.jpeg",
       description: "Commercial grade power rack with pull-up bar",
       features: ["1000lb Capacity", "Safety Bars", "Adjustable"],
       badge: "BEST SELLER",
@@ -154,7 +154,7 @@ const ProductSection = () => {
       rating: 4.4,
       reviews: 98,
       image:
-        "https://images.unsplash.com/photo-1594736797933-d0a1500a6b78?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "/image/bcca.webp",
       description: "Electrolyte powder with BCAA & caffeine",
       features: ["Zero Sugar", "Electrolytes", "Energy Boost"],
       badge: "NEW",
@@ -182,7 +182,7 @@ const ProductSection = () => {
       rating: 4.7,
       reviews: 203,
       image:
-        "https://images.unsplash.com/photo-1526402973497-0c8c1682d1af?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "/image/belt.jpeg",
       description: "Leather weightlifting belt with prong buckle",
       features: ["Genuine Leather", "4-inch Width", "Lifetime Warranty"],
       badge: "PRO",
