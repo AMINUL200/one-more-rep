@@ -13,9 +13,11 @@ import {
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { useNavigate } from "react-router-dom";
 
 const FeatureProduct = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
+  const navigate = useNavigate();
 
   const products = [
     {
@@ -103,7 +105,7 @@ const FeatureProduct = () => {
 
   return (
     <section className="py-16 bg-[#0B0B0B]">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-8xl mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold mb-4">
@@ -235,10 +237,48 @@ const FeatureProduct = () => {
                       </div>
 
                       {/* Add to Cart Button */}
-                      <button className="w-full bg-[#E10600] hover:bg-[#FF0800] text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 hover:shadow-[0_0_20px_rgba(225,6,0,0.5)]">
-                        <ShoppingCart className="w-5 h-5" />
-                        Add to Cart
-                      </button>
+                      <div className="flex gap-3">
+                        {/* VIEW BUTTON */}
+                        <button
+                          className="
+      flex-1 flex items-center justify-center gap-2
+      py-3
+      border-2 border-[#E10600]
+      text-[#E10600]
+      font-bold
+      rounded-lg
+      transition-all duration-300
+      hover:bg-[#E10600]
+      hover:text-white
+      hover:shadow-[0_0_20px_rgba(225,6,0,0.4)]
+      active:scale-95
+    "
+                          onClick={()=> navigate(`/products/${product.id}`)}
+                        >
+                          
+                          <Eye className="w-5 h-5" />
+                          View
+                        </button>
+
+                        {/* ADD TO CART BUTTON */}
+                        <button
+                          className="
+      flex-1 flex items-center justify-center gap-2
+      py-3
+      bg-[#E10600]
+      text-white
+      font-bold
+      rounded-lg
+      transition-all duration-300
+      hover:bg-[#FF0800]
+      hover:shadow-[0_0_25px_rgba(225,6,0,0.6)]
+      active:scale-95
+    "
+                        >
+                          <ShoppingCart className="w-5 h-5" />
+                          Add to Cart
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

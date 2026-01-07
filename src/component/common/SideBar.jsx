@@ -26,46 +26,36 @@ const SideBar = ({ toggleMenu, isOpen }) => {
       path: "/",
       icon: <Home className="w-5 h-5" />,
     },
-    {
-      id: "services",
-      label: "Services",
-      icon: <Briefcase className="w-5 h-5" />,
-      dropdown: [
-        { id: "web-design", label: "Web Design", path: "/services/web-design" },
-        { id: "development", label: "Development", path: "/services/development" },
-        { id: "seo", label: "SEO Optimization", path: "/services/seo" },
-        { id: "marketing", label: "Digital Marketing", path: "/services/digital-marketing" },
-      ],
-    },
+
     {
       id: "products",
       label: "Products",
       icon: <Package className="w-5 h-5" />,
       dropdown: [
-        { id: "software", label: "Software", path: "/products/software" },
-        { id: "templates", label: "Templates", path: "/products/templates" },
-        { id: "plugins", label: "Plugins", path: "/products/plugins" },
+       
+        { id: 1, label: "Barbells", path: "/products/barbells", icon: "💪" },
+        { id: 2, label: "Plates", path: "/products/plates", icon: "⚖️" },
         {
-          id: "custom",
-          label: "Custom Solutions",
-          dropdown: [
-            { id: "enterprise", label: "Enterprise", path: "/products/custom/enterprise" },
-            { id: "startup", label: "Startup", path: "/products/custom/startup" },
-            { id: "ecommerce", label: "E-commerce", path: "/products/custom/ecommerce" },
-          ],
+          id: 3,
+          label: "Strength Equipment",
+          path: "/products/strength-equipment",
+          icon: "🏋️",
+        },
+        { id: 4, label: "Benches", path: "/products/benches", icon: "🛋️" },
+        { id: 5, label: "Dumbbells", path: "/products/dumbbells", icon: "🏋️‍♂️" },
+        {
+          id: 6,
+          label: "Cardio Equipment",
+          path: "/products/cardio",
+          icon: "🏃",
         },
       ],
     },
+
     {
-      id: "pricing",
-      label: "Pricing",
-      path: "/pricing",
-      icon: <DollarSign className="w-5 h-5" />,
-    },
-    {
-      id: "blog",
-      label: "Blog",
-      path: "/blog",
+      id: "about",
+      label: "About Us",
+      path: "/about",
       icon: <BookOpen className="w-5 h-5" />,
     },
     {
@@ -141,9 +131,7 @@ const SideBar = ({ toggleMenu, isOpen }) => {
             }`}
           >
             <div className="border-l border-[#262626] ml-4">
-              {item.dropdown.map((sub) =>
-                renderDropdownItem(sub, level + 1)
-              )}
+              {item.dropdown.map((sub) => renderDropdownItem(sub, level + 1))}
             </div>
           </div>
         )}
@@ -213,7 +201,7 @@ const SideBar = ({ toggleMenu, isOpen }) => {
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-[#262626] bg-[#141414]">
-          <h2 className="text-xl font-bold text-[#E10600]">GYMSTORE</h2>
+          <h2 className="text-xl font-bold text-[#E10600]">ONE REP MORE</h2>
           <button onClick={toggleMenu}>
             <X className="text-white" />
           </button>
@@ -225,40 +213,7 @@ const SideBar = ({ toggleMenu, isOpen }) => {
         </nav>
 
         {/* Auth */}
-        <div className="border-t border-[#262626] p-4 bg-[#141414]">
-          {!isAuthenticated && (
-            <button
-              onClick={() => {
-                navigate("/signin");
-                toggleMenu();
-              }}
-              className="w-full bg-[#E10600] text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2"
-            >
-              <User /> Login
-            </button>
-          )}
-
-          {isAuthenticated && userData?.user_type === 4 && (
-            <button
-              onClick={handleLogout}
-              className="w-full bg-[#DC2626] text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2"
-            >
-              <LogOut /> Logout
-            </button>
-          )}
-
-          {isAuthenticated && userData?.user_type !== 4 && (
-            <button
-              onClick={() => {
-                navigate("/dashboard");
-                toggleMenu();
-              }}
-              className="w-full bg-[#E10600] text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition flex items-center justify-center gap-2"
-            >
-              <LayoutDashboard /> Dashboard
-            </button>
-          )}
-        </div>
+       
       </aside>
     </>
   );

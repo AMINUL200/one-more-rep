@@ -11,10 +11,15 @@ import {
   Truck,
   Shield,
   ChevronRight,
+  Eye,
+  ShoppingCart,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ProductSection = () => {
   // Categories with icons and colors
+  const navigate = useNavigate();
+
   const categories = [
     {
       id: "all",
@@ -216,11 +221,10 @@ const ProductSection = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
-          
           <h2 className="text-5xl font-bold mb-4">
-              <span className="text-white">Premium </span>
-              <span className="text-[#E10600]">Gym Products</span>
-            </h2>
+            <span className="text-white">Premium </span>
+            <span className="text-[#E10600]">Gym Products</span>
+          </h2>
           <p className="text-[#B3B3B3] text-lg md:text-xl max-w-3xl mx-auto">
             Discover professional-grade equipment, supplements, and apparel
             designed for serious athletes
@@ -339,8 +343,8 @@ const ProductSection = () => {
                     </div>
 
                     {/* Price & CTA */}
-                    <div className="flex items-center justify-between">
-                      <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-between gap-4">
                         <div className="flex items-baseline gap-2">
                           <span className="text-2xl font-bold text-white">
                             ${product.price.toFixed(2)}
@@ -362,9 +366,47 @@ const ProductSection = () => {
                           </div>
                         )}
                       </div>
+                    </div>
+                    <div className="flex gap-3">
+                      {/* VIEW BUTTON */}
+                      <button
+                        onClick={() =>
+                          navigate(`/product-details/${product.id}`)
+                        }
+                        className="
+      flex-1 flex items-center justify-center gap-2
+      px-5 py-3
+      border-2 border-[#E10600]
+      text-[#E10600]
+      font-semibold
+      rounded-lg
+      transition-all duration-300
+      hover:bg-[#E10600]
+      hover:text-white
+      hover:shadow-[0_0_20px_rgba(225,6,0,0.4)]
+      active:scale-95
+    "
+                      >
+                        <Eye className="w-4 h-4" />
+                        View
+                      </button>
 
-                      <button className="flex items-center gap-2 px-5 py-3 bg-[#E10600] text-white font-semibold rounded-lg hover:bg-red-700 transition-colors group/btn">
-                        <ShoppingBag className="w-4 h-4" />
+                      {/* ADD TO CART BUTTON */}
+                      <button
+                        className="
+      flex-1 flex items-center justify-center gap-2
+      px-5 py-3
+      bg-[#E10600]
+      text-white
+      font-semibold
+      rounded-lg
+      transition-all duration-300
+      hover:bg-[#C10500]
+      hover:shadow-[0_0_25px_rgba(225,6,0,0.6)]
+      active:scale-95
+    "
+                      >
+                        <ShoppingCart className="w-4 h-4" />
                         Add to Cart
                       </button>
                     </div>

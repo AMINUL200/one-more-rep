@@ -1,10 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ProductPage = () => {
   // Get slug from URL (simulated for demo - in real app use react-router)
-  const slug = 'plates'; // This would come from URL params
-  
-  const [searchQuery, setSearchQuery] = useState('');
+  const slug = "plates"; // This would come from URL params
+  const navigate = useNavigate();
+
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedPriceRanges, setSelectedPriceRanges] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);
   const [isPriceOpen, setIsPriceOpen] = useState(true);
@@ -13,36 +15,124 @@ const ProductPage = () => {
   // Dummy products data
   const allProducts = {
     plates: [
-      { id: 1, name: "Olympic Weight Plate Set", price: 299, rating: 5, image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop", category: "plates" },
-      { id: 2, name: "Bumper Plates 45lb", price: 189, rating: 4, image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop", category: "plates" },
-      { id: 3, name: "Cast Iron Weight Plates", price: 149, rating: 5, image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop", category: "plates" },
-      { id: 4, name: "Rubber Coated Plates", price: 229, rating: 4, image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop", category: "plates" },
-      { id: 5, name: "Competition Bumper Set", price: 449, rating: 5, image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop", category: "plates" },
-      { id: 6, name: "Standard Weight Plates", price: 99, rating: 3, image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop", category: "plates" },
-      { id: 7, name: "Fractional Plates Set", price: 79, rating: 4, image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop", category: "plates" },
-      { id: 8, name: "Color Coded Bumpers", price: 379, rating: 5, image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop", category: "plates" },
+      {
+        id: 1,
+        name: "Olympic Weight Plate Set",
+        price: 299,
+        rating: 5,
+        image:
+          "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop",
+        category: "plates",
+      },
+      {
+        id: 2,
+        name: "Bumper Plates 45lb",
+        price: 189,
+        rating: 4,
+        image:
+          "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop",
+        category: "plates",
+      },
+      {
+        id: 3,
+        name: "Cast Iron Weight Plates",
+        price: 149,
+        rating: 5,
+        image:
+          "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop",
+        category: "plates",
+      },
+      {
+        id: 4,
+        name: "Rubber Coated Plates",
+        price: 229,
+        rating: 4,
+        image:
+          "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop",
+        category: "plates",
+      },
+      {
+        id: 5,
+        name: "Competition Bumper Set",
+        price: 449,
+        rating: 5,
+        image:
+          "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop",
+        category: "plates",
+      },
+      {
+        id: 6,
+        name: "Standard Weight Plates",
+        price: 99,
+        rating: 3,
+        image:
+          "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop",
+        category: "plates",
+      },
+      {
+        id: 7,
+        name: "Fractional Plates Set",
+        price: 79,
+        rating: 4,
+        image:
+          "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop",
+        category: "plates",
+      },
+      {
+        id: 8,
+        name: "Color Coded Bumpers",
+        price: 379,
+        rating: 5,
+        image:
+          "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&h=600&fit=crop",
+        category: "plates",
+      },
     ],
     barbells: [
-      { id: 9, name: "Olympic Barbell 45lb", price: 249, rating: 5, image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=600&fit=crop", category: "barbells" },
-      { id: 10, name: "Power Lifting Barbell", price: 349, rating: 5, image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=600&fit=crop", category: "barbells" },
+      {
+        id: 9,
+        name: "Olympic Barbell 45lb",
+        price: 249,
+        rating: 5,
+        image:
+          "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=600&fit=crop",
+        category: "barbells",
+      },
+      {
+        id: 10,
+        name: "Power Lifting Barbell",
+        price: 349,
+        rating: 5,
+        image:
+          "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=600&fit=crop",
+        category: "barbells",
+      },
     ],
     dumbbells: [
-      { id: 11, name: "Adjustable Dumbbell Set", price: 399, rating: 5, image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&h=600&fit=crop", category: "dumbbells" },
-    ]
+      {
+        id: 11,
+        name: "Adjustable Dumbbell Set",
+        price: 399,
+        rating: 5,
+        image:
+          "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&h=600&fit=crop",
+        category: "dumbbells",
+      },
+    ],
   };
 
   const priceRanges = [
-    { id: 'p1', label: 'Under ₹100', min: 0, max: 100 },
-    { id: 'p2', label: '$100 - ₹200', min: 100, max: 200 },
-    { id: 'p3', label: '₹200 - ₹300', min: 200, max: 300 },
-    { id: 'p4', label: '₹300 - ₹400', min: 300, max: 400 },
-    { id: 'p5', label: 'Above ₹400', min: 400, max: Infinity },
+    { id: "p1", label: "Under ₹100", min: 0, max: 100 },
+    { id: "p2", label: "$100 - ₹200", min: 100, max: 200 },
+    { id: "p3", label: "₹200 - ₹300", min: 200, max: 300 },
+    { id: "p4", label: "₹300 - ₹400", min: 300, max: 400 },
+    { id: "p5", label: "Above ₹400", min: 400, max: Infinity },
   ];
 
   const ratingOptions = [
-    { id: 'r5', label: '5 Stars', value: 5 },
-    { id: 'r4', label: '4 Stars & Up', value: 4 },
-    { id: 'r3', label: '3 Stars & Up', value: 3 },
+    { id: "r5", label: "5 Stars", value: 5 },
+    { id: "r4", label: "4 Stars & Up", value: 4 },
+    { id: "r3", label: "3 Stars & Up", value: 3 },
   ];
 
   // Get products based on slug
@@ -54,16 +144,16 @@ const ProductPage = () => {
 
     // Search filter
     if (searchQuery) {
-      filtered = filtered.filter(product =>
+      filtered = filtered.filter((product) =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     // Price filter
     if (selectedPriceRanges.length > 0) {
-      filtered = filtered.filter(product => {
-        return selectedPriceRanges.some(rangeId => {
-          const range = priceRanges.find(r => r.id === rangeId);
+      filtered = filtered.filter((product) => {
+        return selectedPriceRanges.some((rangeId) => {
+          const range = priceRanges.find((r) => r.id === rangeId);
           return product.price >= range.min && product.price < range.max;
         });
       });
@@ -72,24 +162,24 @@ const ProductPage = () => {
     // Rating filter
     if (selectedRatings.length > 0) {
       const minRating = Math.min(...selectedRatings);
-      filtered = filtered.filter(product => product.rating >= minRating);
+      filtered = filtered.filter((product) => product.rating >= minRating);
     }
 
     return filtered;
   }, [categoryProducts, searchQuery, selectedPriceRanges, selectedRatings]);
 
   const handlePriceChange = (rangeId) => {
-    setSelectedPriceRanges(prev =>
+    setSelectedPriceRanges((prev) =>
       prev.includes(rangeId)
-        ? prev.filter(id => id !== rangeId)
+        ? prev.filter((id) => id !== rangeId)
         : [...prev, rangeId]
     );
   };
 
   const handleRatingChange = (ratingValue) => {
-    setSelectedRatings(prev =>
+    setSelectedRatings((prev) =>
       prev.includes(ratingValue)
-        ? prev.filter(r => r !== ratingValue)
+        ? prev.filter((r) => r !== ratingValue)
         : [...prev, ratingValue]
     );
   };
@@ -97,7 +187,7 @@ const ProductPage = () => {
   const clearFilters = () => {
     setSelectedPriceRanges([]);
     setSelectedRatings([]);
-    setSearchQuery('');
+    setSearchQuery("");
   };
 
   return (
@@ -387,6 +477,25 @@ const ProductPage = () => {
           align-items: center;
         }
 
+        .view-btn {
+  background: transparent;
+  border: 2px solid #E10600;
+  color: #E10600;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-btn:hover {
+  background: #E10600;
+  color: #FFFFFF;
+  box-shadow: 0 0 15px rgba(225, 6, 0, 0.4);
+}
+
+
         .product-price {
           color: #E10600;
           font-size: 24px;
@@ -476,7 +585,8 @@ const ProductPage = () => {
               <div className="filter-section">
                 <div className="filter-header">
                   <h3 className="filter-title">Filters</h3>
-                  {(selectedPriceRanges.length > 0 || selectedRatings.length > 0) && (
+                  {(selectedPriceRanges.length > 0 ||
+                    selectedRatings.length > 0) && (
                     <button className="clear-btn" onClick={clearFilters}>
                       Clear All
                     </button>
@@ -490,18 +600,28 @@ const ProductPage = () => {
                     onClick={() => setIsPriceOpen(!isPriceOpen)}
                   >
                     <h4 className="filter-group-title">Price</h4>
-                    <span className={`toggle-icon ${isPriceOpen ? 'open' : ''}`}>
+                    <span
+                      className={`toggle-icon ${isPriceOpen ? "open" : ""}`}
+                    >
                       ▼
                     </span>
                   </div>
-                  <div className={`filter-options ${isPriceOpen ? 'open' : ''}`}>
+                  <div
+                    className={`filter-options ${isPriceOpen ? "open" : ""}`}
+                  >
                     {priceRanges.map((range) => (
                       <div
                         key={range.id}
                         className="filter-option"
                         onClick={() => handlePriceChange(range.id)}
                       >
-                        <div className={`checkbox ${selectedPriceRanges.includes(range.id) ? 'checked' : ''}`} />
+                        <div
+                          className={`checkbox ${
+                            selectedPriceRanges.includes(range.id)
+                              ? "checked"
+                              : ""
+                          }`}
+                        />
                         <span className="option-label">{range.label}</span>
                       </div>
                     ))}
@@ -515,18 +635,28 @@ const ProductPage = () => {
                     onClick={() => setIsRatingOpen(!isRatingOpen)}
                   >
                     <h4 className="filter-group-title">Rating</h4>
-                    <span className={`toggle-icon ${isRatingOpen ? 'open' : ''}`}>
+                    <span
+                      className={`toggle-icon ${isRatingOpen ? "open" : ""}`}
+                    >
                       ▼
                     </span>
                   </div>
-                  <div className={`filter-options ${isRatingOpen ? 'open' : ''}`}>
+                  <div
+                    className={`filter-options ${isRatingOpen ? "open" : ""}`}
+                  >
                     {ratingOptions.map((option) => (
                       <div
                         key={option.id}
                         className="filter-option"
                         onClick={() => handleRatingChange(option.value)}
                       >
-                        <div className={`checkbox ${selectedRatings.includes(option.value) ? 'checked' : ''}`} />
+                        <div
+                          className={`checkbox ${
+                            selectedRatings.includes(option.value)
+                              ? "checked"
+                              : ""
+                          }`}
+                        />
                         <span className="option-label">{option.label}</span>
                       </div>
                     ))}
@@ -560,15 +690,33 @@ const ProductPage = () => {
                           <div className="stars">
                             {[...Array(5)].map((_, i) => (
                               <span key={i} className="star">
-                                {i < product.rating ? '★' : '☆'}
+                                {i < product.rating ? "★" : "☆"}
                               </span>
                             ))}
                           </div>
-                          <span className="rating-text">({product.rating}.0)</span>
+                          <span className="rating-text">
+                            ({product.rating}.0)
+                          </span>
                         </div>
                         <div className="product-footer">
-                          <span className="product-price">₹{product.price}</span>
-                          <button className="add-to-cart-btn">Add to Cart</button>
+                          <span className="product-price">
+                            ₹{product.price}
+                          </span>
+
+                          <div style={{ display: "flex", gap: "10px" }}>
+                            {/* VIEW BUTTON */}
+                            <button
+                              className="view-btn"
+                              onClick={() => navigate(`/product-details/${product.id}`)}
+                            >
+                              View
+                            </button>
+
+                            {/* ADD TO CART */}
+                            <button className="add-to-cart-btn">
+                              Add to Cart
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -577,7 +725,9 @@ const ProductPage = () => {
               ) : (
                 <div className="no-results">
                   <p className="no-results-text">No products found</p>
-                  <p className="no-results-subtext">Try adjusting your filters or search query</p>
+                  <p className="no-results-subtext">
+                    Try adjusting your filters or search query
+                  </p>
                 </div>
               )}
             </main>
