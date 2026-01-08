@@ -14,6 +14,8 @@ import ContactUs from "./pages/contact/ContactUs";
 import ProfilePage from "./pages/profile/ProfilePage";
 import CartPage from "./pages/product/CartPage";
 import MyOrders from "./pages/product/MyOrders";
+import CheckoutPage from "./pages/product/CheckoutPage";
+import ProductListPage from "./pages/product/ProductListPage";
 
 const App = () => {
   return (
@@ -24,12 +26,17 @@ const App = () => {
 
         <Route element={<AppLayout />}>
           <Route index path="/" element={<LandingPage />} />
-          <Route index path="/products/:slug" element={<ProductPage />} />
+          <Route index path="/products/:category" element={<ProductPage />} />
+           <Route path="/products/:category/:subcategory" element={<ProductListPage />} />
+          <Route index path="/:category/:subcategory/:slug" element={<ProductDetails />} />
+
+
           <Route index path="/product-details/:id" element={<ProductDetails />} />
           <Route index path="/contact" element={<ContactUs />} />
           <Route index path="/profile" element={<ProfilePage />} />
           <Route index path="/orders" element={<MyOrders />} />
           <Route index path="/cart" element={<CartPage />} />
+          <Route index path="/checkout" element={<CheckoutPage />} />
 
         </Route>
 

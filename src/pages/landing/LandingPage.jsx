@@ -18,6 +18,8 @@ import WhyChooseUs from "../../component/landingpage/WhyChooseUs";
 import Testimonials from "../../component/landingpage/Testimonials";
 import ProductCategory from "../../component/landingpage/ProductCategory";
 import PageLoader from "../../component/common/PageLoader";
+import ShopByGoal from "../../component/landingpage/ShopByGoal";
+import HowItWorks from "../../component/landingpage/HowItWorks";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -43,6 +45,10 @@ const LandingPage = () => {
       <ProductSection />
       {/* ================= FEATURED PRODUCTS ================= */}
       <FeatureProduct />
+
+      <HowItWorks/>
+
+      <ShopByGoal/>
 
       {/* ================= WHY CHOOSE US ================= */}
       <WhyChooseUs />

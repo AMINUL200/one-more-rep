@@ -188,12 +188,7 @@ const FeatureProduct = () => {
                             : "opacity-0"
                         }`}
                       >
-                        <button className="bg-white hover:bg-[#E10600] text-[#0B0B0B] hover:text-white p-3 rounded-full transition-all duration-300 hover:scale-110">
-                          <Eye className="w-5 h-5" />
-                        </button>
-                        <button className="bg-white hover:bg-[#E10600] text-[#0B0B0B] hover:text-white p-3 rounded-full transition-all duration-300 hover:scale-110">
-                          <Heart className="w-5 h-5" />
-                        </button>
+                       
                       </div>
                     </div>
 
