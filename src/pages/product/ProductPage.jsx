@@ -6,6 +6,8 @@ const ProductPage = () => {
   const slug = "plates"; // This would come from URL params
   const navigate = useNavigate();
 
+  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPriceRanges, setSelectedPriceRanges] = useState([]);
   const [selectedRatings, setSelectedRatings] = useState([]);

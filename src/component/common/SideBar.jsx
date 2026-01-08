@@ -52,15 +52,10 @@ const SideBar = ({ toggleMenu, isOpen }) => {
       ],
     },
 
-    {
-      id: "about",
-      label: "About Us",
-      path: "/about",
-      icon: <BookOpen className="w-5 h-5" />,
-    },
+   
     {
       id: "contact",
-      label: "Contact",
+      label: "Contact Us",
       path: "/contact",
       icon: <Mail className="w-5 h-5" />,
     },

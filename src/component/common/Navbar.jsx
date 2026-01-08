@@ -52,25 +52,48 @@ const Navbar = ({ toggleMenu }) => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  /* ================= CLOSE USER DROPDOWN ON OUTSIDE CLICK ================= */
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        userDropdownRef.current &&
+        !userDropdownRef.current.contains(e.target)
+      ) {
+        setUserDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  /* ================= CLOSE USER DROPDOWN ON ROUTE CHANGE ================= */
+  useEffect(() => {
+    setUserDropdownOpen(false);
+  }, [location.pathname]);
+
   /* ================= NAV LINKS ================= */
   const navLinks = [
     { id: "home", label: "Home", path: "/" },
-    { 
-      id: "products", 
-      label: "Products", 
+    {
+      id: "products",
+      label: "Products",
       path: "/products/barbells",
       hasDropdown: true,
       children: [
         { label: "Barbells", path: "/products/barbells", icon: "💪" },
         { label: "Plates", path: "/products/plates", icon: "⚖️" },
-        { label: "Strength Equipment", path: "/products/strength-equipment", icon: "🏋️" },
+        {
+          label: "Strength Equipment",
+          path: "/products/strength-equipment",
+          icon: "🏋️",
+        },
         { label: "Benches", path: "/products/benches", icon: "🛋️" },
         { label: "Dumbbells", path: "/products/dumbbells", icon: "🏋️‍♂️" },
         { label: "Cardio Equipment", path: "/products/cardio", icon: "🏃" },
-      ]
+      ],
     },
-    { id: "about", label: "About", path: "/about" },
-    { id: "contact", label: "Contact", path: "/contact" },
+    { id: "contact", label: "Contact Us", path: "/contact" },
   ];
 
   /* ================= PRODUCTS DROPDOWN HANDLERS ================= */
@@ -128,7 +151,7 @@ const Navbar = ({ toggleMenu }) => {
       {/* ================= TOP INFO BAR ================= */}
       {!scrolled && (
         <div
-          className="text-xs md:text-sm py-2 px-6 flex justify-between items-center"
+          className="text-xs md:text-sm py-2 px-6 md:px-10 flex justify-between items-center"
           style={{
             background: "linear-gradient(90deg, #B30000, #E10600)",
             color: "#FFFFFF",
@@ -161,7 +184,7 @@ const Navbar = ({ toggleMenu }) => {
 
       {/* ================= MAIN NAVBAR ================= */}
       <div
-        className={`flex justify-between items-center px-6 md:px-12 transition-all ${
+        className={`flex justify-between items-center px-6 md:px-6 transition-all ${
           scrolled ? "py-2 shadow-lg" : "py-3"
         }`}
         style={{
@@ -178,7 +201,7 @@ const Navbar = ({ toggleMenu }) => {
             <img
               src="/image/gym_logo.png"
               alt="One Rep More"
-              className="h-20 w-20 object-contain rounded-full border-2 border-[#E10600] p-2 bg-[#141414] transition-all duration-300 hover:border-[#FF0800] hover:shadow-[0_0_15px_rgba(225,6,0,0.4)]"
+              className="h-20 w-20 object-contain rounded-full  p-2 bg-[#141414] transition-all duration-300 hover:border-[#FF0800] hover:shadow-[0_0_15px_rgba(225,6,0,0.4)]"
             />
           </div>
         </div>
@@ -186,9 +209,10 @@ const Navbar = ({ toggleMenu }) => {
         {/* CENTER: NAV LINKS */}
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((item) => {
-            const active = location.pathname === item.path || 
-                          (item.hasDropdown && location.pathname.startsWith("/products/"));
-            
+            const active =
+              location.pathname === item.path ||
+              (item.hasDropdown && location.pathname.startsWith("/products/"));
+
             if (item.hasDropdown) {
               return (
                 <div
@@ -204,8 +228,8 @@ const Navbar = ({ toggleMenu }) => {
                       setProductDropdownOpen(!productDropdownOpen);
                     }}
                     className={`relative flex items-center gap-1 text-sm font-semibold tracking-wide transition ${
-                      active 
-                        ? "text-[#E10600]" 
+                      active
+                        ? "text-[#E10600]"
                         : "text-white hover:text-[#E10600]"
                     }`}
                   >
@@ -258,9 +282,8 @@ const Navbar = ({ toggleMenu }) => {
                             </button>
                           ))}
                         </div>
-                        
+
                         {/* VIEW ALL BUTTON */}
-                      
                       </div>
                     </div>
                   )}
@@ -415,7 +438,7 @@ const Navbar = ({ toggleMenu }) => {
             transform: translateY(0);
           }
         }
-        
+
         .animate-fadeIn {
           animation: fadeIn 0.2s ease-out forwards;
         }
