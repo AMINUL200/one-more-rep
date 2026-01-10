@@ -1,5 +1,7 @@
+import { motion } from "framer-motion";
 import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { fadeInUp, premiumItem } from "../../animations/motionVariants";
 
 const ProductCategory = () => {
   const navigate = useNavigate();
@@ -47,26 +49,22 @@ const ProductCategory = () => {
     },
     {
       title: "Gym Wear",
-      image:
-        "/image/wear.webp",
+      image: "/image/wear.webp",
       path: "/products/gym-wear",
     },
     {
       title: "Supplements",
-      image:
-        "/image/supplement.jpeg",
+      image: "/image/supplement.jpeg",
       path: "/products/supplements",
     },
     {
       title: "Accessories",
-      image:
-        "/image/accessories.webp",
+      image: "/image/accessories.webp",
       path: "/products/accessories",
     },
     {
       title: "Instrument",
-      image:
-        "/image/instrument.jpeg",
+      image: "/image/instrument.jpeg",
       path: "/products/accessories",
     },
   ];
@@ -115,13 +113,27 @@ const ProductCategory = () => {
       <div className="max-w-full mx-auto px-4">
         {/* HEADER */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold">
+          <motion.h2
+            variants={premiumItem}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-4xl font-bold"
+          >
             <span className="text-white">Shop by </span>
             <span className="text-[#E10600]">Category</span>
-          </h2>
-          <p className="text-[#B3B3B3] mt-2">
+          </motion.h2>
+
+          <motion.p
+            variants={premiumItem}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            transition={{ delay: 0.15 }}
+            className="text-[#B3B3B3] mt-2"
+          >
             Professional gym equipment & fitness essentials
-          </p>
+          </motion.p>
         </div>
 
         {/* SLIDER */}

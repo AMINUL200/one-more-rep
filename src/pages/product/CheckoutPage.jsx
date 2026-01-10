@@ -630,7 +630,8 @@ const CheckoutPage = () => {
                     <ArrowLeft size={18} />
                     Back to Payment
                   </button>
-                  <button
+                  <Link
+                  to='/order-successful'
                     className="px-8 py-3 rounded-lg font-semibold text-white transition-all hover:shadow-xl hover:scale-105"
                     style={{
                       background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
@@ -638,7 +639,7 @@ const CheckoutPage = () => {
                     }}
                   >
                     Place Order
-                  </button>
+                  </Link>
                 </div>
               </div>
             )}

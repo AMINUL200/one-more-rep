@@ -16,6 +16,7 @@ import CartPage from "./pages/product/CartPage";
 import MyOrders from "./pages/product/MyOrders";
 import CheckoutPage from "./pages/product/CheckoutPage";
 import ProductListPage from "./pages/product/ProductListPage";
+import OrderSuccessful from "./pages/payment/OrderSuccessful";
 
 const App = () => {
   return (
@@ -37,8 +38,10 @@ const App = () => {
           <Route index path="/orders" element={<MyOrders />} />
           <Route index path="/cart" element={<CartPage />} />
           <Route index path="/checkout" element={<CheckoutPage />} />
+          
 
         </Route>
+          <Route index path="/order-successful" element={<OrderSuccessful />} />
 
         {/* Admin Layout */}
         <Route path="/admin" element={<AdminLayout />}>

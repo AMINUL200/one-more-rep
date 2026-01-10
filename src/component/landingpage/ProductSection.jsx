@@ -15,6 +15,8 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { premiumFadeUp, premiumItem } from "../../animations/motionVariants";
 
 const ProductSection = () => {
   // Categories with icons and colors
@@ -69,8 +71,7 @@ const ProductSection = () => {
       originalPrice: 1099.99,
       rating: 4.8,
       reviews: 124,
-      image:
-        "/image/powerback.jpeg",
+      image: "/image/powerback.jpeg",
       description: "Commercial grade power rack with pull-up bar",
       features: ["1000lb Capacity", "Safety Bars", "Adjustable"],
       badge: "BEST SELLER",
@@ -153,8 +154,7 @@ const ProductSection = () => {
       originalPrice: 39.99,
       rating: 4.4,
       reviews: 98,
-      image:
-        "/image/bcca.webp",
+      image: "/image/bcca.webp",
       description: "Electrolyte powder with BCAA & caffeine",
       features: ["Zero Sugar", "Electrolytes", "Energy Boost"],
       badge: "NEW",
@@ -181,8 +181,7 @@ const ProductSection = () => {
       originalPrice: 64.99,
       rating: 4.7,
       reviews: 203,
-      image:
-        "/image/belt.jpeg",
+      image: "/image/belt.jpeg",
       description: "Leather weightlifting belt with prong buckle",
       features: ["Genuine Leather", "4-inch Width", "Lifetime Warranty"],
       badge: "PRO",
@@ -221,27 +220,44 @@ const ProductSection = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-5xl font-bold mb-4">
+          <motion.h2
+            variants={premiumFadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-5xl font-bold mb-4"
+          >
             <span className="text-white">Premium </span>
             <span className="text-[#E10600]">Gym Products</span>
-          </h2>
-          <p className="text-[#B3B3B3] text-lg md:text-xl max-w-3xl mx-auto">
+          </motion.h2>
+
+          <motion.p
+            variants={premiumFadeUp}
+            initial="hidden"
+            whileInView="visible"
+            transition={{ delay: 0.15 }}
+            viewport={{ once: true }}
+            className="text-[#B3B3B3] text-lg md:text-xl max-w-3xl mx-auto"
+          >
             Discover professional-grade equipment, supplements, and apparel
             designed for serious athletes
-          </p>
+          </motion.p>
         </div>
 
         {/* Category Filters */}
         <div className="mb-12">
           <div className="flex flex-wrap justify-center gap-3 md:gap-4">
             {categories.map((category) => (
-              <button
+              <motion.button
                 key={category.id}
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
+                layout
                 onClick={() => {
                   setActiveCategory(category.id);
                   setShowAll(false);
                 }}
-                className={`group flex items-center gap-2 px-5 py-3 rounded-xl border transition-all duration-300 ${
+                className={`group flex items-center gap-2 px-5 py-3 rounded-xl border transition-all duration-300 cursor-pointer ${
                   activeCategory === category.id
                     ? `bg-gradient-to-r ${category.color} border-transparent text-white shadow-lg scale-105`
                     : "bg-[#141414] border-[#262626] text-[#B3B3B3] hover:border-[#E10600] hover:text-white"
@@ -259,7 +275,7 @@ const ProductSection = () => {
                 <span className="font-medium whitespace-nowrap">
                   {category.name}
                 </span>
-              </button>
+              </motion.button>
             ))}
           </div>
         </div>
@@ -267,113 +283,129 @@ const ProductSection = () => {
         {/* Products Grid */}
         <div className="mb-12">
           {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-              {filteredProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="group bg-[#141414] border border-[#262626] rounded-2xl overflow-hidden hover:border-[#E10600] hover:transform hover:scale-[1.02] transition-all duration-300"
-                >
-                  {/* Product Image */}
-                  <div className="relative h-64 overflow-hidden">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
+            <AnimatePresence mode="popLayout">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                {filteredProducts.map((product) => (
+                  <motion.div
+                    key={product.id}
+                    layout
+                    variants={premiumItem}
+                    initial="hidden"
+                    animate="visible"
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    whileHover={{
+                      y: -10,
+                      scale: 1.03,
+                    }}
+                    className="group bg-[#141414] border border-[#262626] rounded-2xl overflow-hidden hover:border-[#E10600] hover:transform hover:scale-[1.02] transition-all duration-300"
+                  >
+                    {/* Product Image */}
+                    <motion.div
+                      whileHover={{ scale: 1.12 }}
+                      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                      className="relative h-64 overflow-hidden"
+                    >
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
 
-                    {/* Badge */}
-                    <div className="absolute top-4 left-4">
-                      <span className="px-3 py-1 bg-[#E10600] text-white text-sm font-semibold rounded-full">
-                        {product.badge}
-                      </span>
-                    </div>
-
-                    {/* Category Tag */}
-                    <div className="absolute top-4 right-4">
-                      <span className="px-3 py-1 bg-black/70 backdrop-blur-sm text-white text-xs font-medium rounded-full">
-                        {product.category.charAt(0).toUpperCase() +
-                          product.category.slice(1)}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Product Info */}
-                  <div className="p-6">
-                    {/* Product Name & Rating */}
-                    <div className="mb-4">
-                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#E10600] transition-colors">
-                        {product.name}
-                      </h3>
-                      <div className="flex items-center gap-2">
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-4 h-4 ${
-                                i < Math.floor(product.rating)
-                                  ? "text-[#FACC15] fill-[#FACC15]"
-                                  : "text-[#262626]"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-[#B3B3B3] text-sm">
-                          {product.rating} ({product.reviews} reviews)
+                      {/* Badge */}
+                      <div className="absolute top-4 left-4">
+                        <span className="px-3 py-1 bg-[#E10600] text-white text-sm font-semibold rounded-full">
+                          {product.badge}
                         </span>
                       </div>
-                    </div>
 
-                    {/* Description */}
-                    <p className="text-[#B3B3B3] text-sm mb-4 line-clamp-2">
-                      {product.description}
-                    </p>
-
-                    {/* Features */}
-                    <div className="mb-6">
-                      <div className="flex flex-wrap gap-2">
-                        {product.features.map((feature, index) => (
-                          <span
-                            key={index}
-                            className="px-3 py-1 bg-[#0B0B0B] border border-[#262626] text-[#B3B3B3] text-xs rounded-full"
-                          >
-                            {feature}
-                          </span>
-                        ))}
+                      {/* Category Tag */}
+                      <div className="absolute top-4 right-4">
+                        <span className="px-3 py-1 bg-black/70 backdrop-blur-sm text-white text-xs font-medium rounded-full">
+                          {product.category.charAt(0).toUpperCase() +
+                            product.category.slice(1)}
+                        </span>
                       </div>
-                    </div>
+                    </motion.div>
 
-                    {/* Price & CTA */}
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-2xl font-bold text-white">
-                            ${product.price.toFixed(2)}
+                    {/* Product Info */}
+                    <div className="p-6">
+                      {/* Product Name & Rating */}
+                      <div className="mb-4">
+                        <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#E10600] transition-colors">
+                          {product.name}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${
+                                  i < Math.floor(product.rating)
+                                    ? "text-[#FACC15] fill-[#FACC15]"
+                                    : "text-[#262626]"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-[#B3B3B3] text-sm">
+                            {product.rating} ({product.reviews} reviews)
                           </span>
-                          {product.originalPrice > product.price && (
-                            <span className="text-[#B3B3B3] line-through">
-                              ${product.originalPrice.toFixed(2)}
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-[#B3B3B3] text-sm mb-4 line-clamp-2">
+                        {product.description}
+                      </p>
+
+                      {/* Features */}
+                      <div className="mb-6">
+                        <div className="flex flex-wrap gap-2">
+                          {product.features.map((feature, index) => (
+                            <span
+                              key={index}
+                              className="px-3 py-1 bg-[#0B0B0B] border border-[#262626] text-[#B3B3B3] text-xs rounded-full"
+                            >
+                              {feature}
                             </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Price & CTA */}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold text-white">
+                              ${product.price.toFixed(2)}
+                            </span>
+                            {product.originalPrice > product.price && (
+                              <span className="text-[#B3B3B3] line-through">
+                                ${product.originalPrice.toFixed(2)}
+                              </span>
+                            )}
+                          </div>
+                          {product.originalPrice > product.price && (
+                            <div className="mt-1">
+                              <span className="text-[#22C55E] text-sm font-semibold">
+                                Save $
+                                {(
+                                  product.originalPrice - product.price
+                                ).toFixed(2)}
+                              </span>
+                            </div>
                           )}
                         </div>
-                        {product.originalPrice > product.price && (
-                          <div className="mt-1">
-                            <span className="text-[#22C55E] text-sm font-semibold">
-                              Save $
-                              {(product.originalPrice - product.price).toFixed(
-                                2
-                              )}
-                            </span>
-                          </div>
-                        )}
                       </div>
-                    </div>
-                    <div className="flex gap-3">
-                      {/* VIEW BUTTON */}
-                      <button
-                        onClick={() =>
-                          navigate(`/product-details/${product.id}`)
-                        }
-                        className="
+                      <div className="flex gap-3">
+                        {/* VIEW BUTTON */}
+                        <motion.button
+                          whileHover={{ scale: 1.06 }}
+                          whileTap={{ scale: 0.94 }}
+                          onClick={() =>
+                            navigate(`/product-details/${product.id}`)
+                          }
+                          className="
       flex-1 flex items-center justify-center gap-2
       px-5 py-3
       border-2 border-[#E10600]
@@ -386,14 +418,16 @@ const ProductSection = () => {
       hover:shadow-[0_0_20px_rgba(225,6,0,0.4)]
       active:scale-95
     "
-                      >
-                        <Eye className="w-4 h-4" />
-                        View
-                      </button>
+                        >
+                          <Eye className="w-4 h-4" />
+                          View
+                        </motion.button>
 
-                      {/* ADD TO CART BUTTON */}
-                      <button
-                        className="
+                        {/* ADD TO CART BUTTON */}
+                        <motion.button
+                          whileHover={{ scale: 1.06 }}
+                          whileTap={{ scale: 0.94 }}
+                          className="
       flex-1 flex items-center justify-center gap-2
       px-5 py-3
       bg-[#E10600]
@@ -405,15 +439,16 @@ const ProductSection = () => {
       hover:shadow-[0_0_25px_rgba(225,6,0,0.6)]
       active:scale-95
     "
-                      >
-                        <ShoppingCart className="w-4 h-4" />
-                        Add to Cart
-                      </button>
+                        >
+                          <ShoppingCart className="w-4 h-4" />
+                          Add to Cart
+                        </motion.button>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  </motion.div>
+                ))}
+              </div>
+            </AnimatePresence>
           ) : (
             <div className="text-center py-16">
               <div className="max-w-md mx-auto">
@@ -433,8 +468,10 @@ const ProductSection = () => {
         {/* View All Button */}
         {filteredProducts.length > 0 && !showAll && (
           <div className="text-center mb-16">
-            <button
-              onClick={() => setShowAll(true)}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate(`/products/${activeCategory}`)}
               className="
       group inline-flex items-center gap-3
       px-8 py-4
@@ -456,7 +493,7 @@ const ProductSection = () => {
                 ? "Products"
                 : categories.find((c) => c.id === activeCategory)?.name}
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-2" />
-            </button>
+            </motion.button>
           </div>
         )}
       </div>

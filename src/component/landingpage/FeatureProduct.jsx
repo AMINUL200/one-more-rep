@@ -14,6 +14,8 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { premiumFadeUp, premiumItem } from "../../animations/motionVariants";
 
 const FeatureProduct = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
@@ -108,14 +110,26 @@ const FeatureProduct = () => {
       <div className="max-w-8xl mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold mb-4">
+          <motion.h2
+            variants={premiumFadeUp}
+            initial="hidden"
+            animate="visible"
+            className="text-5xl font-bold mb-4"
+          >
             <span className="text-white">Featured </span>
             <span className="text-[#E10600]">Products</span>
-          </h2>
-          <p className="text-[#B3B3B3] text-lg max-w-2xl mx-auto">
+          </motion.h2>
+
+          <motion.p
+            variants={premiumFadeUp}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.15 }}
+            className="text-[#B3B3B3] text-lg max-w-2xl mx-auto"
+          >
             Premium gym equipment handpicked for serious athletes. Build
             strength, build legacy.
-          </p>
+          </motion.p>
         </div>
 
         {/* Swiper Carousel */}
@@ -152,11 +166,18 @@ const FeatureProduct = () => {
           >
             {products.map((product) => (
               <SwiperSlide key={product.id}>
-                <div
+                <motion.div
+                  key={product.id}
+                  variants={premiumItem}
+                  initial="hidden"
+                  animate="visible"
+                  transition={{ delay: product.id * 0.05 }}
                   onMouseEnter={() => setHoveredCard(product.id)}
                   onMouseLeave={() => setHoveredCard(null)}
                 >
-                  <div
+                  <motion.div
+                    whileHover={{ y: -14, scale: 1.04 }}
+                    transition={{ type: "spring", stiffness: 160, damping: 18 }}
                     className={`bg-[#141414] rounded-2xl overflow-hidden border-2 transition-all duration-300 h-full ${
                       hoveredCard === product.id
                         ? "border-[#E10600] shadow-[0_0_30px_rgba(225,6,0,0.4)] transform -translate-y-2"
@@ -164,7 +185,11 @@ const FeatureProduct = () => {
                     }`}
                   >
                     {/* Image Container */}
-                    <div className="relative overflow-hidden group">
+                    <motion.div
+                      whileHover={{ scale: 1.12 }}
+                      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                      className="relative overflow-hidden group"
+                    >
                       <img
                         src={product.image}
                         alt={product.name}
@@ -181,16 +206,19 @@ const FeatureProduct = () => {
                       </div>
 
                       {/* Quick Actions */}
-                      <div
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{
+                          opacity: hoveredCard === product.id ? 1 : 0,
+                        }}
+                        transition={{ duration: 0.3 }}
                         className={`absolute inset-0 bg-black/60 flex items-center justify-center gap-4 transition-opacity duration-300 ${
                           hoveredCard === product.id
                             ? "opacity-100"
                             : "opacity-0"
                         }`}
-                      >
-                       
-                      </div>
-                    </div>
+                      ></motion.div>
+                    </motion.div>
 
                     {/* Product Info */}
                     <div className="p-6">
@@ -234,7 +262,10 @@ const FeatureProduct = () => {
                       {/* Add to Cart Button */}
                       <div className="flex gap-3">
                         {/* VIEW BUTTON */}
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.08 }}
+                          whileTap={{ scale: 0.94 }}
+                          transition={{ type: "spring", stiffness: 200 }}
                           className="
       flex-1 flex items-center justify-center gap-2
       py-3
@@ -248,15 +279,17 @@ const FeatureProduct = () => {
       hover:shadow-[0_0_20px_rgba(225,6,0,0.4)]
       active:scale-95
     "
-                          onClick={()=> navigate(`/products/${product.id}`)}
+                          onClick={() => navigate(`/products/${product.id}`)}
                         >
-                          
                           <Eye className="w-5 h-5" />
                           View
-                        </button>
+                        </motion.button>
 
                         {/* ADD TO CART BUTTON */}
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.08 }}
+                          whileTap={{ scale: 0.94 }}
+                          transition={{ type: "spring", stiffness: 200 }}
                           className="
       flex-1 flex items-center justify-center gap-2
       py-3
@@ -272,37 +305,51 @@ const FeatureProduct = () => {
                         >
                           <ShoppingCart className="w-5 h-5" />
                           Add to Cart
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
               </SwiperSlide>
             ))}
           </Swiper>
 
           {/* Custom Navigation Buttons */}
-          <button className="swiper-button-prev-custom absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[#E10600] hover:bg-[#FF0800] text-white p-4 rounded-full transition-all duration-300 hover:scale-110 shadow-[0_0_20px_rgba(225,6,0,0.5)]">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 200 }}
+            className="swiper-button-prev-custom absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-[#E10600] hover:bg-[#FF0800] text-white p-4 rounded-full transition-all duration-300 hover:scale-110 shadow-[0_0_20px_rgba(225,6,0,0.5)]"
+          >
             <ChevronLeft className="w-6 h-6" />
-          </button>
+          </motion.button>
 
-          <button className="swiper-button-next-custom absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[#E10600] hover:bg-[#FF0800] text-white p-4 rounded-full transition-all duration-300 hover:scale-110 shadow-[0_0_20px_rgba(225,6,0,0.5)]">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 200 }}
+            className="swiper-button-next-custom absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-[#E10600] hover:bg-[#FF0800] text-white p-4 rounded-full transition-all duration-300 hover:scale-110 shadow-[0_0_20px_rgba(225,6,0,0.5)]"
+          >
             <ChevronRight className="w-6 h-6" />
-          </button>
+          </motion.button>
 
           {/* Custom Pagination */}
           <div className="swiper-pagination-custom flex justify-center gap-2 mt-4"></div>
         </div>
 
         {/* View All Button */}
-        <div className="text-center mt-12 ">
-          <button className="group px-8 py-4 border-2 border-[#E10600] text-[#E10600] hover:bg-[#E10600] hover:text-white font-bold rounded-lg transition-all duration-300 hover:shadow-[0_0_20px_rgba(225,6,0,0.5)]">
+        {/* <div className="text-center mt-12 ">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="group px-8 py-4 border-2 border-[#E10600] text-[#E10600] hover:bg-[#E10600] hover:text-white font-bold rounded-lg transition-all duration-300 hover:shadow-[0_0_20px_rgba(225,6,0,0.5)]"
+          >
             View All Products
             <span className="inline-block ml-2 transition-transform group-hover:translate-x-1">
               →
             </span>
-          </button>
-        </div>
+          </motion.button>
+        </div> */}
       </div>
 
       <style jsx>{`
