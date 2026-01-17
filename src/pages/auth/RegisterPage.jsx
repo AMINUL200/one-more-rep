@@ -1,7 +1,19 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { UserPlus, ArrowLeft, Shield, Lock, Check, Mail, Phone, User } from "lucide-react";
+import {
+  UserPlus,
+  ArrowLeft,
+  Shield,
+  Lock,
+  Check,
+  Mail,
+  Phone,
+  User,
+} from "lucide-react";
 import CustomInput from "../../component/form/CustomInput";
+import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-toastify";
+import { api } from "../../utils/app";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +23,7 @@ const RegisterPage = () => {
     confirmPassword: "",
     phone: "",
   });
+  const { login } = useAuth();
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
@@ -70,7 +83,8 @@ const RegisterPage = () => {
     } else if (formData.password.length < 8) {
       newErrors.password = "Password must be at least 8 characters";
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = "Password must contain uppercase, lowercase, and number";
+      newErrors.password =
+        "Password must contain uppercase, lowercase, and number";
     }
 
     if (!formData.confirmPassword) {
@@ -90,7 +104,7 @@ const RegisterPage = () => {
   // Password strength indicator
   const getPasswordStrength = (password) => {
     if (!password) return { strength: 0, label: "", color: "" };
-    
+
     let strength = 0;
     if (password.length >= 8) strength++;
     if (password.length >= 12) strength++;
@@ -115,10 +129,19 @@ const RegisterPage = () => {
   // Password requirements checklist
   const passwordRequirements = [
     { label: "At least 8 characters", met: formData.password.length >= 8 },
-    { label: "Contains uppercase letter", met: /[A-Z]/.test(formData.password) },
-    { label: "Contains lowercase letter", met: /[a-z]/.test(formData.password) },
+    {
+      label: "Contains uppercase letter",
+      met: /[A-Z]/.test(formData.password),
+    },
+    {
+      label: "Contains lowercase letter",
+      met: /[a-z]/.test(formData.password),
+    },
     { label: "Contains number", met: /\d/.test(formData.password) },
-    { label: "Contains special character", met: /[^A-Za-z0-9]/.test(formData.password) },
+    {
+      label: "Contains special character",
+      met: /[^A-Za-z0-9]/.test(formData.password),
+    },
   ];
 
   // Handle form submission
@@ -127,30 +150,49 @@ const RegisterPage = () => {
 
     if (validateForm()) {
       setIsLoading(true);
-      
-      // Simulate API call
-      setTimeout(() => {
-        console.log("Register data:", formData);
+
+      try {
+        // Replace with actual API call
+        const res = await api.post("/register", formData);
+        if (res.data?.success) {
+          toast.success("Registration successful! Please login.");
+          // Auto login after register
+          login(res.data.user, res.data.token);
+          navigate("/");
+          if (res.data?.user?.role === "admin") {
+            navigate("/admin");
+          } else {
+            navigate("/");
+          }
+        } else {
+          toast.error(res.data?.message || "Registration failed");
+        }
+      } catch (error) {
+        console.error("Registration error:", error);
         setIsLoading(false);
-        navigate("/login", { state: { successMessage: "Account created successfully! Please login." } });
-      }, 1500);
+        toast.error("Registration failed. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
       style={{ backgroundColor: colors.background }}
     >
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-5">
-        <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl"
+        <div
+          className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl"
           style={{ backgroundColor: colors.primary }}
         ></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl"
+        <div
+          className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl"
           style={{ backgroundColor: colors.primary }}
         ></div>
-        
+
         {/* Gym icons pattern */}
         <div className="absolute top-10 left-10">
           <span className="text-4xl">🏋️</span>
@@ -168,11 +210,13 @@ const RegisterPage = () => {
           style={{ color: colors.muted }}
         >
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="font-medium group-hover:text-white">Back to Home</span>
+          <span className="font-medium group-hover:text-white">
+            Back to Home
+          </span>
         </button>
 
         {/* Register Card */}
-        <div 
+        <div
           className="rounded-2xl shadow-2xl p-8"
           style={{
             backgroundColor: colors.cardBg,
@@ -182,7 +226,7 @@ const RegisterPage = () => {
           {/* Logo and Title */}
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <div 
+              <div
                 className="p-3 rounded-2xl shadow-lg"
                 style={{
                   backgroundColor: colors.background,
@@ -196,7 +240,7 @@ const RegisterPage = () => {
                 />
               </div>
             </div>
-            <h2 
+            <h2
               className="text-3xl font-bold mb-2"
               style={{ color: colors.text }}
             >
@@ -226,11 +270,13 @@ const RegisterPage = () => {
                 icon={User}
                 iconColor={colors.muted}
                 className="bg-transparent"
-                style={{ color: colors.text }}
               />
               {errors.fullName && (
-                <p className="mt-2 text-sm flex items-center" style={{ color: colors.primary }}>
-                  <span 
+                <p
+                  className="mt-2 text-sm flex items-center"
+                  style={{ color: colors.primary }}
+                >
+                  <span
                     className="inline-block w-1 h-1 rounded-full mr-2"
                     style={{ backgroundColor: colors.primary }}
                   ></span>
@@ -256,11 +302,13 @@ const RegisterPage = () => {
                 icon={Mail}
                 iconColor={colors.muted}
                 className="bg-transparent"
-                style={{ color: colors.text }}
               />
               {errors.email && (
-                <p className="mt-2 text-sm flex items-center" style={{ color: colors.primary }}>
-                  <span 
+                <p
+                  className="mt-2 text-sm flex items-center"
+                  style={{ color: colors.primary }}
+                >
+                  <span
                     className="inline-block w-1 h-1 rounded-full mr-2"
                     style={{ backgroundColor: colors.primary }}
                   ></span>
@@ -286,11 +334,13 @@ const RegisterPage = () => {
                 icon={Phone}
                 iconColor={colors.muted}
                 className="bg-transparent"
-                style={{ color: colors.text }}
               />
               {errors.phone && (
-                <p className="mt-2 text-sm flex items-center" style={{ color: colors.primary }}>
-                  <span 
+                <p
+                  className="mt-2 text-sm flex items-center"
+                  style={{ color: colors.primary }}
+                >
+                  <span
                     className="inline-block w-1 h-1 rounded-full mr-2"
                     style={{ backgroundColor: colors.primary }}
                   ></span>
@@ -316,41 +366,51 @@ const RegisterPage = () => {
                 icon={Lock}
                 iconColor={colors.muted}
                 className="bg-transparent"
-                style={{ color: colors.text }}
               />
-              
+
               {/* Password Strength Indicator */}
               {formData.password && (
                 <div className="mt-3 space-y-2">
                   <div className="flex items-center justify-between">
-                    <div className="flex-1 h-2 rounded-full overflow-hidden"
+                    <div
+                      className="flex-1 h-2 rounded-full overflow-hidden"
                       style={{ backgroundColor: `${colors.primary}20` }}
                     >
                       <div
                         className="h-full rounded-full transition-all duration-300"
-                        style={{ 
+                        style={{
                           width: `${(passwordStrength.strength / 5) * 100}%`,
-                          backgroundColor: passwordStrength.color
+                          backgroundColor: passwordStrength.color,
                         }}
                       ></div>
                     </div>
-                    <span className="text-xs font-medium ml-2" style={{ color: passwordStrength.color }}>
+                    <span
+                      className="text-xs font-medium ml-2"
+                      style={{ color: passwordStrength.color }}
+                    >
                       {passwordStrength.label}
                     </span>
                   </div>
-                  
+
                   {/* Password Requirements */}
                   <div className="space-y-1">
                     {passwordRequirements.map((req, index) => (
                       <div key={index} className="flex items-center gap-2">
-                        <div className={`w-4 h-4 rounded flex items-center justify-center ${
-                          req.met ? 'bg-green-500' : 'bg-gray-600'
-                        }`}>
-                          {req.met && <Check size={10} style={{ color: colors.text }} />}
+                        <div
+                          className={`w-4 h-4 rounded flex items-center justify-center ${
+                            req.met ? "bg-green-500" : "bg-gray-600"
+                          }`}
+                        >
+                          {req.met && (
+                            <Check size={10} style={{ color: colors.text }} />
+                          )}
                         </div>
-                        <span className="text-xs" style={{ 
-                          color: req.met ? colors.success : colors.muted 
-                        }}>
+                        <span
+                          className="text-xs"
+                          style={{
+                            color: req.met ? colors.success : colors.muted,
+                          }}
+                        >
                           {req.label}
                         </span>
                       </div>
@@ -358,10 +418,13 @@ const RegisterPage = () => {
                   </div>
                 </div>
               )}
-              
+
               {errors.password && (
-                <p className="mt-2 text-sm flex items-center" style={{ color: colors.primary }}>
-                  <span 
+                <p
+                  className="mt-2 text-sm flex items-center"
+                  style={{ color: colors.primary }}
+                >
+                  <span
                     className="inline-block w-1 h-1 rounded-full mr-2"
                     style={{ backgroundColor: colors.primary }}
                   ></span>
@@ -381,17 +444,21 @@ const RegisterPage = () => {
                 onChange={handleChange}
                 placeholder="Re-enter your password"
                 labelColor={colors.text}
-                borderColor={errors.confirmPassword ? colors.primary : colors.border}
+                borderColor={
+                  errors.confirmPassword ? colors.primary : colors.border
+                }
                 focusColor={colors.primary}
                 placeholderColor={colors.muted}
                 icon={Lock}
                 iconColor={colors.muted}
                 className="bg-transparent"
-                style={{ color: colors.text }}
               />
               {errors.confirmPassword && (
-                <p className="mt-2 text-sm flex items-center" style={{ color: colors.primary }}>
-                  <span 
+                <p
+                  className="mt-2 text-sm flex items-center"
+                  style={{ color: colors.primary }}
+                >
+                  <span
                     className="inline-block w-1 h-1 rounded-full mr-2"
                     style={{ backgroundColor: colors.primary }}
                   ></span>
@@ -410,25 +477,42 @@ const RegisterPage = () => {
                   onChange={(e) => setAgreedToTerms(e.target.checked)}
                   className="w-4 h-4 mt-1 rounded cursor-pointer focus:ring-2 focus:ring-offset-0"
                   style={{
-                    backgroundColor: agreedToTerms ? colors.primary : colors.cardBg,
+                    backgroundColor: agreedToTerms
+                      ? colors.primary
+                      : colors.cardBg,
                     border: `1px solid ${colors.border}`,
                     color: colors.primary,
                   }}
                 />
-                <label htmlFor="terms" className="text-sm cursor-pointer" style={{ color: colors.muted }}>
-                  I agree to the{' '}
-                  <Link to="/terms" className="font-semibold hover:text-white transition-colors" style={{ color: colors.primary }}>
+                <label
+                  htmlFor="terms"
+                  className="text-sm cursor-pointer"
+                  style={{ color: colors.muted }}
+                >
+                  I agree to the{" "}
+                  <Link
+                    to="/terms"
+                    className="font-semibold hover:text-white transition-colors"
+                    style={{ color: colors.primary }}
+                  >
                     Terms of Service
-                  </Link>
-                  {' '}and{' '}
-                  <Link to="/privacy" className="font-semibold hover:text-white transition-colors" style={{ color: colors.primary }}>
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    to="/privacy"
+                    className="font-semibold hover:text-white transition-colors"
+                    style={{ color: colors.primary }}
+                  >
                     Privacy Policy
                   </Link>
                 </label>
               </div>
               {errors.terms && (
-                <p className="mt-2 text-sm flex items-center" style={{ color: colors.primary }}>
-                  <span 
+                <p
+                  className="mt-2 text-sm flex items-center"
+                  style={{ color: colors.primary }}
+                >
+                  <span
                     className="inline-block w-1 h-1 rounded-full mr-2"
                     style={{ backgroundColor: colors.primary }}
                   ></span>
@@ -448,9 +532,7 @@ const RegisterPage = () => {
             >
               {isLoading ? (
                 <>
-                  <div 
-                    className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"
-                  ></div>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                   <span>Creating Account...</span>
                 </>
               ) : (
@@ -463,16 +545,21 @@ const RegisterPage = () => {
           </form>
 
           {/* Security Note */}
-          <div 
+          <div
             className="mt-6 p-4 rounded-lg flex items-start gap-3"
             style={{
               backgroundColor: `${colors.success}10`,
               border: `1px solid ${colors.success}30`,
             }}
           >
-            <Shield size={16} style={{ color: colors.success }} className="mt-0.5 flex-shrink-0" />
+            <Shield
+              size={16}
+              style={{ color: colors.success }}
+              className="mt-0.5 flex-shrink-0"
+            />
             <p className="text-sm" style={{ color: colors.success }}>
-              Your information is secure and encrypted. We never share your personal details.
+              Your information is secure and encrypted. We never share your
+              personal details.
             </p>
           </div>
 
@@ -480,17 +567,17 @@ const RegisterPage = () => {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div 
+                <div
                   className="w-full border-t"
                   style={{ borderColor: colors.border }}
                 ></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span 
+                <span
                   className="px-2"
-                  style={{ 
+                  style={{
                     backgroundColor: colors.cardBg,
-                    color: colors.muted 
+                    color: colors.muted,
                   }}
                 >
                   Already have an account?
@@ -513,8 +600,6 @@ const RegisterPage = () => {
               </Link>
             </div>
           </div>
-
-        
         </div>
       </div>
     </div>

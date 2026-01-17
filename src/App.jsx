@@ -17,6 +17,7 @@ import MyOrders from "./pages/product/MyOrders";
 import CheckoutPage from "./pages/product/CheckoutPage";
 import ProductListPage from "./pages/product/ProductListPage";
 import OrderSuccessful from "./pages/payment/OrderSuccessful";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ResetPassword />} />
 
         <Route element={<AppLayout />}>
           <Route index path="/" element={<LandingPage />} />
