@@ -18,10 +18,34 @@ import CheckoutPage from "./pages/product/CheckoutPage";
 import ProductListPage from "./pages/product/ProductListPage";
 import OrderSuccessful from "./pages/payment/OrderSuccessful";
 import ResetPassword from "./pages/auth/ResetPassword";
+import HandleProductCategory from "./pages/admin/product/HandleProductCategory";
+import { ToastContainer } from "react-toastify";
+import HandleProductSubCategory from "./pages/admin/product/HandleProductSubCategory";
+import HandleProduct from "./pages/admin/product/HandleProduct";
+import SeoSettings from "./pages/admin/settings/SeoSettings";
+import HandleHeroSection from "./pages/admin/landingpage/HandleHeroSection";
+import HandleHowItWorks from "./pages/admin/landingpage/HandleHowItWorks";
+import HandleWhyChoseUs from "./pages/admin/landingpage/HandleWhyChoseUs";
+import HandleYourGoalsSection from "./pages/admin/landingpage/HandleYourGoalsSection";
+import HandleGoals from "./pages/admin/landingpage/HandleGoals";
+import HandleFAQs from "./pages/admin/contact/HandleFAQs";
+import HandleContact from "./pages/admin/contact/HandleContact";
 
 const App = () => {
   return (
     <Router>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000} // Optional: customize auto-close time
+        hideProgressBar={false} // Optional: show/hide progress bar
+        newestOnTop={true} // Optional: new toasts on top
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light" // or "dark" based on your preference
+      />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -30,27 +54,54 @@ const App = () => {
         <Route element={<AppLayout />}>
           <Route index path="/" element={<LandingPage />} />
           <Route index path="/products/:category" element={<ProductPage />} />
-           <Route path="/products/:category/:subcategory" element={<ProductListPage />} />
-          <Route index path="/:category/:subcategory/:slug" element={<ProductDetails />} />
+          <Route
+            path="/products/:category/:subcategory"
+            element={<ProductListPage />}
+          />
+          <Route
+            index
+            path="/:category/:subcategory/:slug"
+            element={<ProductDetails />}
+          />
 
-
-          <Route index path="/product-details/:id" element={<ProductDetails />} />
+          <Route
+            index
+            path="/product-details/:id"
+            element={<ProductDetails />}
+          />
           <Route index path="/contact" element={<ContactUs />} />
           <Route index path="/profile" element={<ProfilePage />} />
           <Route index path="/orders" element={<MyOrders />} />
           <Route index path="/cart" element={<CartPage />} />
           <Route index path="/checkout" element={<CheckoutPage />} />
-          
-
         </Route>
-          <Route index path="/order-successful" element={<OrderSuccessful />} />
+        <Route index path="/order-successful" element={<OrderSuccessful />} />
 
         {/* Admin Layout */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboard />} />
+
+          <Route path="products-category" element={<HandleProductCategory />} />
+          <Route path="products-sub-category" element={<HandleProductSubCategory/>}/>
+          <Route path="products" element={<HandleProduct/>}/>
+
           {/* Additional admin routes can be added here */}
           <Route path="site-settings" element={<SiteSettings />} />
+          <Route path="seo-settings" element={<SeoSettings/>}/>
           <Route path="profile" element={<AdminProfile />} />
+
+          {/* Landing Page Management */}
+          <Route path="landing-page/hero-section" element={<HandleHeroSection/>}/>
+          <Route path="landing-page/how-it-works" element={<HandleHowItWorks/>}/>
+          <Route path="landing-page/why-chose-us" element={<HandleWhyChoseUs/>}/>
+          <Route path="landing-page/your-goals-section" element={<HandleYourGoalsSection/>}/>
+          <Route path="landing-page/your-goals" element={<HandleGoals/>}/>
+
+
+          <Route path="contact" element={<HandleContact/>}/>
+          <Route path="contact/faqs" element={<HandleFAQs/>}/>
+
+
         </Route>
       </Routes>
     </Router>

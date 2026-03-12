@@ -4,6 +4,7 @@ import { Lock, Mail, Key, ArrowLeft, Eye, EyeOff, CheckCircle } from "lucide-rea
 import CustomInput from "../../component/form/CustomInput";
 import { toast } from "react-toastify";
 import { api } from "../../utils/app";
+import PageHelmet from "../../component/common/PageHelmet";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -410,6 +411,8 @@ const ResetPassword = () => {
   ];
 
   return (
+    <>
+      <PageHelmet title="Reset Password - ONE REP MORE" />
     <div 
       className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
       style={{ backgroundColor: colors.background }}
@@ -523,6 +526,7 @@ const ResetPassword = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

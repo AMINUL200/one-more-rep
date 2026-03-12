@@ -15,6 +15,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import PageLoader from "../../component/common/PageLoader";
+import PageHelmet from "../../component/common/PageHelmet";
 
 const ContactUs = () => {
   const [loading, setLoading] = useState(true);
@@ -176,6 +177,8 @@ const ContactUs = () => {
   if (loading) return <PageLoader />;
   
   return (
+    <>
+      <PageHelmet title="Contact Us - ONE REP MORE" />
     <div
       style={{ backgroundColor: colors.background }}
       className="min-h-screen pt-30"
@@ -695,6 +698,7 @@ const ContactUs = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

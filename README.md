@@ -51,3 +51,10 @@ Hover: Lift + shadow
 CTA Sections
 
 Black → Red gradient
+
+
+
+
+
+ <!-- <div className="max-w-[400px] md:max-w-[700px] lg:max-w-[1140px] overflow-x-auto">
+              <table className="w-full min-w-[700px]"> -->

@@ -19,6 +19,7 @@ import {
   Heart,
 } from "lucide-react";
 import PageLoader from "../../component/common/PageLoader";
+import PageHelmet from "../../component/common/PageHelmet";
 
 const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
@@ -123,6 +124,8 @@ const ProfilePage = () => {
   if (loading) return <PageLoader />;
   
   return (
+    <>
+      <PageHelmet title="My Profile - ONE REP MORE" />
     <div
       style={{ backgroundColor: colors.background }}
       className="min-h-screen py-8 px-4 md:px-8 pt-30 md:pt-40"
@@ -750,6 +753,7 @@ const ProfilePage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

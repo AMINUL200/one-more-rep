@@ -18,6 +18,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import PageLoader from "../../component/common/PageLoader";
+import PageHelmet from "../../component/common/PageHelmet";
 
 const CartPage = () => {
   const [loading, setLoading] = useState(true);
@@ -140,6 +141,8 @@ const CartPage = () => {
   
   if (loading) return <PageLoader />;
   return (
+    <>
+      <PageHelmet title="Shopping Cart - ONE REP MORE" />
     <div
       style={{ backgroundColor: colors.background }}
       className="min-h-screen py-8 px-4 md:px-8 pt-30 md:pt-40"
@@ -835,6 +838,7 @@ const CartPage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

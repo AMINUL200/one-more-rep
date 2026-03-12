@@ -14,14 +14,15 @@ import CustomInput from "../../component/form/CustomInput";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import { api } from "../../utils/app";
+import PageHelmet from "../../component/common/PageHelmet";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    fullName: "",
+    name: "", // Changed from fullName to name
     email: "",
     password: "",
     confirmPassword: "",
-    phone: "",
+    // phone: "", // Removed phone as it's not in the API requirement
   });
   const { login } = useAuth();
   const [errors, setErrors] = useState({});
@@ -60,10 +61,10 @@ const RegisterPage = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
-    } else if (formData.fullName.trim().length < 3) {
-      newErrors.fullName = "Name must be at least 3 characters";
+    if (!formData.name?.trim()) {
+      newErrors.name = "Full name is required";
+    } else if (formData.name.trim().length < 3) {
+      newErrors.name = "Name must be at least 3 characters";
     }
 
     if (!formData.email) {
@@ -72,16 +73,10 @@ const RegisterPage = () => {
       newErrors.email = "Email is invalid";
     }
 
-    if (!formData.phone) {
-      newErrors.phone = "Phone number is required";
-    } else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ""))) {
-      newErrors.phone = "Phone number must be 10 digits";
-    }
-
     if (!formData.password) {
       newErrors.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
+    } else if (formData.password.length < 6) { // Changed to 6 as per your API requirement
+      newErrors.password = "Password must be at least 6 characters";
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
       newErrors.password =
         "Password must contain uppercase, lowercase, and number";
@@ -106,8 +101,8 @@ const RegisterPage = () => {
     if (!password) return { strength: 0, label: "", color: "" };
 
     let strength = 0;
+    if (password.length >= 6) strength++; // Changed to 6
     if (password.length >= 8) strength++;
-    if (password.length >= 12) strength++;
     if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
     if (/\d/.test(password)) strength++;
     if (/[^A-Za-z0-9]/.test(password)) strength++;
@@ -128,6 +123,7 @@ const RegisterPage = () => {
 
   // Password requirements checklist
   const passwordRequirements = [
+    { label: "At least 6 characters", met: formData.password.length >= 6 }, // Changed to 6
     { label: "At least 8 characters", met: formData.password.length >= 8 },
     {
       label: "Contains uppercase letter",
@@ -152,457 +148,480 @@ const RegisterPage = () => {
       setIsLoading(true);
 
       try {
-        // Replace with actual API call
-        const res = await api.post("/register", formData);
-        if (res.data?.success) {
-          toast.success("Registration successful! Please login.");
+        // Prepare data for API - only send required fields
+        const registerData = {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        };
+
+        console.log("Sending registration data:", registerData);
+
+        const res = await api.post("/register", registerData);
+        
+        console.log("Registration response:", res.data);
+        
+        if (res.data?.status) { // Changed from success to status based on your response
+          toast.success(res.data.message || "Registration successful! Please login.");
+          
           // Auto login after register
-          login(res.data.user, res.data.token);
-          navigate("/");
-          if (res.data?.user?.role === "admin") {
-            navigate("/admin");
+          if (res.data.data?.token && res.data.data?.user) {
+            await login(res.data.data.user, res.data.data.token);
+            
+            // Redirect based on role
+            if (res.data.data.user.role === "admin") {
+              navigate("/admin", { replace: true });
+            } else {
+              navigate("/", { replace: true });
+            }
           } else {
-            navigate("/");
+            // If auto-login fails, redirect to login page
+            navigate("/login", { 
+              state: { message: "Registration successful! Please login." } 
+            });
           }
         } else {
           toast.error(res.data?.message || "Registration failed");
+          setIsLoading(false);
         }
       } catch (error) {
         console.error("Registration error:", error);
-        setIsLoading(false);
-        toast.error("Registration failed. Please try again.");
-      } finally {
+        toast.error(error.response?.data?.message || "Registration failed. Please try again.");
         setIsLoading(false);
       }
     }
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
-      style={{ backgroundColor: colors.background }}
-    >
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-5">
-        <div
-          className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl"
-          style={{ backgroundColor: colors.primary }}
-        ></div>
-        <div
-          className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl"
-          style={{ backgroundColor: colors.primary }}
-        ></div>
-
-        {/* Gym icons pattern */}
-        <div className="absolute top-10 left-10">
-          <span className="text-4xl">🏋️</span>
-        </div>
-        <div className="absolute bottom-10 right-10">
-          <span className="text-4xl">💪</span>
-        </div>
-      </div>
-
-      <div className="max-w-md w-full relative z-10">
-        {/* Back button */}
-        <button
-          onClick={() => navigate("/")}
-          className="mb-6 flex items-center space-x-2 transition-colors group"
-          style={{ color: colors.muted }}
-        >
-          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="font-medium group-hover:text-white">
-            Back to Home
-          </span>
-        </button>
-
-        {/* Register Card */}
-        <div
-          className="rounded-2xl shadow-2xl p-8"
-          style={{
-            backgroundColor: colors.cardBg,
-            border: `1px solid ${colors.border}`,
-          }}
-        >
-          {/* Logo and Title */}
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <div
-                className="p-3 rounded-2xl shadow-lg"
-                style={{
-                  backgroundColor: colors.background,
-                  border: `2px solid ${colors.border}`,
-                }}
-              >
-                <img
-                  src="/image/gym_logo.png"
-                  alt="One Rep More"
-                  className="h-16 w-16 object-contain rounded-full"
-                />
-              </div>
-            </div>
-            <h2
-              className="text-3xl font-bold mb-2"
-              style={{ color: colors.text }}
-            >
-              Join <span style={{ color: colors.primary }}>One Rep More</span>
-            </h2>
-            <p style={{ color: colors.muted }}>
-              Create your account and start building your dream gym
-            </p>
-          </div>
-
-          {/* Register Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Full Name Field */}
-            <div>
-              <CustomInput
-                label="Full Name"
-                name="fullName"
-                type="text"
-                autoComplete="name"
-                value={formData.fullName}
-                onChange={handleChange}
-                placeholder="Enter your full name"
-                labelColor={colors.text}
-                borderColor={errors.fullName ? colors.primary : colors.border}
-                focusColor={colors.primary}
-                placeholderColor={colors.muted}
-                icon={User}
-                iconColor={colors.muted}
-                className="bg-transparent"
-              />
-              {errors.fullName && (
-                <p
-                  className="mt-2 text-sm flex items-center"
-                  style={{ color: colors.primary }}
-                >
-                  <span
-                    className="inline-block w-1 h-1 rounded-full mr-2"
-                    style={{ backgroundColor: colors.primary }}
-                  ></span>
-                  {errors.fullName}
-                </p>
-              )}
-            </div>
-
-            {/* Email Field */}
-            <div>
-              <CustomInput
-                label="Email Address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Enter your email"
-                labelColor={colors.text}
-                borderColor={errors.email ? colors.primary : colors.border}
-                focusColor={colors.primary}
-                placeholderColor={colors.muted}
-                icon={Mail}
-                iconColor={colors.muted}
-                className="bg-transparent"
-              />
-              {errors.email && (
-                <p
-                  className="mt-2 text-sm flex items-center"
-                  style={{ color: colors.primary }}
-                >
-                  <span
-                    className="inline-block w-1 h-1 rounded-full mr-2"
-                    style={{ backgroundColor: colors.primary }}
-                  ></span>
-                  {errors.email}
-                </p>
-              )}
-            </div>
-
-            {/* Phone Field */}
-            <div>
-              <CustomInput
-                label="Phone Number"
-                name="phone"
-                type="tel"
-                autoComplete="tel"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="Enter 10-digit phone number"
-                labelColor={colors.text}
-                borderColor={errors.phone ? colors.primary : colors.border}
-                focusColor={colors.primary}
-                placeholderColor={colors.muted}
-                icon={Phone}
-                iconColor={colors.muted}
-                className="bg-transparent"
-              />
-              {errors.phone && (
-                <p
-                  className="mt-2 text-sm flex items-center"
-                  style={{ color: colors.primary }}
-                >
-                  <span
-                    className="inline-block w-1 h-1 rounded-full mr-2"
-                    style={{ backgroundColor: colors.primary }}
-                  ></span>
-                  {errors.phone}
-                </p>
-              )}
-            </div>
-
-            {/* Password Field */}
-            <div>
-              <CustomInput
-                label="Password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Create a strong password"
-                labelColor={colors.text}
-                borderColor={errors.password ? colors.primary : colors.border}
-                focusColor={colors.primary}
-                placeholderColor={colors.muted}
-                icon={Lock}
-                iconColor={colors.muted}
-                className="bg-transparent"
-              />
-
-              {/* Password Strength Indicator */}
-              {formData.password && (
-                <div className="mt-3 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div
-                      className="flex-1 h-2 rounded-full overflow-hidden"
-                      style={{ backgroundColor: `${colors.primary}20` }}
-                    >
-                      <div
-                        className="h-full rounded-full transition-all duration-300"
-                        style={{
-                          width: `${(passwordStrength.strength / 5) * 100}%`,
-                          backgroundColor: passwordStrength.color,
-                        }}
-                      ></div>
-                    </div>
-                    <span
-                      className="text-xs font-medium ml-2"
-                      style={{ color: passwordStrength.color }}
-                    >
-                      {passwordStrength.label}
-                    </span>
-                  </div>
-
-                  {/* Password Requirements */}
-                  <div className="space-y-1">
-                    {passwordRequirements.map((req, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <div
-                          className={`w-4 h-4 rounded flex items-center justify-center ${
-                            req.met ? "bg-green-500" : "bg-gray-600"
-                          }`}
-                        >
-                          {req.met && (
-                            <Check size={10} style={{ color: colors.text }} />
-                          )}
-                        </div>
-                        <span
-                          className="text-xs"
-                          style={{
-                            color: req.met ? colors.success : colors.muted,
-                          }}
-                        >
-                          {req.label}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {errors.password && (
-                <p
-                  className="mt-2 text-sm flex items-center"
-                  style={{ color: colors.primary }}
-                >
-                  <span
-                    className="inline-block w-1 h-1 rounded-full mr-2"
-                    style={{ backgroundColor: colors.primary }}
-                  ></span>
-                  {errors.password}
-                </p>
-              )}
-            </div>
-
-            {/* Confirm Password Field */}
-            <div>
-              <CustomInput
-                label="Confirm Password"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Re-enter your password"
-                labelColor={colors.text}
-                borderColor={
-                  errors.confirmPassword ? colors.primary : colors.border
-                }
-                focusColor={colors.primary}
-                placeholderColor={colors.muted}
-                icon={Lock}
-                iconColor={colors.muted}
-                className="bg-transparent"
-              />
-              {errors.confirmPassword && (
-                <p
-                  className="mt-2 text-sm flex items-center"
-                  style={{ color: colors.primary }}
-                >
-                  <span
-                    className="inline-block w-1 h-1 rounded-full mr-2"
-                    style={{ backgroundColor: colors.primary }}
-                  ></span>
-                  {errors.confirmPassword}
-                </p>
-              )}
-            </div>
-
-            {/* Terms Agreement */}
-            <div className="pt-2">
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="terms"
-                  checked={agreedToTerms}
-                  onChange={(e) => setAgreedToTerms(e.target.checked)}
-                  className="w-4 h-4 mt-1 rounded cursor-pointer focus:ring-2 focus:ring-offset-0"
-                  style={{
-                    backgroundColor: agreedToTerms
-                      ? colors.primary
-                      : colors.cardBg,
-                    border: `1px solid ${colors.border}`,
-                    color: colors.primary,
-                  }}
-                />
-                <label
-                  htmlFor="terms"
-                  className="text-sm cursor-pointer"
-                  style={{ color: colors.muted }}
-                >
-                  I agree to the{" "}
-                  <Link
-                    to="/terms"
-                    className="font-semibold hover:text-white transition-colors"
-                    style={{ color: colors.primary }}
-                  >
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link
-                    to="/privacy"
-                    className="font-semibold hover:text-white transition-colors"
-                    style={{ color: colors.primary }}
-                  >
-                    Privacy Policy
-                  </Link>
-                </label>
-              </div>
-              {errors.terms && (
-                <p
-                  className="mt-2 text-sm flex items-center"
-                  style={{ color: colors.primary }}
-                >
-                  <span
-                    className="inline-block w-1 h-1 rounded-full mr-2"
-                    style={{ backgroundColor: colors.primary }}
-                  ></span>
-                  {errors.terms}
-                </p>
-              )}
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex justify-center items-center space-x-2 py-3 px-4 rounded-lg shadow-lg text-white font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] mt-6"
-              style={{
-                background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-              }}
-            >
-              {isLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  <span>Creating Account...</span>
-                </>
-              ) : (
-                <>
-                  <UserPlus className="w-5 h-5" />
-                  <span>Create Account</span>
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Security Note */}
+    <>
+      <PageHelmet title="Register - ONE REP MORE" />
+      <div
+        className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+        style={{ backgroundColor: colors.background }}
+      >
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-5">
           <div
-            className="mt-6 p-4 rounded-lg flex items-start gap-3"
+            className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl"
+            style={{ backgroundColor: colors.primary }}
+          ></div>
+          <div
+            className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl"
+            style={{ backgroundColor: colors.primary }}
+          ></div>
+
+          {/* Gym icons pattern */}
+          <div className="absolute top-10 left-10">
+            <span className="text-4xl">🏋️</span>
+          </div>
+          <div className="absolute bottom-10 right-10">
+            <span className="text-4xl">💪</span>
+          </div>
+        </div>
+
+        <div className="max-w-md w-full relative z-10">
+          {/* Back button */}
+          <button
+            onClick={() => navigate("/")}
+            className="mb-6 flex items-center space-x-2 transition-colors group"
+            style={{ color: colors.muted }}
+          >
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <span className="font-medium group-hover:text-white">
+              Back to Home
+            </span>
+          </button>
+
+          {/* Register Card */}
+          <div
+            className="rounded-2xl shadow-2xl p-8"
             style={{
-              backgroundColor: `${colors.success}10`,
-              border: `1px solid ${colors.success}30`,
+              backgroundColor: colors.cardBg,
+              border: `1px solid ${colors.border}`,
             }}
           >
-            <Shield
-              size={16}
-              style={{ color: colors.success }}
-              className="mt-0.5 flex-shrink-0"
-            />
-            <p className="text-sm" style={{ color: colors.success }}>
-              Your information is secure and encrypted. We never share your
-              personal details.
-            </p>
-          </div>
-
-          {/* Divider */}
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
+            {/* Logo and Title */}
+            <div className="text-center mb-8">
+              <div className="flex justify-center mb-4">
                 <div
-                  className="w-full border-t"
-                  style={{ borderColor: colors.border }}
-                ></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span
-                  className="px-2"
+                  className="p-3 rounded-2xl shadow-lg"
                   style={{
-                    backgroundColor: colors.cardBg,
-                    color: colors.muted,
+                    backgroundColor: colors.background,
+                    border: `2px solid ${colors.border}`,
                   }}
                 >
-                  Already have an account?
-                </span>
+                  <img
+                    src="/image/gym_logo.png"
+                    alt="One Rep More"
+                    className="h-16 w-16 object-contain rounded-full"
+                  />
+                </div>
               </div>
+              <h2
+                className="text-3xl font-bold mb-2"
+                style={{ color: colors.text }}
+              >
+                Join <span style={{ color: colors.primary }}>One Rep More</span>
+              </h2>
+              <p style={{ color: colors.muted }}>
+                Create your account and start building your dream gym
+              </p>
             </div>
 
-            {/* Sign In Link */}
-            <div className="mt-4 text-center">
-              <Link
-                to="/login"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:gap-4"
+            {/* Register Form */}
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Full Name Field - Changed to name */}
+              <div>
+                <CustomInput
+                  label="Full Name"
+                  name="name" // Changed from fullName to name
+                  type="text"
+                  autoComplete="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Enter your full name"
+                  labelColor={colors.text}
+                  borderColor={errors.name ? colors.primary : colors.border}
+                  focusColor={colors.primary}
+                  placeholderColor={colors.muted}
+                  icon={User}
+                  iconColor={colors.muted}
+                  className="bg-transparent"
+                />
+                {errors.name && (
+                  <p
+                    className="mt-2 text-sm flex items-center"
+                    style={{ color: colors.primary }}
+                  >
+                    <span
+                      className="inline-block w-1 h-1 rounded-full mr-2"
+                      style={{ backgroundColor: colors.primary }}
+                    ></span>
+                    {errors.name}
+                  </p>
+                )}
+              </div>
+
+              {/* Email Field */}
+              <div>
+                <CustomInput
+                  label="Email Address"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter your email"
+                  labelColor={colors.text}
+                  borderColor={errors.email ? colors.primary : colors.border}
+                  focusColor={colors.primary}
+                  placeholderColor={colors.muted}
+                  icon={Mail}
+                  iconColor={colors.muted}
+                  className="bg-transparent"
+                />
+                {errors.email && (
+                  <p
+                    className="mt-2 text-sm flex items-center"
+                    style={{ color: colors.primary }}
+                  >
+                    <span
+                      className="inline-block w-1 h-1 rounded-full mr-2"
+                      style={{ backgroundColor: colors.primary }}
+                    ></span>
+                    {errors.email}
+                  </p>
+                )}
+              </div>
+
+              {/* Phone Field - Commented out as it's not in API
+              <div>
+                <CustomInput
+                  label="Phone Number"
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="Enter 10-digit phone number"
+                  labelColor={colors.text}
+                  borderColor={errors.phone ? colors.primary : colors.border}
+                  focusColor={colors.primary}
+                  placeholderColor={colors.muted}
+                  icon={Phone}
+                  iconColor={colors.muted}
+                  className="bg-transparent"
+                />
+                {errors.phone && (
+                  <p
+                    className="mt-2 text-sm flex items-center"
+                    style={{ color: colors.primary }}
+                  >
+                    <span
+                      className="inline-block w-1 h-1 rounded-full mr-2"
+                      style={{ backgroundColor: colors.primary }}
+                    ></span>
+                    {errors.phone}
+                  </p>
+                )}
+              </div>
+              */}
+
+              {/* Password Field */}
+              <div>
+                <CustomInput
+                  label="Password"
+                  name="password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Create a strong password"
+                  labelColor={colors.text}
+                  borderColor={errors.password ? colors.primary : colors.border}
+                  focusColor={colors.primary}
+                  placeholderColor={colors.muted}
+                  icon={Lock}
+                  iconColor={colors.muted}
+                  className="bg-transparent"
+                />
+
+                {/* Password Strength Indicator */}
+                {formData.password && (
+                  <div className="mt-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div
+                        className="flex-1 h-2 rounded-full overflow-hidden"
+                        style={{ backgroundColor: `${colors.primary}20` }}
+                      >
+                        <div
+                          className="h-full rounded-full transition-all duration-300"
+                          style={{
+                            width: `${(passwordStrength.strength / 5) * 100}%`,
+                            backgroundColor: passwordStrength.color,
+                          }}
+                        ></div>
+                      </div>
+                      <span
+                        className="text-xs font-medium ml-2"
+                        style={{ color: passwordStrength.color }}
+                      >
+                        {passwordStrength.label}
+                      </span>
+                    </div>
+
+                    {/* Password Requirements */}
+                    <div className="space-y-1">
+                      {passwordRequirements.map((req, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                          <div
+                            className={`w-4 h-4 rounded flex items-center justify-center ${
+                              req.met ? "bg-green-500" : "bg-gray-600"
+                            }`}
+                          >
+                            {req.met && (
+                              <Check size={10} style={{ color: colors.text }} />
+                            )}
+                          </div>
+                          <span
+                            className="text-xs"
+                            style={{
+                              color: req.met ? colors.success : colors.muted,
+                            }}
+                          >
+                            {req.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {errors.password && (
+                  <p
+                    className="mt-2 text-sm flex items-center"
+                    style={{ color: colors.primary }}
+                  >
+                    <span
+                      className="inline-block w-1 h-1 rounded-full mr-2"
+                      style={{ backgroundColor: colors.primary }}
+                    ></span>
+                    {errors.password}
+                  </p>
+                )}
+              </div>
+
+              {/* Confirm Password Field */}
+              <div>
+                <CustomInput
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Re-enter your password"
+                  labelColor={colors.text}
+                  borderColor={
+                    errors.confirmPassword ? colors.primary : colors.border
+                  }
+                  focusColor={colors.primary}
+                  placeholderColor={colors.muted}
+                  icon={Lock}
+                  iconColor={colors.muted}
+                  className="bg-transparent"
+                />
+                {errors.confirmPassword && (
+                  <p
+                    className="mt-2 text-sm flex items-center"
+                    style={{ color: colors.primary }}
+                  >
+                    <span
+                      className="inline-block w-1 h-1 rounded-full mr-2"
+                      style={{ backgroundColor: colors.primary }}
+                    ></span>
+                    {errors.confirmPassword}
+                  </p>
+                )}
+              </div>
+
+              {/* Terms Agreement */}
+              <div className="pt-2">
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                    className="w-4 h-4 mt-1 rounded cursor-pointer focus:ring-2 focus:ring-offset-0"
+                    style={{
+                      backgroundColor: agreedToTerms
+                        ? colors.primary
+                        : colors.cardBg,
+                      border: `1px solid ${colors.border}`,
+                      color: colors.primary,
+                    }}
+                  />
+                  <label
+                    htmlFor="terms"
+                    className="text-sm cursor-pointer"
+                    style={{ color: colors.muted }}
+                  >
+                    I agree to the{" "}
+                    <Link
+                      to="/terms"
+                      className="font-semibold hover:text-white transition-colors"
+                      style={{ color: colors.primary }}
+                    >
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link
+                      to="/privacy"
+                      className="font-semibold hover:text-white transition-colors"
+                      style={{ color: colors.primary }}
+                    >
+                      Privacy Policy
+                    </Link>
+                  </label>
+                </div>
+                {errors.terms && (
+                  <p
+                    className="mt-2 text-sm flex items-center"
+                    style={{ color: colors.primary }}
+                  >
+                    <span
+                      className="inline-block w-1 h-1 rounded-full mr-2"
+                      style={{ backgroundColor: colors.primary }}
+                    ></span>
+                    {errors.terms}
+                  </p>
+                )}
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full flex justify-center items-center space-x-2 py-3 px-4 rounded-lg shadow-lg text-white font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] mt-6"
                 style={{
-                  color: colors.text,
-                  border: `1px solid ${colors.border}`,
+                  background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
                 }}
               >
-                Sign In to Existing Account
-                <ArrowLeft size={18} className="rotate-180" />
-              </Link>
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Creating Account...</span>
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="w-5 h-5" />
+                    <span>Create Account</span>
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Security Note */}
+            <div
+              className="mt-6 p-4 rounded-lg flex items-start gap-3"
+              style={{
+                backgroundColor: `${colors.success}10`,
+                border: `1px solid ${colors.success}30`,
+              }}
+            >
+              <Shield
+                size={16}
+                style={{ color: colors.success }}
+                className="mt-0.5 flex-shrink-0"
+              />
+              <p className="text-sm" style={{ color: colors.success }}>
+                Your information is secure and encrypted. We never share your
+                personal details.
+              </p>
+            </div>
+
+            {/* Divider */}
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div
+                    className="w-full border-t"
+                    style={{ borderColor: colors.border }}
+                  ></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span
+                    className="px-2"
+                    style={{
+                      backgroundColor: colors.cardBg,
+                      color: colors.muted,
+                    }}
+                  >
+                    Already have an account?
+                  </span>
+                </div>
+              </div>
+
+              {/* Sign In Link */}
+              <div className="mt-4 text-center">
+                <Link
+                  to="/login"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:gap-4"
+                  style={{
+                    color: colors.text,
+                    border: `1px solid ${colors.border}`,
+                  }}
+                >
+                  Sign In to Existing Account
+                  <ArrowLeft size={18} className="rotate-180" />
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -25,10 +25,8 @@ api.interceptors.request.use((config) => {
 
   // 🔥 Auto prevent caching only for GET requests
   if (config.method === "get") {
-    config.params = {
-      ...(config.params || {}), // keep existing params if any
-      t: Date.now(), // add timestamp to bust cache
-    };
+    config.headers["Cache-Control"] = "no-cache";
+    config.headers["Pragma"] = "no-cache";
   }
 
   // 🔥 Auto handle FormData
@@ -73,5 +71,5 @@ api.interceptors.response.use(
       data: err?.response?.data,
       message,
     });
-  }
+  },
 );

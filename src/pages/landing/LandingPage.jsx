@@ -20,42 +20,60 @@ import ProductCategory from "../../component/landingpage/ProductCategory";
 import PageLoader from "../../component/common/PageLoader";
 import ShopByGoal from "../../component/landingpage/ShopByGoal";
 import HowItWorks from "../../component/landingpage/HowItWorks";
+import PageHelmet from "../../component/common/PageHelmet";
+import { api } from "../../utils/app";
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [bannerData, setBannerData] = useState([]);
 
-  // 🔥 Simulate API call (2 seconds)
-  useEffect(() => {
-    const timer = setTimeout(() => {
+  const fetchLandingData = async () => {
+    try {
+      const [bannerRes] = await Promise.all([
+        api.get("/banners"),
+        
+      ]);
+      console.log(bannerRes.data.data)
+      bannerData(bannerRes.data.data)
+      
+    } catch (error) {
+      console.error("Landing API Error:", error.message);
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
+  };
 
-    return () => clearTimeout(timer);
-  }, []);
+  useEffect(() =>{
+    fetchLandingData();
+  },[])
 
   if (loading) return <PageLoader />;
   return (
-    <div className="bg-[#0B0B0B] text-white pt-30">
-      {/* ================= HERO ================= */}
-      <HeroSection />
+    <>
+      <PageHelmet title="Home - ONE REP MORE" />
 
-      <ProductCategory />
+      <div className="bg-[#0B0B0B] text-white pt-30">
+        {/* ================= HERO ================= */}
+        <HeroSection />
 
-      <ProductSection />
-      {/* ================= FEATURED PRODUCTS ================= */}
-      <FeatureProduct />
+        <ProductCategory />
 
-      <HowItWorks/>
+        <ProductSection />
+        {/* ================= FEATURED PRODUCTS ================= */}
+        <FeatureProduct />
 
-      <ShopByGoal/>
+        <HowItWorks />
 
-      {/* ================= WHY CHOOSE US ================= */}
-      <WhyChooseUs />
+        <ShopByGoal />
 
-      {/* ================= TESTIMONIALS ================= */}
-      {/* <Testimonials /> */}
-    </div>
+        {/* ================= WHY CHOOSE US ================= */}
+        <WhyChooseUs />
+
+        {/* ================= TESTIMONIALS ================= */}
+        {/* <Testimonials /> */}
+      </div>
+    </>
   );
 };
 

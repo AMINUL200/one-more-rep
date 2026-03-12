@@ -23,8 +23,10 @@ import {
   Clock,
   Star,
   User2,
+  icons,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { label, path } from "framer-motion/client";
 
 const AdminSidebar = ({ isOpen, setIsOpen }) => {
   const navigate = useNavigate();
@@ -38,99 +40,95 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       icon: <LayoutDashboard className="w-5 h-5" />,
       path: "/admin",
     },
-    {
-      id: "profile",
-      label: "Profile",
-      icon: <User2 className="w-5 h-5" />,
-      path: "/admin/profile",
-    },
-    {
-      id: "users",
-      label: "Users Management",
-      icon: <Users className="w-5 h-5" />,
-      children: [
-        {
-          id: "all-users",
-          label: "All Users",
-          icon: <Users className="w-4 h-4" />,
-          path: "/admin/users/all",
-        },
-        {
-          id: "user-roles",
-          label: "User Roles",
-          icon: <UserCog className="w-4 h-4" />,
-          path: "/admin/users/roles",
-        },
-        {
-          id: "permissions",
-          label: "Permissions",
-          icon: <Shield className="w-4 h-4" />,
-          path: "/admin/users/permissions",
-        },
-      ],
-    },
+    // {
+    //   id: "profile",
+    //   label: "Profile",
+    //   icon: <User2 className="w-5 h-5" />,
+    //   path: "/admin/profile",
+    // },
+
     {
       id: "products",
       label: "Products",
       icon: <Package className="w-5 h-5" />,
       children: [
         {
-          id: "all-products",
-          label: "All Products",
+          id: "products-category",
+          label: "Products Category",
           icon: <Package className="w-4 h-4" />,
-          path: "/admin/products/all",
+          path: "/admin/products-category",
         },
         {
-          id: "categories",
-          label: "Categories",
+          id: "products-sub-category",
+          label: "Product Sub Categories",
           icon: <Tag className="w-4 h-4" />,
-          path: "/admin/products/categories",
+          path: "/admin/products-sub-category",
         },
         {
-          id: "inventory",
-          label: "Inventory",
+          id: "products",
+          label: "Products",
           icon: <Database className="w-4 h-4" />,
-          path: "/admin/products/inventory",
+          path: "/admin/products",
         },
       ],
     },
     {
-      id: "orders",
-      label: "Orders",
-      icon: <ShoppingCart className="w-5 h-5" />,
-      path: "/admin/orders",
-    },
-    {
-      id: "analytics",
-      label: "Analytics",
-      icon: <BarChart className="w-5 h-5" />,
+      id: "contact",
+      label: "Contact",
+      icon: <Database className="w-4 h-4" />,
       children: [
         {
-          id: "overview",
-          label: "Overview",
-          icon: <TrendingUp className="w-4 h-4" />,
-          path: "/admin/analytics/overview",
+          id: "contact",
+          label: "Contact",
+          icon: <Database className="w-4 h-4" />,
+          path: "/admin/contact",
         },
         {
-          id: "sales",
-          label: "Sales Analytics",
-          icon: <DollarSign className="w-4 h-4" />,
-          path: "/admin/analytics/sales",
-        },
-        {
-          id: "user-behavior",
-          label: "User Behavior",
-          icon: <Users className="w-4 h-4" />,
-          path: "/admin/analytics/behavior",
+          id: "faqs",
+          label: "FAQS",
+          icon: <Database className="w-4 h-4" />,
+          path: "/admin/contact/faqs",
         },
       ],
     },
     {
-      id: "reports",
-      label: "Reports",
-      icon: <FileText className="w-5 h-5" />,
-      path: "/admin/reports",
+      id: "landing-page",
+      label: "Landing Page",
+      icon: <Settings className="w-5 h-5" />,
+      children: [
+        {
+          id: "hero-section",
+          label: "Hero Section",
+          icon: <Settings className="w-4 h-4" />,
+          path: "/admin/landing-page/hero-section",
+        },
+        {
+          id: "how-it-works",
+          label: "How It Works",
+          icon: <Settings className="w-4 h-4" />,
+          path: "/admin/landing-page/how-it-works",
+        },
+        {
+          id: "why-chose-us",
+          label: "why Chose Us",
+          icon: <Settings className="w-4 h-4" />,
+          path: "/admin/landing-page/why-chose-us",
+        },
+        {
+          id: "your-goals-section",
+          label: "Your Goals Section",
+          icon: <Settings className="w-4 h-4" />,
+          path: "/admin/landing-page/your-goals-section",
+        },
+        {
+          id: "your-goals",
+          label: "Your Goals",
+          icon: <Settings className="w-4 h-4" />,
+          path: "/admin/landing-page/your-goals",
+        },
+      ],
     },
+
     {
       id: "settings",
       label: "Settings",
@@ -143,22 +141,10 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
           path: "/admin/site-settings",
         },
         {
-          id: "appearance",
-          label: "Appearance",
+          id: "seo-settings",
+          label: "SEO Settings",
           icon: <Palette className="w-4 h-4" />,
-          path: "/admin/settings/appearance",
-        },
-        {
-          id: "notifications",
-          label: "Notifications",
-          icon: <Bell className="w-4 h-4" />,
-          path: "/admin/settings/notifications",
-        },
-        {
-          id: "integrations",
-          label: "Integrations",
-          icon: <Globe className="w-4 h-4" />,
-          path: "/admin/settings/integrations",
+          path: "/admin/seo-settings",
         },
       ],
     },

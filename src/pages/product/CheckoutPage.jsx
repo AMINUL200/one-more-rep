@@ -6,6 +6,7 @@ import {
   User, Mail, Phone, Plus, Trash2, AlertCircle
 } from 'lucide-react';
 import PageLoader from '../../component/common/PageLoader';
+import PageHelmet from '../../component/common/PageHelmet';
 
 const CheckoutPage = () => {
   const [step, setStep] = useState(1);
@@ -90,6 +91,8 @@ const CheckoutPage = () => {
    if (loading) return <PageLoader />;
 
   return (
+    <>
+      <PageHelmet title="Checkout - ONE REP MORE" />
     <div style={{ backgroundColor: colors.background }} className="min-h-screen py-8 px-4 md:px-8 pt-30 md:pt-40">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -819,6 +822,7 @@ const CheckoutPage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
