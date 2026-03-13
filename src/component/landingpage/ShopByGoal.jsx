@@ -15,7 +15,8 @@ import {
 import { motion } from "framer-motion";
 import { premiumFadeUp, premiumItem } from "../../animations/motionVariants";
 
-const ShopByGoal = () => {
+const ShopByGoal = ({ goalData }) => {
+  
   // Color Schema
   const colors = {
     primary: "#E10600",
@@ -29,94 +30,91 @@ const ShopByGoal = () => {
     accent: "#3B82F6",
   };
 
-  const goals = [
-    {
-      id: "build-muscle",
-      title: "Build Muscle",
-      description: "Strength equipment for muscle growth & hypertrophy",
-      icon: TrendingUp,
-      color: "#E10600", // Red
-      gradient: "from-[#E10600] to-[#B30000]",
-      products: ["Barbells", "Weight Plates", "Dumbbells", "Power Racks"],
-      image: "/image/build.webp",
-      path: "/products/build-muscle",
-    },
-    {
-      id: "lose-weight",
-      title: "Lose Weight",
-      description: "Cardio & equipment for fat loss & calorie burn",
-      icon: Scale,
-      color: "#22C55E", // Green
-      gradient: "from-[#22C55E] to-[#16A34A]",
-      products: ["Treadmills", "Exercise Bikes", "Jump Ropes", "Battle Ropes"],
-      image:
-        "https://images.unsplash.com/photo-1538805060514-97d9cc17730c?w=600&h=400&fit=crop",
-      path: "/products/lose-weight",
-    },
-    {
-      id: "home-gym",
-      title: "Home Gym Setup",
-      description: "Complete home gym solutions & space-saving equipment",
-      icon: Home,
-      color: "#3B82F6", // Blue
-      gradient: "from-[#3B82F6] to-[#2563EB]",
-      products: ["Multi-Gyms", "Adjustable Benches", "Storage", "Mats"],
-      image:
-        "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&h=400&fit=crop",
-      path: "/products/home-gym",
-    },
-    {
-      id: "cardio",
-      title: "Cardio & Endurance",
-      description: "Improve heart health & build stamina",
-      icon: Scale,
-      color: "#FACC15", // Yellow
-      gradient: "from-[#FACC15] to-[#EAB308]",
-      products: [
-        "Ellipticals",
-        "Rowing Machines",
-        "Air Bikes",
-        "Step Machines",
-      ],
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=600&h=400&fit=crop",
-      path: "/products/cardio",
-    },
-    {
-      id: "beginner",
-      title: "Beginner Friendly",
-      description: "Equipment perfect for fitness newcomers",
-      icon: UserCheck,
-      color: "#8B5CF6", // Purple
-      gradient: "from-[#8B5CF6] to-[#7C3AED]",
-      products: [
-        "Resistance Bands",
-        "Kettlebells",
-        "Yoga Mats",
-        "Foam Rollers",
-      ],
-      image:
-        "https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=600&h=400&fit=crop",
-      path: "/products/beginner",
-    },
-    {
-      id: "strength",
-      title: "Strength Training",
-      description: "Build raw power & functional strength",
-      icon: Weight,
-      color: "#F97316", // Orange
-      gradient: "from-[#F97316] to-[#EA580C]",
-      products: [
-        "Power Racks",
-        "Olympic Bars",
-        "Weight Benches",
-        "Lifting Platforms",
-      ],
-      image:
-        "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=400&fit=crop",
-      path: "/products/strength",
-    },
-  ];
+  // Map of icon names to Lucide components based on title keywords
+  const getIconForGoal = (title) => {
+    const titleLower = title.toLowerCase();
+    
+    if (titleLower.includes('muscle') || titleLower.includes('build')) return TrendingUp;
+    if (titleLower.includes('weight') || titleLower.includes('lose')) return Scale;
+    if (titleLower.includes('home')) return Home;
+    if (titleLower.includes('cardio') || titleLower.includes('endurance')) return Heart;
+    if (titleLower.includes('beginner')) return UserCheck;
+    if (titleLower.includes('strength') || titleLower.includes('power')) return Weight;
+    
+    // Default icons based on index or fallback
+    const defaultIcons = [Dumbbell, Target, Zap, Scale, UserCheck, Weight];
+    return defaultIcons[Math.floor(Math.random() * defaultIcons.length)];
+  };
+
+  // Get color based on goal title or index
+  const getColorForGoal = (title, index) => {
+    const colors = [
+      "#E10600", // Red
+      "#22C55E", // Green
+      "#3B82F6", // Blue
+      "#FACC15", // Yellow
+      "#8B5CF6", // Purple
+      "#F97316", // Orange
+    ];
+    
+    const titleLower = title.toLowerCase();
+    
+    if (titleLower.includes('muscle')) return colors[0];
+    if (titleLower.includes('weight')) return colors[1];
+    if (titleLower.includes('home')) return colors[2];
+    if (titleLower.includes('cardio')) return colors[3];
+    if (titleLower.includes('beginner')) return colors[4];
+    if (titleLower.includes('strength')) return colors[5];
+    
+    return colors[index % colors.length];
+  };
+
+  // Get gradient based on color
+  const getGradient = (color) => {
+    const gradients = {
+      "#E10600": "from-[#E10600] to-[#B30000]",
+      "#22C55E": "from-[#22C55E] to-[#16A34A]",
+      "#3B82F6": "from-[#3B82F6] to-[#2563EB]",
+      "#FACC15": "from-[#FACC15] to-[#EAB308]",
+      "#8B5CF6": "from-[#8B5CF6] to-[#7C3AED]",
+      "#F97316": "from-[#F97316] to-[#EA580C]",
+    };
+    return gradients[color] || "from-[#E10600] to-[#B30000]";
+  };
+
+  // Get image URL
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=400&fit=crop";
+    
+    // If it's already a full URL
+    if (imagePath.startsWith('http') || imagePath.startsWith('https')) {
+      return imagePath;
+    }
+    
+    // Assuming you have a storage URL from environment variables
+    const storageUrl = import.meta.env.VITE_STORAGE_URL || '';
+    return `${storageUrl}/${imagePath}`;
+  };
+
+  // Get section data (first item or default)
+  const sectionData = goalData?.sections?.[0] || {
+    badge_text: "Shop By Your Goals",
+    title: "Achieve Your Fitness Goals",
+    description: "People don't always think in products — they think in goals. Find the perfect equipment for your fitness journey."
+  };
+
+  // Sort goals by sort_order
+  const sortedGoals = goalData?.goals?.sort((a, b) => a.sort_order - b.sort_order) || [];
+
+  if (!goalData || !goalData.goals || goalData.goals.length === 0) {
+    return (
+      <section className="py-16 px-4 md:px-8" style={{ backgroundColor: colors.background }}>
+        <div className="max-w-7xl mx-auto text-center">
+          <p style={{ color: colors.muted }}>No goals data available</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -141,7 +139,7 @@ const ShopByGoal = () => {
                 border: `1px solid ${colors.primary}30`,
               }}
             >
-              Shop By Your Goals
+              {sectionData.badge_text || "Shop By Your Goals"}
             </span>
           </motion.div>
 
@@ -153,8 +151,8 @@ const ShopByGoal = () => {
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-bold mb-4"
           >
-            <span style={{ color: colors.text }}>Achieve Your </span>
-            <span style={{ color: colors.primary }}>Fitness Goals</span>
+            <span style={{ color: colors.text }}>{sectionData.title || "Achieve Your "}</span>
+            <span style={{ color: colors.primary }}> Fitness Goals</span>
           </motion.h2>
 
           <motion.p
@@ -166,18 +164,27 @@ const ShopByGoal = () => {
             className="text-lg max-w-2xl mx-auto"
             style={{ color: colors.muted }}
           >
-            People don't always think in products — they think in goals. Find
-            the perfect equipment for your fitness journey.
+            {sectionData.description || "People don't always think in products — they think in goals. Find the perfect equipment for your fitness journey."}
           </motion.p>
         </div>
 
         {/* Goals Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {goals.map((goal) => {
-            const Icon = goal.icon;
+          {sortedGoals.map((goal, index) => {
+            const Icon = getIconForGoal(goal.title);
+            const goalColor = getColorForGoal(goal.title, index);
+            const gradient = getGradient(goalColor);
+            
+            // Create products array from tags
+            const products = [
+              goal.tag1,
+              goal.tag2,
+              goal.tag3,
+            ].filter(tag => tag); // Filter out null/empty tags
 
             return (
-              <Link key={goal.id} to={goal.path} className="group block">
+              // <Link key={goal.id} to={`/products/${goal.slug}`} className="group block">
+              <Link key={goal.id} to={`#`} className="group block">
                 <motion.div
                   whileHover={{ y: -14, scale: 1.03 }}
                   transition={{ type: "spring", stiffness: 160, damping: 18 }}
@@ -194,14 +201,17 @@ const ShopByGoal = () => {
                     className="relative h-48 overflow-hidden"
                   >
                     <img
-                      src={goal.image}
-                      alt={goal.title}
+                      src={getImageUrl(goal.image)}
+                      alt={goal.image_alt || goal.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      onError={(e) => {
+                        e.target.src = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=400&fit=crop";
+                      }}
                     />
                     <div
                       className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                       style={{
-                        background: `linear-gradient(to bottom, transparent 0%, ${goal.color}20 100%)`,
+                        background: `linear-gradient(to bottom, transparent 0%, ${goalColor}20 100%)`,
                       }}
                     />
 
@@ -214,11 +224,11 @@ const ShopByGoal = () => {
                         transition={{ type: "spring", stiffness: 220 }}
                         className="w-12 h-12 rounded-xl flex items-center justify-center backdrop-blur-sm"
                         style={{
-                          backgroundColor: `${goal.color}20`,
-                          border: `2px solid ${goal.color}30`,
+                          backgroundColor: `${goalColor}20`,
+                          border: `2px solid ${goalColor}30`,
                         }}
                       >
-                        <Icon size={24} style={{ color: goal.color }} />
+                        <Icon size={24} style={{ color: goalColor }} />
                       </motion.div>
                     </div>
                   </motion.div>
@@ -242,50 +252,52 @@ const ShopByGoal = () => {
                       <div
                         className="w-10 h-10 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transform group-hover:translate-x-0 -translate-x-2 transition-all duration-300"
                         style={{
-                          backgroundColor: `${goal.color}20`,
-                          border: `1px solid ${goal.color}30`,
+                          backgroundColor: `${goalColor}20`,
+                          border: `1px solid ${goalColor}30`,
                         }}
                       >
-                        <ArrowRight size={18} style={{ color: goal.color }} />
+                        <ArrowRight size={18} style={{ color: goalColor }} />
                       </div>
                     </div>
 
                     {/* Product Tags */}
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      {goal.products.slice(0, 3).map((product, index) => (
-                        <motion.span
-                          key={index}
-                          whileHover={{ scale: 1.08 }}
-                          transition={{ type: "spring", stiffness: 200 }}
-                          className="px-3 py-1 text-xs rounded-full transition-all group-hover:scale-105"
-                          style={{
-                            backgroundColor: `${goal.color}10`,
-                            color: goal.color,
-                            border: `1px solid ${goal.color}20`,
-                          }}
-                        >
-                          {product}
-                        </motion.span>
-                      ))}
-                      {goal.products.length > 3 && (
-                        <span
-                          className="px-3 py-1 text-xs rounded-full"
-                          style={{
-                            backgroundColor: colors.border,
-                            color: colors.muted,
-                          }}
-                        >
-                          +{goal.products.length - 3} more
-                        </span>
-                      )}
-                    </div>
+                    {products.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        {products.slice(0, 3).map((product, idx) => (
+                          <motion.span
+                            key={idx}
+                            whileHover={{ scale: 1.08 }}
+                            transition={{ type: "spring", stiffness: 200 }}
+                            className="px-3 py-1 text-xs rounded-full transition-all group-hover:scale-105"
+                            style={{
+                              backgroundColor: `${goalColor}10`,
+                              color: goalColor,
+                              border: `1px solid ${goalColor}20`,
+                            }}
+                          >
+                            {product}
+                          </motion.span>
+                        ))}
+                        {products.length > 3 && (
+                          <span
+                            className="px-3 py-1 text-xs rounded-full"
+                            style={{
+                              backgroundColor: colors.border,
+                              color: colors.muted,
+                            }}
+                          >
+                            +{products.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Bottom Gradient Border */}
                   <div
                     className="h-1 w-0 group-hover:w-full transition-all duration-500"
                     style={{
-                      background: `linear-gradient(90deg, ${goal.color}, ${goal.color}80)`,
+                      background: `linear-gradient(90deg, ${goalColor}, ${goalColor}80)`,
                     }}
                   />
                 </motion.div>
@@ -294,45 +306,7 @@ const ShopByGoal = () => {
           })}
         </div>
 
-        {/* CTA Section */}
-        <div className="text-center">
-          <motion.div
-            whileHover={{ scale: 1.06 }}
-            whileTap={{ scale: 0.94 }}
-            transition={{ type: "spring", stiffness: 220 }}
-            className="inline-block rounded-2xl p-1"
-            style={{
-              background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-            }}
-          >
-            <Link
-              to="/products"
-              className="group flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold transition-all duration-300 hover:gap-6"
-              style={{
-                backgroundColor: colors.background,
-                color: colors.text,
-              }}
-            >
-              <span>View All Fitness Goals</span>
-              <ArrowRight
-                size={20}
-                className="group-hover:translate-x-2 transition-transform"
-                style={{ color: colors.primary }}
-              />
-            </Link>
-          </motion.div>
-
-          <p className="text-sm mt-6" style={{ color: colors.muted }}>
-            Can't find your specific goal?{" "}
-            <Link
-              to="/contact"
-              className="font-semibold hover:text-white transition-colors"
-              style={{ color: colors.primary }}
-            >
-              Contact our fitness experts
-            </Link>
-          </p>
-        </div>
+      
       </div>
     </section>
   );

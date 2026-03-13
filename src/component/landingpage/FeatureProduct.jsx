@@ -7,6 +7,7 @@ import {
   Eye,
   ChevronLeft,
   ChevronRight,
+  IndianRupee,
 } from "lucide-react";
 
 // Import Swiper styles
@@ -17,93 +18,163 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { premiumFadeUp, premiumItem } from "../../animations/motionVariants";
 
-const FeatureProduct = () => {
+const FeatureProduct = ({ featureProduct }) => {
   const [hoveredCard, setHoveredCard] = useState(null);
   const navigate = useNavigate();
 
-  const products = [
-    {
-      id: 1,
-      name: "Pro Adjustable Dumbbell Set",
-      price: 299.99,
-      originalPrice: 399.99,
-      image:
-        "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80",
-      badge: "BESTSELLER",
-      rating: 4.8,
-      reviews: 234,
-    },
-    {
-      id: 2,
-      name: "Olympic Barbell 20KG",
-      price: 189.99,
-      originalPrice: 249.99,
-      image:
-        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&q=80",
-      badge: "NEW",
-      rating: 4.9,
-      reviews: 156,
-    },
-    {
-      id: 3,
-      name: "Premium Resistance Bands",
-      price: 49.99,
-      originalPrice: 79.99,
-      image:
-        "https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=500&q=80",
-      badge: "SALE",
-      rating: 4.7,
-      reviews: 189,
-    },
-    {
-      id: 4,
-      name: "Heavy Duty Power Rack",
-      price: 899.99,
-      originalPrice: 1199.99,
-      image:
-        "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&q=80",
-      badge: "FEATURED",
-      rating: 4.9,
-      reviews: 312,
-    },
-    {
-      id: 5,
-      name: "Hex Dumbbell Set 5-50lb",
-      price: 599.99,
-      originalPrice: 799.99,
-      image:
-        "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=500&q=80",
-      badge: "BESTSELLER",
-      rating: 4.8,
-      reviews: 267,
-    },
-    {
-      id: 6,
-      name: "Competition Kettlebell 24KG",
-      price: 79.99,
-      originalPrice: 109.99,
-      image:
-        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&q=80",
-      badge: "NEW",
-      rating: 4.6,
-      reviews: 145,
-    },
-  ];
+  // Get image URL
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) {
+      return "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80";
+    }
+    
+    // If it's already a full URL
+    if (imagePath.startsWith('http') || imagePath.startsWith('https')) {
+      return imagePath;
+    }
+    
+    // Assuming you have a storage URL from environment variables
+    const storageUrl = import.meta.env.VITE_STORAGE_URL || '';
+    return `${storageUrl}/${imagePath}`;
+  };
+
+  // Get product image (thumbnail first, then first image, then fallback)
+  const getProductImage = (product) => {
+    if (product.images && product.images.length > 0) {
+      const thumbnail = product.images.find(img => img.is_thumbnail === 1);
+      if (thumbnail) {
+        return getImageUrl(thumbnail.image);
+      }
+      return getImageUrl(product.images[0].image);
+    }
+    return "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80";
+  };
+
+  // Get badge based on product data
+  const getProductBadge = (product) => {
+    if (product.sale_price && parseFloat(product.sale_price) < parseFloat(product.price)) {
+      return "SALE";
+    }
+    if (product.rating >= 4.5 && product.review_count > 10) {
+      return "BESTSELLER";
+    }
+    if (product.stock < 5) {
+      return "LOW STOCK";
+    }
+    return "FEATURED";
+  };
 
   const getBadgeColor = (badge) => {
     switch (badge) {
       case "BESTSELLER":
         return "bg-[#E10600]";
-      case "NEW":
-        return "bg-[#22C55E]";
-      case "SALE":
+      case "LOW STOCK":
         return "bg-[#FACC15] text-[#0B0B0B]";
+      case "SALE":
+        return "bg-[#22C55E]";
       case "FEATURED":
         return "bg-gradient-to-r from-[#E10600] to-[#FF0800]";
       default:
         return "bg-[#E10600]";
     }
   };
+
+  // Format price in rupees
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
+  // Use API data if available, otherwise fallback to hardcoded products
+  const products = featureProduct && featureProduct.length > 0 
+    ? featureProduct.map(product => ({
+        id: product.id,
+        name: product.name,
+        price: parseFloat(product.price),
+        originalPrice: product.sale_price ? parseFloat(product.sale_price) : parseFloat(product.price),
+        image: getProductImage(product),
+        badge: getProductBadge(product),
+        rating: product.rating || 4.5,
+        reviews: product.review_count || 0,
+        slug: product.slug,
+      }))
+    : [
+        {
+          id: 1,
+          name: "Pro Adjustable Dumbbell Set",
+          price: 299.99,
+          originalPrice: 399.99,
+          image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80",
+          badge: "BESTSELLER",
+          rating: 4.8,
+          reviews: 234,
+        },
+        {
+          id: 2,
+          name: "Olympic Barbell 20KG",
+          price: 189.99,
+          originalPrice: 249.99,
+          image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&q=80",
+          badge: "NEW",
+          rating: 4.9,
+          reviews: 156,
+        },
+        {
+          id: 3,
+          name: "Premium Resistance Bands",
+          price: 49.99,
+          originalPrice: 79.99,
+          image: "https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=500&q=80",
+          badge: "SALE",
+          rating: 4.7,
+          reviews: 189,
+        },
+        {
+          id: 4,
+          name: "Heavy Duty Power Rack",
+          price: 899.99,
+          originalPrice: 1199.99,
+          image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&q=80",
+          badge: "FEATURED",
+          rating: 4.9,
+          reviews: 312,
+        },
+        {
+          id: 5,
+          name: "Hex Dumbbell Set 5-50lb",
+          price: 599.99,
+          originalPrice: 799.99,
+          image: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=500&q=80",
+          badge: "BESTSELLER",
+          rating: 4.8,
+          reviews: 267,
+        },
+        {
+          id: 6,
+          name: "Competition Kettlebell 24KG",
+          price: 79.99,
+          originalPrice: 109.99,
+          image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&q=80",
+          badge: "NEW",
+          rating: 4.6,
+          reviews: 145,
+        },
+      ];
+
+  // Don't render if no products
+  if (!featureProduct || featureProduct.length === 0) {
+    return (
+      <section className="py-16 bg-[#0B0B0B]">
+        <div className="max-w-8xl mx-auto px-4 text-center">
+          <p className="text-[#B3B3B3]">No featured products available</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-[#0B0B0B]">
@@ -171,7 +242,7 @@ const FeatureProduct = () => {
                   variants={premiumItem}
                   initial="hidden"
                   animate="visible"
-                  transition={{ delay: product.id * 0.05 }}
+                  transition={{ delay: (product.id % 10) * 0.05 }}
                   onMouseEnter={() => setHoveredCard(product.id)}
                   onMouseLeave={() => setHoveredCard(null)}
                 >
@@ -194,6 +265,9 @@ const FeatureProduct = () => {
                         src={product.image}
                         alt={product.name}
                         className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                        onError={(e) => {
+                          e.target.src = "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80";
+                        }}
                       />
 
                       {/* Badge */}
@@ -245,21 +319,28 @@ const FeatureProduct = () => {
                           ))}
                         </div>
                         <span className="text-[#B3B3B3] text-sm">
-                          {product.rating} ({product.reviews})
+                          {product.rating.toFixed(1)} ({product.reviews})
                         </span>
                       </div>
 
-                      {/* Price */}
+                      {/* Price in Rupees */}
                       <div className="flex items-center gap-3 mb-4">
-                        <span className="text-[#E10600] text-2xl font-bold">
-                          ${product.price}
-                        </span>
-                        <span className="text-[#B3B3B3] text-lg line-through">
-                          ${product.originalPrice}
-                        </span>
+                        <div className="flex items-center">
+                          <IndianRupee className="w-5 h-5 text-[#E10600]" />
+                          <span className="text-[#E10600] text-2xl font-bold ml-1">
+                            {formatPrice(product.price).replace('₹', '')}
+                          </span>
+                        </div>
+                        {product.originalPrice !== product.price && (
+                          <div className="flex items-center">
+                            <span className="text-[#B3B3B3] text-lg line-through">
+                              ₹{product.originalPrice.toLocaleString('en-IN')}
+                            </span>
+                          </div>
+                        )}
                       </div>
 
-                      {/* Add to Cart Button */}
+                      {/* Action Buttons */}
                       <div className="flex gap-3">
                         {/* VIEW BUTTON */}
                         <motion.button
@@ -267,19 +348,19 @@ const FeatureProduct = () => {
                           whileTap={{ scale: 0.94 }}
                           transition={{ type: "spring", stiffness: 200 }}
                           className="
-      flex-1 flex items-center justify-center gap-2
-      py-3
-      border-2 border-[#E10600]
-      text-[#E10600]
-      font-bold
-      rounded-lg
-      transition-all duration-300
-      hover:bg-[#E10600]
-      hover:text-white
-      hover:shadow-[0_0_20px_rgba(225,6,0,0.4)]
-      active:scale-95
-    "
-                          onClick={() => navigate(`/products/${product.id}`)}
+                            flex-1 flex items-center justify-center gap-2
+                            py-3
+                            border-2 border-[#E10600]
+                            text-[#E10600]
+                            font-bold
+                            rounded-lg
+                            transition-all duration-300
+                            hover:bg-[#E10600]
+                            hover:text-white
+                            hover:shadow-[0_0_20px_rgba(225,6,0,0.4)]
+                            active:scale-95
+                          "
+                          onClick={() => navigate(`/product-details/${product.slug || product.id}`)}
                         >
                           <Eye className="w-5 h-5" />
                           View
@@ -291,17 +372,17 @@ const FeatureProduct = () => {
                           whileTap={{ scale: 0.94 }}
                           transition={{ type: "spring", stiffness: 200 }}
                           className="
-      flex-1 flex items-center justify-center gap-2
-      py-3
-      bg-[#E10600]
-      text-white
-      font-bold
-      rounded-lg
-      transition-all duration-300
-      hover:bg-[#FF0800]
-      hover:shadow-[0_0_25px_rgba(225,6,0,0.6)]
-      active:scale-95
-    "
+                            flex-1 flex items-center justify-center gap-2
+                            py-3
+                            bg-[#E10600]
+                            text-white
+                            font-bold
+                            rounded-lg
+                            transition-all duration-300
+                            hover:bg-[#FF0800]
+                            hover:shadow-[0_0_25px_rgba(225,6,0,0.6)]
+                            active:scale-95
+                          "
                         >
                           <ShoppingCart className="w-5 h-5" />
                           Add to Cart
@@ -336,20 +417,6 @@ const FeatureProduct = () => {
           {/* Custom Pagination */}
           <div className="swiper-pagination-custom flex justify-center gap-2 mt-4"></div>
         </div>
-
-        {/* View All Button */}
-        {/* <div className="text-center mt-12 ">
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            className="group px-8 py-4 border-2 border-[#E10600] text-[#E10600] hover:bg-[#E10600] hover:text-white font-bold rounded-lg transition-all duration-300 hover:shadow-[0_0_20px_rgba(225,6,0,0.5)]"
-          >
-            View All Products
-            <span className="inline-block ml-2 transition-transform group-hover:translate-x-1">
-              →
-            </span>
-          </motion.button>
-        </div> */}
       </div>
 
       <style jsx>{`

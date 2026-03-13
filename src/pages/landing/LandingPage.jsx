@@ -27,15 +27,29 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [bannerData, setBannerData] = useState([]);
+  const [workData, setWorkData] = useState([]);
+  const [choseData, setChoseData] = useState([]);
+  const [goalData, setGoalData] = useState();
+  const [categoryData, setCategoryData] = useState([]);
+  const [productData, setProductData] = useState([]);
 
   const fetchLandingData = async () => {
     try {
-      const [bannerRes] = await Promise.all([
+      const [bannerRes, workRes,choseRes, goalRes, categoryRes, productRes] = await Promise.all([
         api.get("/banners"),
+        api.get("/how-it-works"),
+        api.get("/why-choose-us"),
+        api.get("/goals"),
+        api.get("/category"),
+        api.get("/products"),
         
       ]);
-      console.log(bannerRes.data.data)
-      bannerData(bannerRes.data.data)
+      setBannerData(bannerRes.data.data)
+      setWorkData(workRes.data.data);
+      setChoseData(choseRes.data.data);
+      setGoalData(goalRes.data.data);
+      setCategoryData(categoryRes.data.data);
+      setProductData(productRes.data.data);
       
     } catch (error) {
       console.error("Landing API Error:", error.message);
@@ -55,20 +69,20 @@ const LandingPage = () => {
 
       <div className="bg-[#0B0B0B] text-white pt-30">
         {/* ================= HERO ================= */}
-        <HeroSection />
+        <HeroSection heroData={bannerData}/>
 
-        <ProductCategory />
+        <ProductCategory categoryData={categoryData} />
 
-        <ProductSection />
+        <ProductSection productData={productData} />
         {/* ================= FEATURED PRODUCTS ================= */}
-        <FeatureProduct />
+        <FeatureProduct  featureProduct={productData} />
 
-        <HowItWorks />
+        <HowItWorks workData={workData} />
 
-        <ShopByGoal />
+        <ShopByGoal goalData={goalData} />
 
         {/* ================= WHY CHOOSE US ================= */}
-        <WhyChooseUs />
+        <WhyChooseUs choseData={choseData} />
 
         {/* ================= TESTIMONIALS ================= */}
         {/* <Testimonials /> */}

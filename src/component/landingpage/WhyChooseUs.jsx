@@ -11,63 +11,53 @@ import { motion, useInView } from "framer-motion";
 import CountUp from "react-countup";
 import { cardItem, fadeUpPremium } from "../../animations/motionVariants";
 
-const WhyChooseUs = () => {
-  const features = [
-    {
-      id: 1,
-      icon: Shield,
-      title: "Premium Quality",
-      description:
-        "100% authentic gym equipment from trusted brands. Every product is quality-tested and certified.",
-      stats: "5000+ Reviews",
-    },
-    {
-      id: 2,
-      icon: Truck,
-      title: "Fast Delivery",
-      description:
-        "Free shipping on orders over $100. Get your equipment delivered to your doorstep within 3-5 days.",
-      stats: "2-3 Days",
-    },
-    {
-      id: 3,
-      icon: Award,
-      title: "Best Price Guarantee",
-      description:
-        "Competitive prices with exclusive deals. We match any lower price you find elsewhere.",
-      stats: "Save Up to 40%",
-    },
-    {
-      id: 4,
-      icon: Headphones,
-      title: "24/7 Support",
-      description:
-        "Expert fitness advisors ready to help. Get personalized recommendations and instant support.",
-      stats: "Always Available",
-    },
-    {
-      id: 5,
-      icon: Zap,
-      title: "Easy Returns",
-      description:
-        "30-day hassle-free returns. Not satisfied? Send it back with no questions asked.",
-      stats: "30-Day Policy",
-    },
-    {
-      id: 6,
-      icon: TrendingUp,
-      title: "Fitness Progress",
-      description:
-        "Free workout plans and nutrition guides with every purchase. Track your progress with our app.",
-      stats: "Free Resources",
-    },
-  ];
+// Map of icon names to Lucide components
+const iconMap = {
+  Shield: Shield,
+  Truck: Truck,
+  Award: Award,
+  Headphones: Headphones,
+  Zap: Zap,
+  TrendingUp: TrendingUp,
+};
+
+const WhyChooseUs = ({ choseData }) => {
 
   const statsRef = useRef(null);
   const isStatsInView = useInView(statsRef, {
     once: true,
     margin: "-100px",
   });
+
+  // Sort data by short_order
+  const sortedData = choseData?.sort((a, b) => a.short_order - b.short_order) || [];
+
+  // Icon mapping based on title or short_order
+  const getIconForItem = (item, index) => {
+    // Map based on title keywords or use index to cycle through icons
+    const title = item.title.toLowerCase();
+    
+    if (title.includes('quality') || title.includes('premium')) return Shield;
+    if (title.includes('delivery') || title.includes('shipping')) return Truck;
+    if (title.includes('price') || title.includes('guarantee')) return Award;
+    if (title.includes('support') || title.includes('24/7')) return Headphones;
+    if (title.includes('return') || title.includes('policy')) return Zap;
+    if (title.includes('progress') || title.includes('fitness')) return TrendingUp;
+    
+    // Fallback: cycle through icons based on index
+    const icons = [Shield, Truck, Award, Headphones, Zap, TrendingUp];
+    return icons[index % icons.length];
+  };
+
+  if (!choseData || choseData.length === 0) {
+    return (
+      <section className="py-20 bg-gradient-to-b from-[#0B0B0B] to-[#141414]">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <p className="text-[#B3B3B3]">No data available</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-20 bg-gradient-to-b from-[#0B0B0B] to-[#141414] relative overflow-hidden">
@@ -109,11 +99,11 @@ const WhyChooseUs = () => {
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {features.map((feature, index) => {
-            const Icon = feature.icon;
+          {sortedData.map((item, index) => {
+            const Icon = getIconForItem(item, index);
             return (
               <motion.div
-                key={feature.id}
+                key={item.id}
                 custom={index}
                 variants={cardItem}
                 initial="hidden"
@@ -134,17 +124,17 @@ const WhyChooseUs = () => {
                 {/* Content */}
                 <div>
                   <h3 className="text-white text-2xl font-bold mb-3 group-hover:text-[#E10600] transition-colors duration-300">
-                    {feature.title}
+                    {item.title}
                   </h3>
                   <p className="text-[#B3B3B3] leading-relaxed mb-4">
-                    {feature.description}
+                    {item.description}
                   </p>
 
                   {/* Stats Badge */}
                   <div className="inline-flex items-center gap-2 bg-[#0B0B0B] border border-[#262626] px-4 py-2 rounded-lg group-hover:border-[#E10600] transition-colors duration-300">
                     <div className="w-2 h-2 bg-[#22C55E] rounded-full animate-pulse"></div>
                     <span className="text-[#E10600] font-bold text-sm">
-                      {feature.stats}
+                      {item.badge || "Featured"}
                     </span>
                   </div>
                 </div>
@@ -198,35 +188,7 @@ const WhyChooseUs = () => {
           </div>
         </motion.div>
 
-        {/* CTA Section */}
-        <motion.div
-          variants={fadeUpPremium}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="text-center mt-16"
-        >
-          <h3 className="text-3xl font-bold text-white mb-4">
-            Ready to Transform Your Fitness Journey?
-          </h3>
-          <p className="text-[#B3B3B3] mb-8 text-lg">
-            Join thousands of athletes who trust One Rep More for their training
-            needs.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <motion.button
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 220 }}
-              className="px-8 py-4 bg-[#E10600] hover:bg-[#FF0800] text-white font-bold rounded-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(225,6,0,0.6)] hover:scale-105"
-            >
-              Shop Now
-            </motion.button>
-            <button className="px-8 py-4 border-2 border-[#E10600] text-[#E10600] hover:bg-[#E10600] hover:text-white font-bold rounded-lg transition-all duration-300">
-              Contact Us
-            </button>
-          </div>
-        </motion.div>
+        
       </div>
 
       <style jsx>{`

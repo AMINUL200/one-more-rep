@@ -72,24 +72,18 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
         },
       ],
     },
+   
+    {
+      id: "faqs",
+      label: "FAQS",
+      icon: <Database className="w-4 h-4" />,
+      path: "/admin/contact/faqs",
+    },
     {
       id: "contact",
       label: "Contact",
       icon: <Database className="w-4 h-4" />,
-      children: [
-        {
-          id: "contact",
-          label: "Contact",
-          icon: <Database className="w-4 h-4" />,
-          path: "/admin/contact",
-        },
-        {
-          id: "faqs",
-          label: "FAQS",
-          icon: <Database className="w-4 h-4" />,
-          path: "/admin/contact/faqs",
-        },
-      ],
+      path: "/admin/contact",
     },
     {
       id: "landing-page",
@@ -147,6 +141,12 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
           path: "/admin/seo-settings",
         },
       ],
+    },
+    {
+      id: "payment",
+      label: "Payment Setup ",
+      icon: <User2 className="w-5 h-5" />,
+      path: "/admin/payment-setup",
     },
   ];
 

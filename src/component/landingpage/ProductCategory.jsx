@@ -3,71 +3,95 @@ import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { fadeInUp, premiumItem } from "../../animations/motionVariants";
 
-const ProductCategory = () => {
+const ProductCategory = ({ categoryData }) => {
   const navigate = useNavigate();
   const sliderRef = useRef(null);
   const isDown = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
 
-  const categories = [
-    {
-      title: "Barbells",
-      image:
-        "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80",
-      path: "/products/barbells",
-    },
-    {
-      title: "Plates",
-      image:
-        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=600&q=80",
-      path: "/products/plates",
-    },
-    {
-      title: "Dumbbells",
-      image:
-        "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=600&q=80",
-      path: "/products/dumbbells",
-    },
-    {
-      title: "Strength",
-      image:
-        "https://images.unsplash.com/photo-1584466977773-e625c37cdd50?auto=format&fit=crop&w=600&q=80",
-      path: "/products/strength",
-    },
-    {
-      title: "Benches",
-      image:
-        "https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=600&q=80",
-      path: "/products/benches",
-    },
-    {
-      title: "Cardio",
-      image:
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=600&q=80",
-      path: "/products/cardio",
-    },
-    {
-      title: "Gym Wear",
-      image: "/image/wear.webp",
-      path: "/products/gym-wear",
-    },
-    {
-      title: "Supplements",
-      image: "/image/supplement.jpeg",
-      path: "/products/supplements",
-    },
-    {
-      title: "Accessories",
-      image: "/image/accessories.webp",
-      path: "/products/accessories",
-    },
-    {
-      title: "Instrument",
-      image: "/image/instrument.jpeg",
-      path: "/products/accessories",
-    },
-  ];
+  // Get image URL
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) {
+      // Fallback images based on category name or default
+      return "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80";
+    }
+    
+    // If it's already a full URL
+    if (imagePath.startsWith('http') || imagePath.startsWith('https')) {
+      return imagePath;
+    }
+    
+    // Assuming you have a storage URL from environment variables
+    const storageUrl = import.meta.env.VITE_STORAGE_URL || '';
+    return `${storageUrl}/${imagePath}`;
+  };
+
+  // Sort categories by ID or any other criteria
+  const sortedCategories = categoryData?.sort((a, b) => a.id - b.id) || [];
+
+  // Use API data if available, otherwise fallback to hardcoded categories
+  const categories = sortedCategories.length > 0 
+    ? sortedCategories.map(cat => ({
+        id: cat.id,
+        title: cat.name,
+        image: getImageUrl(cat.image),
+        image_alt: cat.image_alt || cat.name,
+        slug: cat.slug,
+        path: `/products/${cat.slug}`,
+      }))
+    : [
+        {
+          title: "Barbells",
+          image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80",
+          path: "/products/barbells",
+        },
+        {
+          title: "Plates",
+          image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=600&q=80",
+          path: "/products/plates",
+        },
+        {
+          title: "Dumbbells",
+          image: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=600&q=80",
+          path: "/products/dumbbells",
+        },
+        {
+          title: "Strength",
+          image: "https://images.unsplash.com/photo-1584466977773-e625c37cdd50?auto=format&fit=crop&w=600&q=80",
+          path: "/products/strength",
+        },
+        {
+          title: "Benches",
+          image: "https://images.unsplash.com/photo-1576678927484-cc907957088c?auto=format&fit=crop&w=600&q=80",
+          path: "/products/benches",
+        },
+        {
+          title: "Cardio",
+          image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=600&q=80",
+          path: "/products/cardio",
+        },
+        {
+          title: "Gym Wear",
+          image: "/image/wear.webp",
+          path: "/products/gym-wear",
+        },
+        {
+          title: "Supplements",
+          image: "/image/supplement.jpeg",
+          path: "/products/supplements",
+        },
+        {
+          title: "Accessories",
+          image: "/image/accessories.webp",
+          path: "/products/accessories",
+        },
+        {
+          title: "Instrument",
+          image: "/image/instrument.jpeg",
+          path: "/products/accessories",
+        },
+      ];
 
   // 🔁 Duplicate for infinite loop
   const loopedCategories = [...categories, ...categories];
@@ -107,6 +131,17 @@ const ProductCategory = () => {
     const walk = (x - startX.current) * 1.5;
     sliderRef.current.scrollLeft = scrollLeft.current - walk;
   };
+
+  // Don't render if no categories
+  if (!categoryData || categoryData.length === 0) {
+    return (
+      <section className="bg-[#0B0B0B] py-16 overflow-hidden">
+        <div className="max-w-full mx-auto px-4 text-center">
+          <p className="text-[#B3B3B3]">No categories available</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="bg-[#0B0B0B] py-16 overflow-hidden">
@@ -150,7 +185,7 @@ const ProductCategory = () => {
         >
           {loopedCategories.map((cat, index) => (
             <div
-              key={index}
+              key={`${cat.id || index}-${index}`}
               onClick={() => navigate(cat.path)}
               className="min-w-[150px] flex flex-col items-center group cursor-pointer"
             >
@@ -168,8 +203,11 @@ const ProductCategory = () => {
               >
                 <img
                   src={cat.image}
-                  alt={cat.title}
+                  alt={cat.image_alt || cat.title}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80";
+                  }}
                 />
               </div>
 

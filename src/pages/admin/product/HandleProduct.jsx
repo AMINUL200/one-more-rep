@@ -478,9 +478,9 @@ const HandleProduct = () => {
     if (!formData.category_id) {
       errors.category_id = "Please select a category";
     }
-    if (!formData.subcategory_id) {
-      errors.subcategory_id = "Please select a subcategory";
-    }
+    // if (!formData.subcategory_id) {
+    //   errors.subcategory_id = "Please select a subcategory";
+    // }
     if (!formData.name.trim()) {
       errors.name = "Product name is required";
     } else if (formData.name.trim().length < 3) {
@@ -1138,7 +1138,7 @@ const HandleProduct = () => {
                           color: colors.success,
                         }}
                       >
-                        {product.subcategory?.name}
+                        {product.subcategory?.name || "N/A"}
                       </span>
                     </td>
                     <td
