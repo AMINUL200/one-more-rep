@@ -362,7 +362,7 @@ const FeatureProduct = ({ featureProduct }) => {
           </motion.p>
 
           {/* Cart Button */}
-          <motion.button
+          {/* <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsCartOpen(true)}
@@ -376,7 +376,7 @@ const FeatureProduct = ({ featureProduct }) => {
                 </span>
               )}
             </div>
-          </motion.button>
+          </motion.button> */}
         </div>
 
         {/* Swiper Carousel */}

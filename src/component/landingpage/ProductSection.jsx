@@ -456,7 +456,7 @@ const ProductSection = ({ productData }) => {
           </motion.p>
 
           {/* Cart Button */}
-          <motion.button
+          {/* <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsCartOpen(true)}
@@ -470,7 +470,7 @@ const ProductSection = ({ productData }) => {
                 </span>
               )}
             </div>
-          </motion.button>
+          </motion.button> */}
         </div>
 
         {/* Category Filters */}
