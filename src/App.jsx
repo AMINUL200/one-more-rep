@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import AppLayout from "./layout/AppLayout";
@@ -32,81 +32,184 @@ import HandleFAQs from "./pages/admin/contact/HandleFAQs";
 import HandleContact from "./pages/admin/contact/HandleContact";
 import HandlePaymentSetup from "./pages/admin/payment/HandlePaymentSetup";
 import HandleOrderTract from "./pages/admin/track/HandleOrderTract";
+import OrderDetails from "./pages/product/OrderDetails";
+import { useAuth } from "./context/AuthContext";
+
+// Protected Route Component for authenticated users only
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-[#0B0B0B]">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E10600] mx-auto mb-4"></div>
+        <p className="text-[#B3B3B3]">Loading...</p>
+      </div>
+    </div>;
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  return children;
+};
+
+// Admin Route Component for admin users only
+const AdminRoute = ({ children }) => {
+  const { isAuthenticated, user, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-[#0B0B0B]">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E10600] mx-auto mb-4"></div>
+        <p className="text-[#B3B3B3]">Loading...</p>
+      </div>
+    </div>;
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (user?.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
+
+// Public Route Component (redirects to home if already authenticated)
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center bg-[#0B0B0B]">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E10600] mx-auto mb-4"></div>
+        <p className="text-[#B3B3B3]">Loading...</p>
+      </div>
+    </div>;
+  }
+  
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
 
 const App = () => {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0B0B0B]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E10600] mx-auto mb-4"></div>
+          <p className="text-[#B3B3B3]">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Router>
       <ToastContainer
         position="top-right"
-        autoClose={3000} // Optional: customize auto-close time
-        hideProgressBar={false} // Optional: show/hide progress bar
-        newestOnTop={true} // Optional: new toasts on top
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light" // or "dark" based on your preference
+        theme="light"
       />
+      
       <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ResetPassword />} />
+        {/* Public Routes - No authentication required */}
+        <Route path="/login" element={
+          <PublicRoute>
+            <LoginPage />
+          </PublicRoute>
+        } />
+        <Route path="/register" element={
+          <PublicRoute>
+            <RegisterPage />
+          </PublicRoute>
+        } />
+        <Route path="/forgot-password" element={
+          <PublicRoute>
+            <ResetPassword />
+          </PublicRoute>
+        } />
 
+        {/* Main App Layout Routes */}
         <Route element={<AppLayout />}>
+          {/* Public Routes - Accessible to everyone */}
           <Route index path="/" element={<LandingPage />} />
-          <Route index path="/products/:category" element={<ProductPage />} />
-          <Route
-            path="/products/:category/:subcategory"
-            element={<ProductListPage />}
-          />
-          <Route
-            index
-            path="/:category/:subcategory/:PSlug"
-            element={<ProductDetails />}
-          />
+          <Route path="/products/:category" element={<ProductPage />} />
+          <Route path="/products/:category/:subcategory" element={<ProductListPage />} />
+          <Route path="/:category/:subcategory/:PSlug" element={<ProductDetails />} />
+          <Route path="/product-details/:PSlug" element={<ProductDetails />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/order-successful" element={<OrderSuccessful />} />
 
-          <Route
-            index
-            path="/product-details/:PSlug"
-            element={<ProductDetails />}
-          />
-          <Route index path="/contact" element={<ContactUs />} />
-          <Route index path="/profile" element={<ProfilePage />} />
-          <Route index path="/orders" element={<MyOrders />} />
-          <Route index path="/cart" element={<CartPage />} />
-          <Route index path="/checkout/:id" element={<CheckoutPage />} />
+          {/* Protected Routes - Require login */}
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/orders" element={
+            <ProtectedRoute>
+              <MyOrders />
+            </ProtectedRoute>
+          } />
+          <Route path="/order/:id" element={
+            <ProtectedRoute>
+              <OrderDetails />
+            </ProtectedRoute>
+          } />
+          <Route path="/checkout/:id" element={
+            <ProtectedRoute>
+              <CheckoutPage />
+            </ProtectedRoute>
+          } />
         </Route>
-        <Route index path="/order-successful" element={<OrderSuccessful />} />
 
-        {/* Admin Layout */}
-        <Route path="/admin" element={<AdminLayout />}>
+        {/* Admin Routes - Only admin users can access */}
+        <Route path="/admin" element={
+          <AdminRoute>
+            <AdminLayout />
+          </AdminRoute>
+        }>
           <Route index element={<AdminDashboard />} />
-
           <Route path="products-category" element={<HandleProductCategory />} />
-          <Route path="products-sub-category" element={<HandleProductSubCategory/>}/>
-          <Route path="products" element={<HandleProduct/>}/>
-
-          {/* Additional admin routes can be added here */}
+          <Route path="products-sub-category" element={<HandleProductSubCategory />} />
+          <Route path="products" element={<HandleProduct />} />
           <Route path="site-settings" element={<SiteSettings />} />
-          <Route path="seo-settings" element={<SeoSettings/>}/>
+          <Route path="seo-settings" element={<SeoSettings />} />
           <Route path="profile" element={<AdminProfile />} />
 
           {/* Landing Page Management */}
-          <Route path="landing-page/hero-section" element={<HandleHeroSection/>}/>
-          <Route path="landing-page/how-it-works" element={<HandleHowItWorks/>}/>
-          <Route path="landing-page/why-chose-us" element={<HandleWhyChoseUs/>}/>
-          <Route path="landing-page/your-goals-section" element={<HandleYourGoalsSection/>}/>
-          <Route path="landing-page/your-goals" element={<HandleGoals/>}/>
+          <Route path="landing-page/hero-section" element={<HandleHeroSection />} />
+          <Route path="landing-page/how-it-works" element={<HandleHowItWorks />} />
+          <Route path="landing-page/why-chose-us" element={<HandleWhyChoseUs />} />
+          <Route path="landing-page/your-goals-section" element={<HandleYourGoalsSection />} />
+          <Route path="landing-page/your-goals" element={<HandleGoals />} />
 
-
-          <Route path="contact" element={<HandleContact/>}/>
-          <Route path="contact/faqs" element={<HandleFAQs/>}/>
-          <Route path="payment-setup" element={<HandlePaymentSetup/>}/>
-          <Route path="order-track" element={<HandleOrderTract/>}/>
-
-
+          <Route path="contact" element={<HandleContact />} />
+          <Route path="contact/faqs" element={<HandleFAQs />} />
+          <Route path="payment-setup" element={<HandlePaymentSetup />} />
+          <Route path="order-track" element={<HandleOrderTract />} />
         </Route>
+
+        {/* 404 Not Found Route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

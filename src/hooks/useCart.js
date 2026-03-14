@@ -1,3 +1,4 @@
+// hooks/useCart.js
 import { useState, useEffect } from 'react';
 
 const CART_STORAGE_KEY = 'cart';
@@ -35,7 +36,7 @@ export const useCart = () => {
     loadFromStorage();
   }, []);
 
-  // Save cart to localStorage whenever it changes (but not on initial load)
+  // Save cart to localStorage whenever it changes
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));

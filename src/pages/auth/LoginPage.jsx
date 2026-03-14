@@ -8,8 +8,8 @@ import PageHelmet from "../../component/common/PageHelmet";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
-    email: "admin@yopmail.com",
-    password: "password",
+    email: "",
+    password: "",
   });
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState("");

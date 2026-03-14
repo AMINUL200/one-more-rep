@@ -10,10 +10,14 @@ import {
   Shield,
   CreditCard,
   Truck,
+  Globe,
+  Linkedin,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
-const Footer = ({ categoryData }) => {
+const Footer = ({ categoryData, contactData }) => {
+  console.log("Contact Data:", contactData);
+  
   // Generate shop links from categoryData
   const shopLinks = categoryData && categoryData.length > 0 
     ? categoryData.slice(0, 9).map(category => ({
@@ -29,22 +33,47 @@ const Footer = ({ categoryData }) => {
         { name: "Apparel", url: "/products/apparel" },
       ];
 
+  // Generate social links from contactData
   const socialLinks = [
-    { icon: Facebook, url: "https://facebook.com", label: "Facebook" },
-    { icon: Twitter, url: "https://twitter.com", label: "Twitter" },
-    { icon: Instagram, url: "https://instagram.com", label: "Instagram" },
-    { icon: Youtube, url: "https://youtube.com", label: "YouTube" },
+    { icon: Facebook, url: contactData?.facebook || "https://facebook.com", label: "Facebook", active: !!contactData?.facebook },
+    { icon: Twitter, url: contactData?.twitter || "https://twitter.com", label: "Twitter", active: !!contactData?.twitter },
+    { icon: Instagram, url: contactData?.instagram || "https://instagram.com", label: "Instagram", active: !!contactData?.instagram },
+    { icon: Linkedin, url: contactData?.linkedin || "https://linkedin.com", label: "LinkedIn", active: !!contactData?.linkedin },
+    { icon: Youtube, url: "#", label: "YouTube", active: false },
+  ].filter(social => social.active); // Only show active social links
+
+  // Generate contact info from contactData
+  const contactInfo = [
+    { 
+      icon: Phone, 
+      text: contactData?.phone || "+91 1800-123-4567", 
+      url: `tel:${contactData?.phone?.replace(/\s/g, '') || "+9118001234567"}` 
+    },
+    { 
+      icon: Mail, 
+      text: contactData?.email || "support@onerepmore.com", 
+      url: `mailto:${contactData?.email || "support@onerepmore.com"}` 
+    },
+    { 
+      icon: MapPin, 
+      text: `${contactData?.street_address || "Mumbai"}, ${contactData?.city || "Maharashtra"} ${contactData?.zip || "400001"}`, 
+      url: "#" 
+    },
   ];
 
-  const contactInfo = [
-    { icon: Phone, text: "+91 1800-123-4567", url: "tel:+9118001234567" },
-    {
-      icon: Mail,
-      text: "support@onerepmore.com",
-      url: "mailto:support@onerepmore.com",
-    },
-    { icon: MapPin, text: "Mumbai, Maharashtra 400001", url: "#" },
-  ];
+  // Format full address
+  const getFullAddress = () => {
+    if (!contactData) return "Mumbai, Maharashtra 400001";
+    
+    const parts = [];
+    if (contactData.street_address) parts.push(contactData.street_address);
+    if (contactData.city) parts.push(contactData.city);
+    if (contactData.state) parts.push(contactData.state);
+    if (contactData.zip) parts.push(contactData.zip);
+    if (contactData.country) parts.push(contactData.country);
+    
+    return parts.join(", ") || "Mumbai, Maharashtra 400001";
+  };
 
   const trustBadges = [
     { icon: Shield, text: "Secure Payment" },
@@ -84,7 +113,7 @@ const Footer = ({ categoryData }) => {
                   <div className="w-16 h-16 sm:w-14 sm:h-14 rounded-lg overflow-hidden flex-shrink-0">
                     <img
                       src="/image/gym_logo.png"
-                      alt="ONE REP MORE Logo"
+                      alt={contactData?.site_logo_alt || "ONE REP MORE Logo"}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         e.target.onerror = null;
@@ -95,8 +124,8 @@ const Footer = ({ categoryData }) => {
                   </div>
                   <div>
                     <h2 className="text-2xl sm:text-3xl font-bold">
-                      <span className="text-white">ONE</span>
-                      <span className="text-[#E10600]"> REP MORE</span>
+                      <span className="text-white">{contactData?.site_name?.split(' ')[0] || "ONE"}</span>
+                      <span className="text-[#E10600]"> {contactData?.site_name?.split(' ').slice(1).join(' ') || "REP MORE"}</span>
                     </h2>
                     <p className="text-[#B3B3B3] text-xs sm:text-sm mt-1">
                       Premium Fitness Equipment
@@ -129,29 +158,52 @@ const Footer = ({ categoryData }) => {
                     </span>
                   </motion.a>
                 ))}
+                
+                {/* Additional Contact Info (if available) */}
+                {contactData?.landline && (
+                  <motion.a
+                    href={`tel:${contactData.landline.replace(/\s/g, '')}`}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.24 }}
+                    className="flex items-start sm:items-center gap-3 text-[#B3B3B3] hover:text-white transition-colors duration-200 group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-[#141414] border border-[#262626] flex items-center justify-center group-hover:bg-[#E10600]/10 group-hover:border-[#E10600]/30 transition-colors flex-shrink-0">
+                      <Phone size={16} />
+                    </div>
+                    <span className="text-sm sm:text-base break-all">
+                      Landline: {contactData.landline}
+                    </span>
+                  </motion.a>
+                )}
               </div>
 
               {/* Social Links */}
-              <div className="mb-8">
-                <h4 className="text-sm font-semibold mb-4 text-white">
-                  Follow Us
-                </h4>
-                <div className="flex gap-3">
-                  {socialLinks.map((social, index) => (
-                    <motion.a
-                      key={index}
-                      whileHover={{ scale: 1.15, y: -3 }}
-                      whileTap={{ scale: 0.95 }}
-                      transition={{ type: "spring", stiffness: 260 }}
-                      href={social.url}
-                      aria-label={social.label}
-                      className="w-10 h-10 rounded-lg bg-[#141414] border border-[#262626] flex items-center justify-center hover:bg-[#E10600] hover:border-[#E10600] transition-all duration-200 hover:scale-105"
-                    >
-                      <social.icon size={18} />
-                    </motion.a>
-                  ))}
+              {socialLinks.length > 0 && (
+                <div className="mb-8">
+                  <h4 className="text-sm font-semibold mb-4 text-white">
+                    Follow Us
+                  </h4>
+                  <div className="flex gap-3">
+                    {socialLinks.map((social, index) => (
+                      <motion.a
+                        key={index}
+                        whileHover={{ scale: 1.15, y: -3 }}
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ type: "spring", stiffness: 260 }}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={social.label}
+                        className="w-10 h-10 rounded-lg bg-[#141414] border border-[#262626] flex items-center justify-center hover:bg-[#E10600] hover:border-[#E10600] transition-all duration-200 hover:scale-105"
+                      >
+                        <social.icon size={18} />
+                      </motion.a>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Trust Badges */}
               <div className="grid grid-cols-3 gap-3">
@@ -280,7 +332,7 @@ const Footer = ({ categoryData }) => {
               </div>
               <p className="text-[#B3B3B3] text-xs sm:text-sm text-center">
                 © {new Date().getFullYear()}{" "}
-                <span className="text-white font-semibold">ONE REP MORE</span>.
+                <span className="text-white font-semibold">{contactData?.site_name || "ONE REP MORE"}</span>.
                 All rights reserved.
               </p>
             </div>

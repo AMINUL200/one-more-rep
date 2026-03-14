@@ -11,6 +11,7 @@ const AppLayout = () => {
    const {
     loading,
     categoryData,
+    contactData
    
   } = useApp();
   
@@ -19,7 +20,7 @@ const AppLayout = () => {
       <Navbar toggleMenu={toggleSidebar} categoryData={categoryData} />
       <SideBar toggleMenu={toggleSidebar} isOpen={sidebarOpen} categoryData={categoryData} />
       <Outlet />
-      <Footer categoryData={categoryData} />
+      <Footer categoryData={categoryData} contactData={contactData} />
     </div>
   );
 };
