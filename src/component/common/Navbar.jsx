@@ -18,21 +18,24 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
+// import { useCart } from "../../hooks/useCart";
 
-const Navbar = ({ toggleMenu }) => {
+const Navbar = ({ toggleMenu, categoryData }) => {
+  
   const { user, isAuthenticated, logout } = useAuth();
+  const { getTotalItems } = useCart(); // Use cart hook to get total items
   const navigate = useNavigate();
   const location = useLocation();
 
   const [scrolled, setScrolled] = useState(false);
-  const [cartCount] = useState(3);
   const [darkMode, setDarkMode] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [productDropdownOpen, setProductDropdownOpen] = useState(false);
-  const [dropdownTimeout, setDropdownTimeout] = useState(null);
 
   const userDropdownRef = useRef(null);
   const productDropdownRef = useRef(null);
+  const productButtonRef = useRef(null);
 
   /* ================= BRAND COLORS ================= */
   const colors = {
@@ -45,6 +48,23 @@ const Navbar = ({ toggleMenu }) => {
     danger: "#DC2626",
   };
 
+  /* ================= ICON MAPPING FOR CATEGORIES ================= */
+  const getCategoryIcon = (categoryName) => {
+    const name = categoryName?.toLowerCase() || "";
+    
+    if (name.includes("barbell")) return "💪";
+    if (name.includes("plate")) return "⚖️";
+    if (name.includes("strength")) return "🏋️";
+    if (name.includes("bench")) return "🛋️";
+    if (name.includes("dumbbell")) return "🏋️‍♂️";
+    if (name.includes("cardio")) return "🏃";
+    if (name.includes("machine")) return "⚙️";
+    if (name.includes("supplement") || name.includes("suppliment")) return "💊";
+    if (name.includes("accessor")) return "🧤";
+    
+    return "🏋️"; // Default icon
+  };
+
   /* ================= SCROLL EFFECT ================= */
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -52,14 +72,25 @@ const Navbar = ({ toggleMenu }) => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* ================= CLOSE USER DROPDOWN ON OUTSIDE CLICK ================= */
+  /* ================= CLOSE DROPDOWNS ON OUTSIDE CLICK ================= */
   useEffect(() => {
     const handleClickOutside = (e) => {
+      // Close user dropdown if click outside
       if (
         userDropdownRef.current &&
         !userDropdownRef.current.contains(e.target)
       ) {
         setUserDropdownOpen(false);
+      }
+
+      // Close product dropdown if click outside
+      if (
+        productDropdownRef.current &&
+        !productDropdownRef.current.contains(e.target) &&
+        productButtonRef.current &&
+        !productButtonRef.current.contains(e.target)
+      ) {
+        setProductDropdownOpen(false);
       }
     };
 
@@ -67,9 +98,10 @@ const Navbar = ({ toggleMenu }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  /* ================= CLOSE USER DROPDOWN ON ROUTE CHANGE ================= */
+  /* ================= CLOSE DROPDOWNS ON ROUTE CHANGE ================= */
   useEffect(() => {
     setUserDropdownOpen(false);
+    setProductDropdownOpen(false);
   }, [location.pathname]);
 
   /* ================= NAV LINKS ================= */
@@ -78,56 +110,20 @@ const Navbar = ({ toggleMenu }) => {
     {
       id: "products",
       label: "Products",
-      path: "/products/barbells",
       hasDropdown: true,
-      children: [
-        { label: "Barbells", path: "/products/barbells", icon: "💪" },
-        { label: "Plates", path: "/products/plates", icon: "⚖️" },
-        {
-          label: "Strength Equipment",
-          path: "/products/strength-equipment",
-          icon: "🏋️",
-        },
-        { label: "Benches", path: "/products/benches", icon: "🛋️" },
-        { label: "Dumbbells", path: "/products/dumbbells", icon: "🏋️‍♂️" },
-        { label: "Cardio Equipment", path: "/products/cardio", icon: "🏃" },
-      ],
     },
     { id: "contact", label: "Contact Us", path: "/contact" },
   ];
 
-  /* ================= PRODUCTS DROPDOWN HANDLERS ================= */
-  const handleProductMouseEnter = () => {
-    if (dropdownTimeout) {
-      clearTimeout(dropdownTimeout);
-      setDropdownTimeout(null);
-    }
-    setProductDropdownOpen(true);
+  /* ================= PRODUCTS DROPDOWN HANDLERS (CLICK BASED - NO REDIRECT) ================= */
+  const handleProductClick = (e) => {
+    e.preventDefault();
+    // Just toggle the dropdown, no navigation
+    setProductDropdownOpen(!productDropdownOpen);
   };
 
-  const handleProductMouseLeave = () => {
-    const timeout = setTimeout(() => {
-      setProductDropdownOpen(false);
-    }, 200);
-    setDropdownTimeout(timeout);
-  };
-
-  const handleDropdownMouseEnter = () => {
-    if (dropdownTimeout) {
-      clearTimeout(dropdownTimeout);
-      setDropdownTimeout(null);
-    }
-  };
-
-  const handleDropdownMouseLeave = () => {
-    const timeout = setTimeout(() => {
-      setProductDropdownOpen(false);
-    }, 200);
-    setDropdownTimeout(timeout);
-  };
-
-  const handleProductClick = (path) => {
-    navigate(path);
+  const handleProductItemClick = (slug) => {
+    navigate(`/products/${slug}`);
     setProductDropdownOpen(false);
   };
 
@@ -145,6 +141,9 @@ const Navbar = ({ toggleMenu }) => {
       .join("")
       .slice(0, 2)
       .toUpperCase();
+
+  // Get cart count
+  const cartCount = getTotalItems();
 
   return (
     <header className="fixed top-0 left-0 w-full z-50">
@@ -201,7 +200,7 @@ const Navbar = ({ toggleMenu }) => {
             <img
               src="/image/gym_logo.png"
               alt="One Rep More"
-              className="h-20 w-20 object-contain rounded-full  p-2 bg-[#141414] transition-all duration-300 hover:border-[#FF0800] hover:shadow-[0_0_15px_rgba(225,6,0,0.4)]"
+              className="h-20 w-20 object-contain rounded-full p-2 bg-[#141414] transition-all duration-300 hover:border-[#FF0800] hover:shadow-[0_0_15px_rgba(225,6,0,0.4)]"
             />
           </div>
         </div>
@@ -211,24 +210,17 @@ const Navbar = ({ toggleMenu }) => {
           {navLinks.map((item) => {
             const active =
               location.pathname === item.path ||
-              (item.hasDropdown && location.pathname.startsWith("/products/"));
+              (item.id === "products" && location.pathname.startsWith("/products/"));
 
-            if (item.hasDropdown) {
+            if (item.id === "products") {
               return (
-                <div
-                  key={item.id}
-                  className="relative"
-                  ref={productDropdownRef}
-                  onMouseEnter={handleProductMouseEnter}
-                  onMouseLeave={handleProductMouseLeave}
-                >
+                <div key={item.id} className="relative">
+                  {/* Single button that toggles dropdown only - no navigation */}
                   <button
-                    onClick={() => {
-                      navigate(item.path);
-                      setProductDropdownOpen(!productDropdownOpen);
-                    }}
-                    className={`relative flex items-center gap-1 text-sm font-semibold tracking-wide transition ${
-                      active
+                    ref={productButtonRef}
+                    onClick={handleProductClick}
+                    className={`flex items-center gap-1 text-sm font-semibold tracking-wide transition px-2 py-1 ${
+                      active || productDropdownOpen
                         ? "text-[#E10600]"
                         : "text-white hover:text-[#E10600]"
                     }`}
@@ -240,7 +232,7 @@ const Navbar = ({ toggleMenu }) => {
                         productDropdownOpen ? "rotate-180" : ""
                       }`}
                     />
-                    {active && !productDropdownOpen && (
+                    {(active || productDropdownOpen) && (
                       <span
                         className="absolute -bottom-1 left-0 w-full h-0.5"
                         style={{ backgroundColor: colors.primary }}
@@ -248,43 +240,74 @@ const Navbar = ({ toggleMenu }) => {
                     )}
                   </button>
 
-                  {/* PRODUCTS DROPDOWN MENU */}
-                  {productDropdownOpen && (
+                  {/* PRODUCTS DROPDOWN MENU with REAL DATA */}
+                  {productDropdownOpen && categoryData && categoryData.length > 0 && (
                     <div
+                      ref={productDropdownRef}
                       className="absolute top-full left-0 mt-2 rounded-lg shadow-xl animate-fadeIn"
-                      onMouseEnter={handleDropdownMouseEnter}
-                      onMouseLeave={handleDropdownMouseLeave}
                       style={{
                         backgroundColor: colors.cardBg,
                         border: `1px solid ${colors.border}`,
-                        minWidth: "220px",
+                        minWidth: "260px",
+                        maxHeight: "400px",
+                        overflowY: "auto",
+                        zIndex: 100,
                       }}
                     >
                       <div className="p-4">
-                        <h4 className="text-white font-semibold mb-3 text-sm">
-                          Shop by Category
+                        <h4 className="text-white font-semibold mb-3 text-sm flex items-center justify-between">
+                          <span>Shop by Category</span>
+                          <span className="text-xs px-2 py-1 rounded-full bg-white/10 text-[#B3B3B3]">
+                            {categoryData.length} items
+                          </span>
                         </h4>
+                        
                         <div className="space-y-1">
-                          {item.children.map((child, index) => (
+                          {categoryData.map((category) => (
                             <button
-                              key={index}
-                              onClick={() => handleProductClick(child.path)}
-                              className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-sm transition-all duration-200 hover:bg-white/5 ${
-                                location.pathname === child.path
+                              key={category.id}
+                              onClick={() => handleProductItemClick(category.slug)}
+                              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-md text-sm transition-all duration-200 hover:bg-white/10 group ${
+                                location.pathname === `/products/${category.slug}`
                                   ? "text-[#E10600] bg-white/10"
                                   : "text-[#B3B3B3] hover:text-white"
                               }`}
                             >
                               <div className="flex items-center gap-3">
-                                <span>{child.label}</span>
+                                <span className="text-base">
+                                  {getCategoryIcon(category.name)}
+                                </span>
+                                <span>{category.name}</span>
                               </div>
-                              <ChevronRight size={14} />
+                              <div className="flex items-center gap-2">
+                                <ChevronRight 
+                                  size={14} 
+                                  color={colors.muted}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity" 
+                                />
+                              </div>
                             </button>
                           ))}
                         </div>
-
-                        {/* VIEW ALL BUTTON */}
                       </div>
+                    </div>
+                  )}
+
+                  {/* Show message if no categories */}
+                  {productDropdownOpen && (!categoryData || categoryData.length === 0) && (
+                    <div
+                      ref={productDropdownRef}
+                      className="absolute top-full left-0 mt-2 rounded-lg shadow-xl animate-fadeIn p-4"
+                      style={{
+                        backgroundColor: colors.cardBg,
+                        border: `1px solid ${colors.border}`,
+                        minWidth: "200px",
+                        zIndex: 100,
+                      }}
+                    >
+                      <p className="text-sm text-[#B3B3B3] text-center">
+                        No categories available
+                      </p>
                     </div>
                   )}
                 </div>
@@ -339,7 +362,7 @@ const Navbar = ({ toggleMenu }) => {
             <div className="relative" ref={userDropdownRef}>
               <button
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 hover:opacity-80 transition"
               >
                 <div
                   className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold text-white"
@@ -349,7 +372,7 @@ const Navbar = ({ toggleMenu }) => {
                 </div>
                 <ChevronDown
                   size={16}
-                  className={`transition ${
+                  className={`transition-transform duration-200 ${
                     userDropdownOpen ? "rotate-180" : ""
                   }`}
                   color={colors.muted}
@@ -358,10 +381,11 @@ const Navbar = ({ toggleMenu }) => {
 
               {userDropdownOpen && (
                 <div
-                  className="absolute right-0 mt-3 w-60 rounded-lg shadow-xl"
+                  className="absolute right-0 mt-3 w-60 rounded-lg shadow-xl animate-fadeIn"
                   style={{
                     backgroundColor: colors.cardBg,
                     border: `1px solid ${colors.border}`,
+                    zIndex: 100,
                   }}
                 >
                   {/* USER INFO */}
@@ -378,15 +402,21 @@ const Navbar = ({ toggleMenu }) => {
                   {/* MENU */}
                   <div className="py-2">
                     <button
-                      onClick={() => navigate("/profile")}
-                      className="w-full flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/5 text-white"
+                      onClick={() => {
+                        navigate("/profile");
+                        setUserDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-white/10 text-white transition"
                     >
                       <UserCircle size={16} /> Profile
                     </button>
 
                     <button
-                      onClick={() => navigate("/orders")}
-                      className="w-full flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/5 text-white"
+                      onClick={() => {
+                        navigate("/orders");
+                        setUserDropdownOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-white/10 text-white transition"
                     >
                       <Package size={16} /> My Orders
                     </button>
@@ -398,7 +428,7 @@ const Navbar = ({ toggleMenu }) => {
 
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-3 px-4 py-2 text-sm hover:bg-red-600/20"
+                      className="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-red-600/20 transition"
                       style={{ color: colors.danger }}
                     >
                       <LogOut size={16} /> Logout
@@ -410,7 +440,7 @@ const Navbar = ({ toggleMenu }) => {
           ) : (
             <button
               onClick={() => navigate("/login")}
-              className="px-4 py-2 rounded-lg font-semibold transition hover:scale-105 text-white"
+              className="px-4 py-2 rounded-lg font-semibold transition hover:scale-105 hover:shadow-lg text-white"
               style={{
                 background: "linear-gradient(135deg, #E10600, #B30000)",
               }}
@@ -441,6 +471,26 @@ const Navbar = ({ toggleMenu }) => {
 
         .animate-fadeIn {
           animation: fadeIn 0.2s ease-out forwards;
+        }
+
+        /* Custom scrollbar for dropdown */
+        .overflow-y-auto::-webkit-scrollbar {
+          width: 4px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-track {
+          background: ${colors.border};
+          border-radius: 4px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+          background: ${colors.primary};
+          border-radius: 4px;
+        }
+        
+        .overflow-y-auto {
+          scrollbar-width: thin;
+          scrollbar-color: ${colors.primary} ${colors.border};
         }
       `}</style>
     </header>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import {
@@ -8,6 +8,10 @@ import {
   ChevronLeft,
   ChevronRight,
   IndianRupee,
+  Check,
+  Minus,
+  Plus,
+  Trash2,
 } from "lucide-react";
 
 // Import Swiper styles
@@ -15,33 +19,229 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { premiumFadeUp, premiumItem } from "../../animations/motionVariants";
+import { useCart } from "../../hooks/useCart";
+
+// Toast notification component
+const Toast = ({ message, type, onClose }) => {
+  useEffect(() => {
+    const timer = setTimeout(onClose, 3000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 50, x: "-50%" }}
+      animate={{ opacity: 1, y: 0, x: "-50%" }}
+      exit={{ opacity: 0, y: 50, x: "-50%" }}
+      className={`fixed bottom-4 left-1/2 z-50 px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3 ${
+        type === "success" ? "bg-[#22C55E]" : "bg-[#E10600]"
+      }`}
+    >
+      {type === "success" ? <Check size={20} /> : <ShoppingCart size={20} />}
+      <span className="text-white font-medium">{message}</span>
+    </motion.div>
+  );
+};
+
+// Cart Drawer Component
+const CartDrawer = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
+  const {
+    cartItems,
+    updateQuantity,
+    removeFromCart,
+    getSubtotal,
+    getTotalItems,
+  } = useCart();
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Overlay */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 z-50"
+            onClick={onClose}
+          />
+
+          {/* Drawer */}
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 25 }}
+            className="fixed right-0 top-0 h-full w-full md:w-96 bg-[#0B0B0B] z-50 shadow-2xl border-l border-[#262626]"
+          >
+            <div className="flex flex-col h-full">
+              {/* Header */}
+              <div className="p-6 border-b border-[#262626] bg-[#141414]">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                    <ShoppingCart className="text-[#E10600]" />
+                    Your Cart
+                    <span className="text-sm bg-[#E10600] text-white px-2 py-1 rounded-full">
+                      {getTotalItems()}
+                    </span>
+                  </h2>
+                  <button
+                    onClick={onClose}
+                    className="p-2 hover:bg-[#262626] rounded-full transition"
+                  >
+                    <ChevronRight className="text-white" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Cart Items */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                {cartItems.length === 0 ? (
+                  <div className="text-center py-12">
+                    <ShoppingCart className="w-16 h-16 text-[#262626] mx-auto mb-4" />
+                    <p className="text-[#B3B3B3]">Your cart is empty</p>
+                    <button
+                      onClick={onClose}
+                      className="mt-4 px-6 py-2 bg-[#E10600] text-white rounded-lg hover:bg-[#FF0800] transition"
+                    >
+                      Continue Shopping
+                    </button>
+                  </div>
+                ) : (
+                  cartItems.map((item) => (
+                    <motion.div
+                      key={item.id}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className="flex gap-4 p-4 bg-[#141414] rounded-lg border border-[#262626]"
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-20 h-20 object-cover rounded-lg"
+                      />
+                      <div className="flex-1">
+                        <h3 className="text-white font-semibold line-clamp-2 text-sm">
+                          {item.name}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-2">
+                          <IndianRupee className="w-4 h-4 text-[#E10600]" />
+                          <span className="text-[#E10600] font-bold">
+                            {item.price.toLocaleString("en-IN")}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between mt-3">
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity - 1)
+                              }
+                              className="p-1 bg-[#262626] rounded hover:bg-[#E10600] transition"
+                            >
+                              <Minus size={14} />
+                            </button>
+                            <span className="text-white w-8 text-center">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity + 1)
+                              }
+                              className="p-1 bg-[#262626] rounded hover:bg-[#E10600] transition"
+                            >
+                              <Plus size={14} />
+                            </button>
+                          </div>
+                          <button
+                            onClick={() => removeFromCart(item.id)}
+                            className="p-1 text-red-500 hover:bg-red-500/20 rounded transition"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                )}
+              </div>
+
+              {/* Footer */}
+              {cartItems.length > 0 && (
+                <div className="p-6 border-t border-[#262626] bg-[#141414]">
+                  <div className="flex justify-between mb-4">
+                    <span className="text-[#B3B3B3]">Subtotal</span>
+                    <span className="text-white font-bold flex items-center">
+                      <IndianRupee size={16} />
+                      {getSubtotal().toLocaleString("en-IN")}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      onClose();
+                      navigate("/checkout");
+                    }}
+                    className="w-full py-3 bg-[#E10600] text-white font-bold rounded-lg hover:bg-[#FF0800] transition mb-2"
+                  >
+                    Proceed to Checkout
+                  </button>
+                  <button
+                    onClick={onClose}
+                    className="w-full py-2 text-[#B3B3B3] hover:text-white transition"
+                  >
+                    Continue Shopping
+                  </button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+};
 
 const FeatureProduct = ({ featureProduct }) => {
   const [hoveredCard, setHoveredCard] = useState(null);
   const navigate = useNavigate();
+
+  // Use the cart hook
+  const {
+    cartItems,
+    showToast,
+    isCartOpen,
+    isLoaded,
+    setIsCartOpen,
+    setShowToast,
+    addToCart,
+    toggleWishlist,
+    isInWishlist,
+    getCartQuantity,
+    getTotalItems,
+  } = useCart();
 
   // Get image URL
   const getImageUrl = (imagePath) => {
     if (!imagePath) {
       return "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80";
     }
-    
-    // If it's already a full URL
-    if (imagePath.startsWith('http') || imagePath.startsWith('https')) {
+
+    if (imagePath.startsWith("http") || imagePath.startsWith("https")) {
       return imagePath;
     }
-    
-    // Assuming you have a storage URL from environment variables
-    const storageUrl = import.meta.env.VITE_STORAGE_URL || '';
+
+    const storageUrl = import.meta.env.VITE_STORAGE_URL || "";
     return `${storageUrl}/${imagePath}`;
   };
 
-  // Get product image (thumbnail first, then first image, then fallback)
+  // Get product image
   const getProductImage = (product) => {
     if (product.images && product.images.length > 0) {
-      const thumbnail = product.images.find(img => img.is_thumbnail === 1);
+      const thumbnail = product.images.find((img) => img.is_thumbnail === 1);
       if (thumbnail) {
         return getImageUrl(thumbnail.image);
       }
@@ -52,10 +252,18 @@ const FeatureProduct = ({ featureProduct }) => {
 
   // Get badge based on product data
   const getProductBadge = (product) => {
-    if (product.sale_price && parseFloat(product.sale_price) < parseFloat(product.price)) {
-      return "SALE";
+    if (
+      product.sale_price &&
+      parseFloat(product.sale_price) < parseFloat(product.price)
+    ) {
+      const discount = Math.round(
+        ((parseFloat(product.price) - parseFloat(product.sale_price)) /
+          parseFloat(product.price)) *
+          100,
+      );
+      return `${discount}% OFF`;
     }
-    if (product.rating >= 4.5 && product.review_count > 10) {
+    if (product.rating >= 4.5 && product.review_count > 5) {
       return "BESTSELLER";
     }
     if (product.stock < 5) {
@@ -65,105 +273,43 @@ const FeatureProduct = ({ featureProduct }) => {
   };
 
   const getBadgeColor = (badge) => {
-    switch (badge) {
-      case "BESTSELLER":
-        return "bg-[#E10600]";
-      case "LOW STOCK":
-        return "bg-[#FACC15] text-[#0B0B0B]";
-      case "SALE":
-        return "bg-[#22C55E]";
-      case "FEATURED":
-        return "bg-gradient-to-r from-[#E10600] to-[#FF0800]";
-      default:
-        return "bg-[#E10600]";
-    }
+    if (badge.includes("% OFF")) return "bg-[#22C55E]";
+    if (badge === "BESTSELLER") return "bg-[#E10600]";
+    if (badge === "LOW STOCK") return "bg-[#FACC15] text-[#0B0B0B]";
+    return "bg-gradient-to-r from-[#E10600] to-[#FF0800]";
   };
 
   // Format price in rupees
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(price);
   };
 
-  // Use API data if available, otherwise fallback to hardcoded products
-  const products = featureProduct && featureProduct.length > 0 
-    ? featureProduct.map(product => ({
-        id: product.id,
-        name: product.name,
-        price: parseFloat(product.price),
-        originalPrice: product.sale_price ? parseFloat(product.sale_price) : parseFloat(product.price),
-        image: getProductImage(product),
-        badge: getProductBadge(product),
-        rating: product.rating || 4.5,
-        reviews: product.review_count || 0,
-        slug: product.slug,
-      }))
-    : [
-        {
-          id: 1,
-          name: "Pro Adjustable Dumbbell Set",
-          price: 299.99,
-          originalPrice: 399.99,
-          image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80",
-          badge: "BESTSELLER",
-          rating: 4.8,
-          reviews: 234,
-        },
-        {
-          id: 2,
-          name: "Olympic Barbell 20KG",
-          price: 189.99,
-          originalPrice: 249.99,
-          image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&q=80",
-          badge: "NEW",
-          rating: 4.9,
-          reviews: 156,
-        },
-        {
-          id: 3,
-          name: "Premium Resistance Bands",
-          price: 49.99,
-          originalPrice: 79.99,
-          image: "https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=500&q=80",
-          badge: "SALE",
-          rating: 4.7,
-          reviews: 189,
-        },
-        {
-          id: 4,
-          name: "Heavy Duty Power Rack",
-          price: 899.99,
-          originalPrice: 1199.99,
-          image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&q=80",
-          badge: "FEATURED",
-          rating: 4.9,
-          reviews: 312,
-        },
-        {
-          id: 5,
-          name: "Hex Dumbbell Set 5-50lb",
-          price: 599.99,
-          originalPrice: 799.99,
-          image: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=500&q=80",
-          badge: "BESTSELLER",
-          rating: 4.8,
-          reviews: 267,
-        },
-        {
-          id: 6,
-          name: "Competition Kettlebell 24KG",
-          price: 79.99,
-          originalPrice: 109.99,
-          image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&q=80",
-          badge: "NEW",
-          rating: 4.6,
-          reviews: 145,
-        },
-      ];
+  // Prepare products
+  const products =
+    featureProduct && featureProduct.length > 0
+      ? featureProduct.map((product) => ({
+          id: product.id,
+          name: product.name,
+          price: product.sale_price
+            ? parseFloat(product.sale_price)
+            : parseFloat(product.price),
+          sale_price: product.sale_price
+            ? parseFloat(product.sale_price)
+            : null,
+          originalPrice: parseFloat(product.price),
+          image: getProductImage(product),
+          badge: getProductBadge(product),
+          rating: product.rating || 4.5,
+          reviews: product.review_count || 0,
+          slug: product.slug,
+          stock: product.stock || 10,
+        }))
+      : [];
 
   // Don't render if no products
   if (!featureProduct || featureProduct.length === 0) {
@@ -176,11 +322,24 @@ const FeatureProduct = ({ featureProduct }) => {
     );
   }
 
+  // Show loading state while cart is being loaded
+  if (!isLoaded) {
+    return (
+      <section className="py-16 bg-[#0B0B0B]">
+        <div className="max-w-8xl mx-auto px-4 text-center">
+          <div className="animate-pulse">
+            <div className="h-8 bg-[#262626] rounded w-64 mx-auto mb-4"></div>
+            <div className="h-4 bg-[#262626] rounded w-96 mx-auto"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className="py-16 bg-[#0B0B0B]">
       <div className="max-w-8xl mx-auto px-4">
-        {/* Section Header */}
-        <div className="text-center mb-16">
+        {/* Section Header with Cart Icon */}
+        <div className="text-center mb-16 relative">
           <motion.h2
             variants={premiumFadeUp}
             initial="hidden"
@@ -201,6 +360,23 @@ const FeatureProduct = ({ featureProduct }) => {
             Premium gym equipment handpicked for serious athletes. Build
             strength, build legacy.
           </motion.p>
+
+          {/* Cart Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsCartOpen(true)}
+            className="absolute right-0 top-0 bg-[#141414] p-4 rounded-full border border-[#262626] hover:border-[#E10600] transition group"
+          >
+            <div className="relative">
+              <ShoppingCart className="w-6 h-6 text-white group-hover:text-[#E10600] transition" />
+              {cartItems.length > 0 && (
+                <span className="absolute -top-2 -right-2 w-5 h-5 bg-[#E10600] text-white text-xs rounded-full flex items-center justify-center">
+                  {getTotalItems()}
+                </span>
+              )}
+            </div>
+          </motion.button>
         </div>
 
         {/* Swiper Carousel */}
@@ -238,7 +414,6 @@ const FeatureProduct = ({ featureProduct }) => {
             {products.map((product) => (
               <SwiperSlide key={product.id}>
                 <motion.div
-                  key={product.id}
                   variants={premiumItem}
                   initial="hidden"
                   animate="visible"
@@ -256,43 +431,65 @@ const FeatureProduct = ({ featureProduct }) => {
                     }`}
                   >
                     {/* Image Container */}
-                    <motion.div
-                      whileHover={{ scale: 1.12 }}
-                      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                      className="relative overflow-hidden group"
-                    >
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
-                        onError={(e) => {
-                          e.target.src = "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80";
-                        }}
-                      />
+                    <div className="relative overflow-hidden group">
+                      <motion.div
+                        whileHover={{ scale: 1.12 }}
+                        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                      >
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-72 object-cover transition-transform duration-500 group-hover:scale-110"
+                          onError={(e) => {
+                            e.target.src =
+                              "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80";
+                          }}
+                        />
+                      </motion.div>
 
                       {/* Badge */}
                       <div
                         className={`absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-bold ${getBadgeColor(
-                          product.badge
+                          product.badge,
                         )}`}
                       >
                         {product.badge}
                       </div>
 
-                      {/* Quick Actions */}
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{
-                          opacity: hoveredCard === product.id ? 1 : 0,
-                        }}
-                        transition={{ duration: 0.3 }}
-                        className={`absolute inset-0 bg-black/60 flex items-center justify-center gap-4 transition-opacity duration-300 ${
-                          hoveredCard === product.id
-                            ? "opacity-100"
-                            : "opacity-0"
-                        }`}
-                      ></motion.div>
-                    </motion.div>
+                      {/* Wishlist Button */}
+                      <button
+                        onClick={() => toggleWishlist(product)}
+                        className="absolute top-4 right-4 p-2 bg-black/50 backdrop-blur-sm rounded-full hover:bg-[#E10600] transition"
+                      >
+                        <Heart
+                          size={18}
+                          className={
+                            isInWishlist(product.id)
+                              ? "fill-white text-white"
+                              : "text-white"
+                          }
+                        />
+                      </button>
+
+                      {/* Stock Indicator */}
+                      {product.stock < 5 && (
+                        <div className="absolute bottom-4 left-4">
+                          <span className="px-3 py-1 bg-yellow-500/90 text-black text-xs font-semibold rounded-full">
+                            Only {product.stock} left
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Cart Quantity Badge */}
+                      {getCartQuantity(product.id) > 0 && (
+                        <div className="absolute top-16 left-4">
+                          <span className="px-3 py-1 bg-[#E10600] text-white text-xs font-semibold rounded-full flex items-center gap-1">
+                            <ShoppingCart size={12} />
+                            {getCartQuantity(product.id)} in cart
+                          </span>
+                        </div>
+                      )}
+                    </div>
 
                     {/* Product Info */}
                     <div className="p-6">
@@ -328,16 +525,17 @@ const FeatureProduct = ({ featureProduct }) => {
                         <div className="flex items-center">
                           <IndianRupee className="w-5 h-5 text-[#E10600]" />
                           <span className="text-[#E10600] text-2xl font-bold ml-1">
-                            {formatPrice(product.price).replace('₹', '')}
+                            {formatPrice(product.price).replace("₹", "")}
                           </span>
                         </div>
-                        {product.originalPrice !== product.price && (
-                          <div className="flex items-center">
-                            <span className="text-[#B3B3B3] text-lg line-through">
-                              ₹{product.originalPrice.toLocaleString('en-IN')}
-                            </span>
-                          </div>
-                        )}
+                        {product.sale_price &&
+                          product.sale_price < product.originalPrice && (
+                            <div className="flex items-center">
+                              <span className="text-[#B3B3B3] text-lg line-through">
+                                ₹{product.originalPrice.toLocaleString("en-IN")}
+                              </span>
+                            </div>
+                          )}
                       </div>
 
                       {/* Action Buttons */}
@@ -360,7 +558,11 @@ const FeatureProduct = ({ featureProduct }) => {
                             hover:shadow-[0_0_20px_rgba(225,6,0,0.4)]
                             active:scale-95
                           "
-                          onClick={() => navigate(`/product-details/${product.slug || product.id}`)}
+                          onClick={() =>
+                            navigate(
+                              `/product-details/${product.slug || product.id}`,
+                            )
+                          }
                         >
                           <Eye className="w-5 h-5" />
                           View
@@ -371,7 +573,7 @@ const FeatureProduct = ({ featureProduct }) => {
                           whileHover={{ scale: 1.08 }}
                           whileTap={{ scale: 0.94 }}
                           transition={{ type: "spring", stiffness: 200 }}
-                          className="
+                          className={`
                             flex-1 flex items-center justify-center gap-2
                             py-3
                             bg-[#E10600]
@@ -382,10 +584,24 @@ const FeatureProduct = ({ featureProduct }) => {
                             hover:bg-[#FF0800]
                             hover:shadow-[0_0_25px_rgba(225,6,0,0.6)]
                             active:scale-95
-                          "
+                            ${product.stock === 0 ? "opacity-50 cursor-not-allowed" : ""}
+                          `}
+                          onClick={() =>
+                            product.stock > 0 && addToCart(product)
+                          }
+                          disabled={product.stock === 0}
                         >
-                          <ShoppingCart className="w-5 h-5" />
-                          Add to Cart
+                          {getCartQuantity(product.id) > 0 ? (
+                            <>
+                              <Check className="w-5 h-5" />
+                              Added ({getCartQuantity(product.id)})
+                            </>
+                          ) : (
+                            <>
+                              <ShoppingCart className="w-5 h-5" />
+                              Add to Cart
+                            </>
+                          )}
                         </motion.button>
                       </div>
                     </div>
@@ -418,6 +634,20 @@ const FeatureProduct = ({ featureProduct }) => {
           <div className="swiper-pagination-custom flex justify-center gap-2 mt-4"></div>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {showToast && (
+          <Toast
+            message={showToast.message}
+            type={showToast.type}
+            onClose={() => setShowToast(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Cart Drawer */}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
 
       <style jsx>{`
         .swiper-pagination-custom .swiper-pagination-bullet {

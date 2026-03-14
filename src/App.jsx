@@ -61,7 +61,7 @@ const App = () => {
           />
           <Route
             index
-            path="/:category/:subcategory/:slug"
+            path="/:category/:subcategory/:PSlug"
             element={<ProductDetails />}
           />
 
@@ -74,7 +74,7 @@ const App = () => {
           <Route index path="/profile" element={<ProfilePage />} />
           <Route index path="/orders" element={<MyOrders />} />
           <Route index path="/cart" element={<CartPage />} />
-          <Route index path="/checkout" element={<CheckoutPage />} />
+          <Route index path="/checkout/:id" element={<CheckoutPage />} />
         </Route>
         <Route index path="/order-successful" element={<OrderSuccessful />} />
 

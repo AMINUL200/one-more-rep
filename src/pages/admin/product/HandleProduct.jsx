@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { api } from "../../../utils/app";
+import CustomTextEditor from "../../../component/form/TextEditor";
 
 const HandleProduct = () => {
   const [products, setProducts] = useState([]);
@@ -1621,18 +1622,23 @@ const HandleProduct = () => {
                     className="absolute left-3 top-3"
                     style={{ color: colors.muted }}
                   />
-                  <textarea
-                    name="description"
+
+                  <CustomTextEditor
                     value={formData.description}
-                    onChange={handleInputChange}
-                    rows="3"
+                    height={300}
+                    placeholder="Enter product description..."
                     className="w-full pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
                     style={{
                       backgroundColor: colors.background,
                       border: `1px solid ${formErrors.description ? colors.danger : colors.border}`,
                       color: colors.text,
                     }}
-                    placeholder="Enter product description"
+                    onChange={(content) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        description: content,
+                      }))
+                    }
                   />
                 </div>
                 {formErrors.description && (
@@ -1673,18 +1679,23 @@ const HandleProduct = () => {
                 >
                   <Truck size={16} /> Shipping Policy
                 </label>
-                <textarea
-                  name="shipping_policy"
+
+                <CustomTextEditor
                   value={formData.shipping_policy}
-                  onChange={handleInputChange}
-                  rows="2"
+                  height={250}
+                  placeholder="Enter shipping policy..."
                   className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
                   style={{
                     backgroundColor: colors.background,
                     border: `1px solid ${colors.border}`,
                     color: colors.text,
                   }}
-                  placeholder="Enter shipping policy"
+                  onChange={(content) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      shipping_policy: content,
+                    }))
+                  }
                 />
               </div>
 
@@ -1719,10 +1730,11 @@ const HandleProduct = () => {
                 >
                   <RotateCcw size={16} /> Return Policy
                 </label>
-                <textarea
-                  name="return_policy"
+
+                <CustomTextEditor
                   value={formData.return_policy}
-                  onChange={handleInputChange}
+                  height={250}
+                  placeholder="Enter return policy..."
                   rows="2"
                   className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
                   style={{
@@ -1730,7 +1742,12 @@ const HandleProduct = () => {
                     border: `1px solid ${colors.border}`,
                     color: colors.text,
                   }}
-                  placeholder="Enter return policy"
+                  onChange={(content) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      return_policy: content,
+                    }))
+                  }
                 />
               </div>
 

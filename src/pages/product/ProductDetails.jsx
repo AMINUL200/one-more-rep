@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import {
   Star,
   Heart,
@@ -68,7 +68,7 @@ const ProductDetails = () => {
   }, [PSlug]);
 
   // Get image URL
-  const getImageUrl = (imagePath) => {
+  const getImageUrl = useCallback((imagePath) => {
     if (!imagePath) return "";
     
     if (imagePath.startsWith('http') || imagePath.startsWith('https')) {
@@ -77,13 +77,13 @@ const ProductDetails = () => {
     
     const storageUrl = import.meta.env.VITE_STORAGE_URL || '';
     return `${storageUrl}/${imagePath}`;
-  };
+  }, []);
 
   // Prepare media array from product images
-  const getMediaFromProduct = () => {
+  const media = useMemo(() => {
     if (!productData) return [];
     
-    const media = [];
+    const mediaArray = [];
     
     // Add images from product.images
     if (productData.images && productData.images.length > 0) {
@@ -91,7 +91,7 @@ const ProductDetails = () => {
       const sortedImages = [...productData.images].sort((a, b) => a.sort_order - b.sort_order);
       
       sortedImages.forEach(img => {
-        media.push({
+        mediaArray.push({
           type: "image",
           src: getImageUrl(img.image),
           thumbnail: getImageUrl(img.image),
@@ -100,7 +100,7 @@ const ProductDetails = () => {
       });
     } else {
       // Fallback image
-      media.push({
+      mediaArray.push({
         type: "image",
         src: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80",
         thumbnail: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=200&h=150&fit=crop",
@@ -108,16 +108,16 @@ const ProductDetails = () => {
       });
     }
     
-    return media;
-  };
+    return mediaArray;
+  }, [productData, getImageUrl]);
 
   // Format price in rupees
-  const formatPrice = (price) => {
+  const formatPrice = useCallback((price) => {
     return parseFloat(price).toLocaleString('en-IN');
-  };
+  }, []);
 
   // Calculate discount percentage
-  const getDiscountPercentage = () => {
+  const discountPercentage = useMemo(() => {
     if (!productData) return 0;
     const price = parseFloat(productData.price);
     const salePrice = productData.sale_price ? parseFloat(productData.sale_price) : price;
@@ -125,9 +125,7 @@ const ProductDetails = () => {
       return Math.round(((price - salePrice) / price) * 100);
     }
     return 0;
-  };
-
-  const media = getMediaFromProduct();
+  }, [productData]);
 
   const handleVideoPlay = () => {
     if (videoRef.current) {
@@ -145,7 +143,7 @@ const ProductDetails = () => {
   };
 
   // Prepare specifications from product.specifications
-  const getProductSpecs = () => {
+  const productSpecs = useMemo(() => {
     if (!productData) return [];
     
     if (productData.specifications && productData.specifications.length > 0) {
@@ -164,10 +162,10 @@ const ProductDetails = () => {
       { label: "Dimensions", value: "45 × 15 × 15 cm" },
       { label: "Max Load", value: "50 kg per dumbbell" },
     ];
-  };
+  }, [productData]);
 
   // Prepare features from product.features
-  const getProductFeatures = () => {
+  const features = useMemo(() => {
     if (!productData) return [];
     
     if (productData.features && productData.features.length > 0) {
@@ -185,10 +183,10 @@ const ProductDetails = () => {
       "Includes storage tray and user manual",
       "Suitable for beginners to professional athletes",
     ];
-  };
+  }, [productData]);
 
   // Prepare reviews from product.reviews
-  const getProductReviews = () => {
+  const reviews = useMemo(() => {
     if (!productData) return [];
     
     if (productData.reviews && productData.reviews.length > 0) {
@@ -202,52 +200,59 @@ const ProductDetails = () => {
           year: 'numeric'
         }),
         comment: review.review,
-        verified: true,
-        helpful: Math.floor(Math.random() * 20) + 5, // Random helpful count
+        // verified: true,
+        // helpful: Math.floor(Math.random() * 20) + 5, // Random helpful count
       }));
     }
     
     return [];
-  };
-
-  const productSpecs = getProductSpecs();
-  const features = getProductFeatures();
-  const reviews = getProductReviews();
-  const discountPercentage = getDiscountPercentage();
+  }, [productData]);
 
   // Technical specifications from product data
-  const technicalSpecs = productData ? [
-    { label: "Material", value: productData.specifications?.find(s => s.spec_key === "Material")?.spec_value || "High-grade Steel + Rubber" },
-    { label: "Weight", value: `${productData.stock || 20} kg total` },
-    { label: "Maximum Load", value: `${productData.stock * 2 || 50} kg` },
-    { label: "Warranty", value: "2 Years Limited" },
-    { label: "Manufacturer", value: "GymPro Equipment Co." },
-    { label: "Country of Origin", value: "Made in India" },
-    { label: "Certifications", value: "ISO 9001, CE Certified" },
-  ] : [];
+  const technicalSpecs = useMemo(() => {
+    if (!productData) return [];
+    
+    return [
+      { label: "Material", value: productData.specifications?.find(s => s.spec_key === "Material")?.spec_value || "High-grade Steel + Rubber" },
+      { label: "Weight", value: `${productData.stock || 20} kg total` },
+      { label: "Maximum Load", value: `${productData.stock * 2 || 50} kg` },
+      { label: "Warranty", value: "2 Years Limited" },
+      { label: "Manufacturer", value: "GymPro Equipment Co." },
+      { label: "Country of Origin", value: "Made in India" },
+      { label: "Certifications", value: "ISO 9001, CE Certified" },
+    ];
+  }, [productData]);
 
-  const shippingInfo = [
-    {
-      icon: Truck,
-      title: "Free Shipping",
-      description: productData?.shipping_policy || "On orders above ₹2,000. Delivered in 3-7 business days.",
-    },
-    {
-      icon: Package,
-      title: "Easy Installation",
-      description: "Comes with detailed manual. Professional installation available.",
-    },
-    {
-      icon: RotateCcw,
-      title: productData?.return_policy ? "Return Policy" : "30-Day Returns",
-      description: productData?.return_policy || "Not satisfied? Return within 30 days for full refund.",
-    },
-    {
-      icon: ShieldCheck,
-      title: "2-Year Warranty",
-      description: "Covers manufacturing defects and parts replacement.",
-    },
-  ];
+  const shippingInfo = useMemo(() => {
+    return [
+      {
+        icon: Truck,
+        title: "Free Shipping",
+        description: productData?.shipping_policy || "On orders above ₹2,000. Delivered in 3-7 business days.",
+      },
+      {
+        icon: Package,
+        title: "Easy Installation",
+        description: "Comes with detailed manual. Professional installation available.",
+      },
+      {
+        icon: RotateCcw,
+        title: productData?.return_policy ? "Return Policy" : "30-Day Returns",
+        description: productData?.return_policy || "Not satisfied? Return within 30 days for full refund.",
+      },
+      {
+        icon: ShieldCheck,
+        title: "2-Year Warranty",
+        description: "Covers manufacturing defects and parts replacement.",
+      },
+    ];
+  }, [productData]);
+
+  // Function to render HTML content safely
+  const renderHTML = (htmlContent) => {
+    if (!htmlContent) return null;
+    return <div dangerouslySetInnerHTML={{ __html: htmlContent }} />;
+  };
 
   if (loading) return <PageLoader />;
   
@@ -504,25 +509,7 @@ const ProductDetails = () => {
                 </button>
               </div>
 
-              {/* Trust Icons */}
-              <div className="grid grid-cols-2 gap-6">
-                {shippingInfo.slice(0, 2).map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-3 p-4 rounded-xl bg-[#141414] border border-[#262626]"
-                  >
-                    <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-[#E10600]/10 border border-[#E10600]/20">
-                      <item.icon size={20} className="text-[#E10600]" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold">{item.title}</h4>
-                      <p className="text-sm text-[#B3B3B3]">
-                        {item.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            
             </div>
           </div>
 
@@ -532,7 +519,7 @@ const ProductDetails = () => {
             <div className="flex border-b border-[#262626] mb-8">
               {[
                 { id: "details", label: "Product Details" },
-                { id: "reviews", label: `Reviews (${productData.review_count || 0})` },
+                { id: "reviews", label: `Reviews (${productData.rating || 0})` },
                 { id: "shipping", label: "Shipping & Returns" },
               ].map((tab) => (
                 <button
@@ -555,36 +542,25 @@ const ProductDetails = () => {
               {activeTab === "details" && (
                 <div className="grid md:grid-cols-2 gap-12">
                   <div>
-                    <h3 className="text-2xl font-bold mb-6">
+                    {/* <h3 className="text-2xl font-bold mb-6 text-white">
                       Features & Benefits
-                    </h3>
-                    <ul className="space-y-4">
-                      {features.map((feature, index) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <div className="w-6 h-6 rounded-full bg-[#E10600] flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <CheckCircle size={14} />
-                          </div>
-                          <span className="text-[#B3B3B3]">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    </h3> */}
+                    {productData.description ? (
+                      renderHTML(productData.description)
+                    ) : (
+                      <ul className="space-y-4">
+                        {features.map((feature, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <div className="w-6 h-6 rounded-full bg-[#E10600] flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <CheckCircle size={14} />
+                            </div>
+                            <span className="text-[#B3B3B3]">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
-                  <div>
-                    <h3 className="text-2xl font-bold mb-6">
-                      Technical Specifications
-                    </h3>
-                    <div className="space-y-4">
-                      {technicalSpecs.map((spec, index) => (
-                        <div
-                          key={index}
-                          className="flex justify-between py-3 border-b border-[#262626]"
-                        >
-                          <span className="text-[#B3B3B3]">{spec.label}</span>
-                          <span className="font-semibold">{spec.value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                 
                 </div>
               )}
 
@@ -593,20 +569,20 @@ const ProductDetails = () => {
                 <div>
                   <div className="flex items-center justify-between mb-8">
                     <div>
-                      <h3 className="text-2xl font-bold mb-2">
+                      <h3 className="text-2xl font-bold mb-2 text-white">
                         Customer Reviews
                       </h3>
                       <div className="flex items-center gap-4">
                         <div className="text-center">
-                          <div className="text-5xl font-bold">
-                            {productData.rating?.toFixed(1) || "4.8"}
+                          <div className="text-5xl font-bold text-white">
+                             {productData.rating?.toFixed(1) || "4.8"}
                           </div>
                           <div className="flex items-center justify-center gap-1 mt-1">
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
                                 className={`w-4 h-4 ${
-                                  i < (productData.rating || 0)
+                                  i <  (productData.rating || 0)
                                     ? "text-[#FACC15] fill-[#FACC15]"
                                     : "text-[#262626]"
                                 }`}
@@ -614,14 +590,12 @@ const ProductDetails = () => {
                             ))}
                           </div>
                           <p className="text-sm text-[#B3B3B3] mt-2">
-                            Based on {productData.review_count || 0} reviews
+                            Based on   {productData.review_count || 0} Reviews
                           </p>
                         </div>
                       </div>
                     </div>
-                    <button className="px-6 py-3 rounded-lg font-semibold border-2 border-[#E10600] text-[#E10600] hover:bg-[#E10600] hover:text-white transition-colors">
-                      Write a Review
-                    </button>
+                   
                   </div>
 
                   {reviews.length > 0 ? (
@@ -637,7 +611,7 @@ const ProductDetails = () => {
                                 <User size={20} />
                               </div>
                               <div>
-                                <h4 className="font-bold">{review.name}</h4>
+                                <h4 className="font-bold text-white">{review.name}</h4>
                                 <div className="flex items-center gap-2 mt-1">
                                   <div className="flex items-center gap-1">
                                     {[...Array(5)].map((_, i) => (
@@ -662,10 +636,7 @@ const ProductDetails = () => {
                                 </div>
                               </div>
                             </div>
-                            <button className="flex items-center gap-2 text-sm text-[#B3B3B3] hover:text-white">
-                              <ThumbsUp size={16} />
-                              Helpful ({review.helpful})
-                            </button>
+                           
                           </div>
                           <p className="text-[#B3B3B3]">{review.comment}</p>
                         </div>
@@ -683,56 +654,40 @@ const ProductDetails = () => {
               {activeTab === "shipping" && (
                 <div className="grid md:grid-cols-2 gap-12">
                   <div>
-                    <h3 className="text-2xl font-bold mb-6">
-                      Shipping Information
-                    </h3>
-                    <div className="space-y-6">
-                      <div className="p-6 rounded-xl border border-[#262626]">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-[#E10600]/10">
-                            <Truck size={20} className="text-[#E10600]" />
+                  
+                    {productData.shipping_policy ? (
+                      renderHTML(productData.shipping_policy)
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="p-6 rounded-xl border border-[#262626]">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-[#E10600]/10">
+                              <Truck size={20} className="text-[#E10600]" />
+                            </div>
+                            <h4 className="text-xl font-bold text-white">Delivery</h4>
                           </div>
-                          <h4 className="text-xl font-bold">Delivery</h4>
+                          <p className="text-[#B3B3B3]">Free shipping across India within 5-7 days.</p>
                         </div>
-                        <p className="text-[#B3B3B3]">{productData.shipping_policy || "Free shipping across India within 5-7 days."}</p>
                       </div>
-
-                      <div className="p-6 rounded-xl border border-[#262626]">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-[#E10600]/10">
-                            <RotateCcw size={20} className="text-[#E10600]" />
-                          </div>
-                          <h4 className="text-xl font-bold">Return Policy</h4>
-                        </div>
-                        <p className="text-[#B3B3B3]">{productData.return_policy || "7 day return policy for unused products."}</p>
-                      </div>
-                    </div>
+                    )}
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold mb-6">
-                      Warranty & Support
-                    </h3>
-                    <div className="space-y-6">
-                      <div className="p-6 rounded-xl border border-[#262626]">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-[#E10600]/10">
-                            <ShieldCheck size={20} className="text-[#E10600]" />
+                    
+                    {productData.return_policy ? (
+                      renderHTML(productData.return_policy)
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="p-6 rounded-xl border border-[#262626]">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-[#E10600]/10">
+                              <RotateCcw size={20} className="text-[#E10600]" />
+                            </div>
+                            <h4 className="text-xl font-bold text-white">Return Policy</h4>
                           </div>
-                          <h4 className="text-xl font-bold">Warranty</h4>
+                          <p className="text-[#B3B3B3]">7 day return policy for unused products.</p>
                         </div>
-                        <p className="text-[#B3B3B3]">2-Year Warranty covering manufacturing defects and parts replacement.</p>
                       </div>
-
-                      <div className="p-6 rounded-xl border border-[#262626]">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-[#E10600]/10">
-                            <MessageCircle size={20} className="text-[#E10600]" />
-                          </div>
-                          <h4 className="text-xl font-bold">Need Help?</h4>
-                        </div>
-                        <p className="text-[#B3B3B3]">Contact our customer support for any queries about shipping, returns, or product assistance.</p>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               )}

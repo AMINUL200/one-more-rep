@@ -16,6 +16,7 @@ const PageLoader = () => {
     muted: "#B3B3B3",
     success: "#22C55E",
     warning: "#FACC15",
+    accent: "#8B5CF6", // Added accent color for floating dots
   };
 
   // Gym instruments to rotate
@@ -75,145 +76,151 @@ const PageLoader = () => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center px-4"
-      style={{ backgroundColor: colors.background }}
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden"
+      style={{ 
+        backgroundColor: colors.background,
+        // Ensure no scrollbars appear
+        overscrollBehavior: 'none',
+        WebkitOverflowScrolling: 'touch',
+      }}
     >
-      {/* Top: Company Logo & Heading */}
-      <div className="text-center mb-12 animate-fadeIn">
-        <div className="relative w-20 h-20 mx-auto mb-6">
-          {/* Logo Container */}
-          <div className="absolute inset-0 rounded-full overflow-hidden border-2 p-1"
-            style={{ 
-              borderColor: colors.primary,
-              backgroundColor: colors.cardBg,
-            }}
-          >
-            <img
-              src="/image/gym_logo.png"
-              alt="One Rep More"
-              className="w-full h-full object-cover rounded-full"
+      {/* Main content container with proper spacing */}
+      <div className="relative w-full h-full flex flex-col items-center justify-between py-8 px-4 overflow-y-auto">
+        {/* Top: Company Logo & Heading */}
+        <div className="text-center animate-fadeIn flex-shrink-0">
+          <div className="relative w-20 h-20 mx-auto mb-6">
+            {/* Logo Container */}
+            <div className="absolute inset-0 rounded-full overflow-hidden border-2 p-1"
+              style={{ 
+                borderColor: colors.primary,
+                backgroundColor: colors.cardBg,
+              }}
+            >
+              <img
+                src="/image/gym_logo.png"
+                alt="One Rep More"
+                className="w-full h-full object-cover rounded-full"
+              />
+            </div>
+            
+            {/* Animated Ring */}
+            <div className="absolute -inset-2 rounded-full animate-ping-slow opacity-30"
+              style={{ border: `2px solid ${colors.primary}` }}
             />
           </div>
           
-          {/* Animated Ring */}
-          <div className="absolute -ins-2 rounded-full animate-ping-slow opacity-30"
-            style={{ border: `2px solid ${colors.primary}` }}
-          />
-        </div>
-        
-        <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2"
-          style={{ color: colors.text }}
-        >
-          ONE <span style={{ color: colors.primary }}>REP</span> MORE
-        </h1>
-        <p className="text-sm uppercase tracking-widest"
-          style={{ color: colors.muted }}
-        >
-          Premium Fitness Equipment
-        </p>
-      </div>
-
-      {/* Middle: Rotating Gym Instrument */}
-      <div className="relative w-64 h-64 flex items-center justify-center mb-10">
-        {/* Outer Ring */}
-        <div className="absolute inset-0 rounded-full border-2 animate-spin-slow"
-          style={{ 
-            borderColor: `${instrumentColor}40`,
-            borderTopColor: instrumentColor,
-            borderRightColor: instrumentColor,
-          }}
-        />
-        
-        {/* Middle Ring */}
-        <div className="absolute inset-8 rounded-full border-2 animate-spin-reverse"
-          style={{ 
-            borderColor: `${instrumentColor}30`,
-            borderBottomColor: instrumentColor,
-            borderLeftColor: instrumentColor,
-          }}
-        />
-        
-        {/* Instrument Display */}
-        <div className="relative z-10 text-center">
-          <div className="w-32 h-32 rounded-full flex items-center justify-center mx-auto mt-12 mb-4 transition-all duration-500 animate-pulse-subtle"
-            style={{
-              backgroundColor: `${instrumentColor}15`,
-              border: `2px solid ${instrumentColor}30`,
-              boxShadow: `0 0 40px ${instrumentColor}30`,
-            }}
-          >
-            <InstrumentIcon 
-              size={48} 
-              className="animate-bounce-subtle"
-              style={{ color: instrumentColor }}
-            />
-          </div>
-          
-          <h3 className="text-xl font-bold uppercase tracking-wider"
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2"
             style={{ color: colors.text }}
           >
-            {gymInstruments[currentInstrument].label}
-          </h3>
-         
-        </div>
-        
-        {/* Floating Dots */}
-        <div className="absolute -top-4 -right-4 w-8 h-8 rounded-full animate-float"
-          style={{ backgroundColor: colors.primary }}
-        />
-        <div className="absolute -bottom-4 -left-4 w-8 h-8 rounded-full animate-float-delayed"
-          style={{ backgroundColor: colors.accent }}
-        />
-      </div>
-
-      {/* Bottom: Motivational Quote */}
-      <div className="max-w-md text-center mb-8">
-        <div className="relative">
-          {/* Quote Marks */}
-          <div className="absolute -left-6 -top-4 text-3xl"
-            style={{ color: colors.primary }}
+            ONE <span style={{ color: colors.primary }}>REP</span> MORE
+          </h1>
+          <p className="text-sm uppercase tracking-widest"
+            style={{ color: colors.muted }}
           >
-            "
-          </div>
-          <p className="text-lg md:text-xl px-8 py-4 rounded-xl transition-all duration-500 animate-fadeInUp"
-            style={{
-              color: colors.text,
-              backgroundColor: `${colors.cardBg}80`,
-              backdropFilter: 'blur(10px)',
-              border: `1px solid ${colors.border}`,
-              minHeight: '80px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            {motivationalQuotes[currentQuote]}
+            Premium Fitness Equipment
           </p>
-          <div className="absolute -right-6 -bottom-4 text-3xl"
-            style={{ color: colors.primary }}
-          >
-            "
+        </div>
+
+        {/* Middle: Rotating Gym Instrument */}
+        <div className="relative w-64 h-64 flex items-center justify-center my-4 flex-shrink-0">
+          {/* Outer Ring */}
+          <div className="absolute inset-0 rounded-full border-2 animate-spin-slow"
+            style={{ 
+              borderColor: `${instrumentColor}40`,
+              borderTopColor: instrumentColor,
+              borderRightColor: instrumentColor,
+            }}
+          />
+          
+          {/* Middle Ring */}
+          <div className="absolute inset-8 rounded-full border-2 animate-spin-reverse"
+            style={{ 
+              borderColor: `${instrumentColor}30`,
+              borderBottomColor: instrumentColor,
+              borderLeftColor: instrumentColor,
+            }}
+          />
+          
+          {/* Instrument Display */}
+          <div className="relative z-10 text-center">
+            <div className="w-32 h-32 rounded-full flex items-center justify-center mx-auto mt-12 mb-4 transition-all duration-500 animate-pulse-subtle"
+              style={{
+                backgroundColor: `${instrumentColor}15`,
+                border: `2px solid ${instrumentColor}30`,
+                boxShadow: `0 0 40px ${instrumentColor}30`,
+              }}
+            >
+              <InstrumentIcon 
+                size={48} 
+                className="animate-bounce-subtle"
+                style={{ color: instrumentColor }}
+              />
+            </div>
+            
+            <h3 className="text-xl font-bold uppercase tracking-wider"
+              style={{ color: colors.text }}
+            >
+              {gymInstruments[currentInstrument].label}
+            </h3>
+          </div>
+          
+          {/* Floating Dots - Fixed positioning to be relative to container */}
+          <div className="absolute -top-4 -right-4 w-8 h-8 rounded-full animate-float"
+            style={{ backgroundColor: colors.primary }}
+          />
+          <div className="absolute -bottom-4 -left-4 w-8 h-8 rounded-full animate-float-delayed"
+            style={{ backgroundColor: colors.accent }}
+          />
+        </div>
+
+        {/* Bottom: Motivational Quote */}
+        <div className="max-w-md text-center mb-4 flex-shrink-0">
+          <div className="relative">
+            {/* Quote Marks */}
+            <div className="absolute -left-6 -top-4 text-3xl"
+              style={{ color: colors.primary }}
+            >
+              "
+            </div>
+            <p className="text-lg md:text-xl px-8 py-4 rounded-xl transition-all duration-500 animate-fadeInUp"
+              style={{
+                color: colors.text,
+                backgroundColor: `${colors.cardBg}80`,
+                backdropFilter: 'blur(10px)',
+                border: `1px solid ${colors.border}`,
+                minHeight: '80px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              {motivationalQuotes[currentQuote]}
+            </p>
+            <div className="absolute -right-6 -bottom-4 text-3xl"
+              style={{ color: colors.primary }}
+            >
+              "
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Bottom: Dot Loader */}
-      <div className="flex flex-col items-center gap-4">
-        <div className="flex gap-3">
-          {[...Array(5)].map((_, index) => (
-            <div
-              key={index}
-              className="w-3 h-3 rounded-full transition-all duration-300"
-              style={{
-                backgroundColor: index * 20 <= progress ? colors.primary : colors.border,
-                animation: `pulse 1.5s ease-in-out ${index * 0.2}s infinite`,
-                transform: index * 20 <= progress ? 'scale(1.2)' : 'scale(1)',
-                boxShadow: index * 20 <= progress ? `0 0 20px ${colors.primary}` : 'none'
-              }}
-            />
-          ))}
+        {/* Bottom: Dot Loader */}
+        <div className="flex flex-col items-center gap-4 flex-shrink-0">
+          <div className="flex gap-3">
+            {[...Array(5)].map((_, index) => (
+              <div
+                key={index}
+                className="w-3 h-3 rounded-full transition-all duration-300"
+                style={{
+                  backgroundColor: index * 20 <= progress ? colors.primary : colors.border,
+                  animation: `pulse 1.5s ease-in-out ${index * 0.2}s infinite`,
+                  transform: index * 20 <= progress ? 'scale(1.2)' : 'scale(1)',
+                  boxShadow: index * 20 <= progress ? `0 0 20px ${colors.primary}` : 'none'
+                }}
+              />
+            ))}
+          </div>
         </div>
-       
       </div>
 
       {/* CSS Animations */}
@@ -297,6 +304,17 @@ const PageLoader = () => {
         
         .animate-ping-slow {
           animation: ping-slow 2s ease-out infinite;
+        }
+        
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .overflow-y-auto::-webkit-scrollbar {
+          display: none;
+        }
+        
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .overflow-y-auto {
+          -ms-overflow-style: none;  /* IE and Edge */
+          scrollbar-width: none;  /* Firefox */
         }
       `}</style>
     </div>

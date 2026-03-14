@@ -18,11 +18,11 @@ import PageHelmet from "../../component/common/PageHelmet";
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    name: "", // Changed from fullName to name
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
-    // phone: "", // Removed phone as it's not in the API requirement
+    phone: "", // Added phone field
   });
   const { login } = useAuth();
   const [errors, setErrors] = useState({});
@@ -73,13 +73,16 @@ const RegisterPage = () => {
       newErrors.email = "Email is invalid";
     }
 
+    if (!formData.phone) {
+      newErrors.phone = "Phone number is required";
+    } else if (!/^\d{10}$/.test(formData.phone)) {
+      newErrors.phone = "Phone number must be 10 digits";
+    }
+
     if (!formData.password) {
       newErrors.password = "Password is required";
-    } else if (formData.password.length < 6) { // Changed to 6 as per your API requirement
+    } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password =
-        "Password must contain uppercase, lowercase, and number";
     }
 
     if (!formData.confirmPassword) {
@@ -101,7 +104,7 @@ const RegisterPage = () => {
     if (!password) return { strength: 0, label: "", color: "" };
 
     let strength = 0;
-    if (password.length >= 6) strength++; // Changed to 6
+    if (password.length >= 6) strength++;
     if (password.length >= 8) strength++;
     if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
     if (/\d/.test(password)) strength++;
@@ -123,7 +126,7 @@ const RegisterPage = () => {
 
   // Password requirements checklist
   const passwordRequirements = [
-    { label: "At least 6 characters", met: formData.password.length >= 6 }, // Changed to 6
+    { label: "At least 6 characters", met: formData.password.length >= 6 },
     { label: "At least 8 characters", met: formData.password.length >= 8 },
     {
       label: "Contains uppercase letter",
@@ -148,11 +151,12 @@ const RegisterPage = () => {
       setIsLoading(true);
 
       try {
-        // Prepare data for API - only send required fields
+        // Prepare data for API - send all required fields
         const registerData = {
           name: formData.name,
           email: formData.email,
           password: formData.password,
+          phone: formData.phone,
         };
 
         console.log("Sending registration data:", registerData);
@@ -161,7 +165,7 @@ const RegisterPage = () => {
         
         console.log("Registration response:", res.data);
         
-        if (res.data?.status) { // Changed from success to status based on your response
+        if (res.data?.status) {
           toast.success(res.data.message || "Registration successful! Please login.");
           
           // Auto login after register
@@ -186,7 +190,21 @@ const RegisterPage = () => {
         }
       } catch (error) {
         console.error("Registration error:", error);
-        toast.error(error.response?.data?.message || "Registration failed. Please try again.");
+        
+        // Handle validation errors
+        if (error.response?.status === 422) {
+          const validationErrors = error.response.data?.errors || {};
+          const formattedErrors = {};
+          
+          Object.keys(validationErrors).forEach(key => {
+            formattedErrors[key] = validationErrors[key][0];
+          });
+          
+          setErrors(formattedErrors);
+          toast.error("Please check the form for errors");
+        } else {
+          toast.error(error.response?.data?.message || "Registration failed. Please try again.");
+        }
         setIsLoading(false);
       }
     }
@@ -270,11 +288,11 @@ const RegisterPage = () => {
 
             {/* Register Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Full Name Field - Changed to name */}
+              {/* Full Name Field */}
               <div>
                 <CustomInput
                   label="Full Name"
-                  name="name" // Changed from fullName to name
+                  name="name"
                   type="text"
                   autoComplete="name"
                   value={formData.name}
@@ -334,7 +352,7 @@ const RegisterPage = () => {
                 )}
               </div>
 
-              {/* Phone Field - Commented out as it's not in API
+              {/* Phone Field - Added back as required by API */}
               <div>
                 <CustomInput
                   label="Phone Number"
@@ -365,7 +383,6 @@ const RegisterPage = () => {
                   </p>
                 )}
               </div>
-              */}
 
               {/* Password Field */}
               <div>

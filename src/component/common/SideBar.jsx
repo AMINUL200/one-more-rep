@@ -14,11 +14,31 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 
-const SideBar = ({ toggleMenu, isOpen }) => {
+const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
   const [openDropdowns, setOpenDropdowns] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
 
+  console.log("Sidebar Category Data:", categoryData);
+
+  /* ================= ICON MAPPING FOR CATEGORIES ================= */
+  const getCategoryIcon = (categoryName) => {
+    const name = categoryName?.toLowerCase() || "";
+    
+    if (name.includes("barbell")) return "💪";
+    if (name.includes("plate")) return "⚖️";
+    if (name.includes("strength")) return "🏋️";
+    if (name.includes("bench")) return "🛋️";
+    if (name.includes("dumbbell")) return "🏋️‍♂️";
+    if (name.includes("cardio")) return "🏃";
+    if (name.includes("machine")) return "⚙️";
+    if (name.includes("supplement") || name.includes("suppliment")) return "💊";
+    if (name.includes("accessor")) return "🧤";
+    
+    return "🏋️"; // Default icon
+  };
+
+  /* ================= SIDEBAR LINKS WITH REAL CATEGORY DATA ================= */
   const sidebarLinks = [
     {
       id: "home",
@@ -26,33 +46,20 @@ const SideBar = ({ toggleMenu, isOpen }) => {
       path: "/",
       icon: <Home className="w-5 h-5" />,
     },
-
     {
       id: "products",
       label: "Products",
       icon: <Package className="w-5 h-5" />,
-      dropdown: [
-       
-        { id: 1, label: "Barbells", path: "/products/barbells", icon: "💪" },
-        { id: 2, label: "Plates", path: "/products/plates", icon: "⚖️" },
-        {
-          id: 3,
-          label: "Strength Equipment",
-          path: "/products/strength-equipment",
-          icon: "🏋️",
-        },
-        { id: 4, label: "Benches", path: "/products/benches", icon: "🛋️" },
-        { id: 5, label: "Dumbbells", path: "/products/dumbbells", icon: "🏋️‍♂️" },
-        {
-          id: 6,
-          label: "Cardio Equipment",
-          path: "/products/cardio",
-          icon: "🏃",
-        },
-      ],
+      dropdown: categoryData && categoryData.length > 0 
+        ? categoryData.map((category) => ({
+            id: category.id,
+            label: category.name,
+            path: `/products/${category.slug}`,
+            icon: getCategoryIcon(category.name),
+            image: category.image,
+          }))
+        : [], // Empty array if no categories
     },
-
-   
     {
       id: "contact",
       label: "Contact Us",
@@ -109,7 +116,12 @@ const SideBar = ({ toggleMenu, isOpen }) => {
               : "text-[#B3B3B3] hover:bg-[#141414] hover:text-[#E10600]"
           }`}
         >
-          <span>{item.label}</span>
+          <div className="flex items-center gap-2">
+            {item.icon && (
+              <span className="text-base">{item.icon}</span>
+            )}
+            <span>{item.label}</span>
+          </div>
           {hasSub && (
             <ChevronRight
               className={`w-4 h-4 transition-transform ${
@@ -156,7 +168,7 @@ const SideBar = ({ toggleMenu, isOpen }) => {
             {item.icon}
             <span>{item.label}</span>
           </div>
-          {item.dropdown && (
+          {item.dropdown && item.dropdown.length > 0 && (
             <ChevronRight
               className={`w-5 h-5 transition-transform ${
                 open ? "rotate-90" : ""
@@ -165,13 +177,20 @@ const SideBar = ({ toggleMenu, isOpen }) => {
           )}
         </div>
 
-        {item.dropdown && (
+        {item.dropdown && item.dropdown.length > 0 && (
           <div
             className={`overflow-hidden transition-all ${
               open ? "max-h-[800px]" : "max-h-0"
             }`}
           >
             {item.dropdown.map((d) => renderDropdownItem(d))}
+          </div>
+        )}
+
+        {/* Show message if products dropdown is empty */}
+        {item.id === "products" && item.dropdown && item.dropdown.length === 0 && open && (
+          <div className="px-4 py-3 ml-8 text-sm text-[#B3B3B3] italic">
+            No categories available
           </div>
         )}
       </div>
@@ -193,23 +212,99 @@ const SideBar = ({ toggleMenu, isOpen }) => {
         className={`fixed top-0 right-0 h-full w-80 bg-[#0B0B0B] z-50 transform transition-transform ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
+        style={{
+          boxShadow: "-4px 0 20px rgba(0, 0, 0, 0.5)",
+        }}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-[#262626] bg-[#141414]">
-          <h2 className="text-xl font-bold text-[#E10600]">ONE REP MORE</h2>
-          <button onClick={toggleMenu}>
-            <X className="text-white" />
+          <h2 className="text-xl font-bold">
+            <span className="text-white">ONE </span>
+            <span className="text-[#E10600]">REP MORE</span>
+          </h2>
+          <button 
+            onClick={toggleMenu}
+            className="p-2 rounded-full hover:bg-[#262626] transition"
+          >
+            <X className="text-white" size={20} />
           </button>
         </div>
 
+        {/* Category Count Badge (if needed) */}
+        {categoryData && categoryData.length > 0 && (
+          <div className="px-6 py-2 border-b border-[#262626] bg-[#0B0B0B]">
+            <span className="text-xs text-[#B3B3B3]">
+              {categoryData.length} Categories Available
+            </span>
+          </div>
+        )}
+
         {/* Nav */}
-        <nav className="flex-1 overflow-y-auto py-4">
+        <nav className="flex-1 overflow-y-auto py-4 max-h-[calc(100vh-180px)]">
           {sidebarLinks.map(renderNavItem)}
         </nav>
 
-        {/* Auth */}
-       
+        {/* Auth Section */}
+        {!isAuthenticated ? (
+          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-[#262626] bg-[#141414]">
+            <button
+              onClick={() => {
+                navigate("/login");
+                toggleMenu();
+              }}
+              className="w-full py-2 px-4 rounded-lg font-semibold transition hover:scale-105 text-white"
+              style={{
+                background: "linear-gradient(135deg, #E10600, #B30000)",
+              }}
+            >
+              Login / Sign Up
+            </button>
+          </div>
+        ) : (
+          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-[#262626] bg-[#141414]">
+            <div className="flex items-center gap-3 mb-3">
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                style={{ backgroundColor: "#E10600" }}
+              >
+                U
+              </div>
+              <div>
+                <p className="text-white font-medium">User Name</p>
+                <p className="text-xs text-[#B3B3B3]">user@example.com</p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-[#DC2626] hover:bg-red-600/20 transition"
+            >
+              <LogOut size={18} />
+              <span>Logout</span>
+            </button>
+          </div>
+        )}
       </aside>
+
+      {/* Custom Scrollbar Styles */}
+      <style jsx>{`
+        .overflow-y-auto::-webkit-scrollbar {
+          width: 4px;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-track {
+          background: #262626;
+        }
+        
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+          background: #E10600;
+          border-radius: 4px;
+        }
+        
+        .overflow-y-auto {
+          scrollbar-width: thin;
+          scrollbar-color: #E10600 #262626;
+        }
+      `}</style>
     </>
   );
 };
