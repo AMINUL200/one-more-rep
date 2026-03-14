@@ -19,7 +19,7 @@ const AppLayout = () => {
       <Navbar toggleMenu={toggleSidebar} categoryData={categoryData} />
       <SideBar toggleMenu={toggleSidebar} isOpen={sidebarOpen} categoryData={categoryData} />
       <Outlet />
-      <Footer />
+      <Footer categoryData={categoryData} />
     </div>
   );
 };

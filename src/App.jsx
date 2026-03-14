@@ -31,6 +31,7 @@ import HandleGoals from "./pages/admin/landingpage/HandleGoals";
 import HandleFAQs from "./pages/admin/contact/HandleFAQs";
 import HandleContact from "./pages/admin/contact/HandleContact";
 import HandlePaymentSetup from "./pages/admin/payment/HandlePaymentSetup";
+import HandleOrderTract from "./pages/admin/track/HandleOrderTract";
 
 const App = () => {
   return (
@@ -102,6 +103,7 @@ const App = () => {
           <Route path="contact" element={<HandleContact/>}/>
           <Route path="contact/faqs" element={<HandleFAQs/>}/>
           <Route path="payment-setup" element={<HandlePaymentSetup/>}/>
+          <Route path="order-track" element={<HandleOrderTract/>}/>
 
 
         </Route>

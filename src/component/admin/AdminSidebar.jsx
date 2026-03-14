@@ -148,6 +148,12 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       icon: <User2 className="w-5 h-5" />,
       path: "/admin/payment-setup",
     },
+    {
+      id: "order-track",
+      label: "Order Track",
+      icon: <User2 className="w-5 h-5" />,
+      path: "/admin/order-track",
+    },
   ];
 
   const toggleDropdown = (id) => {
