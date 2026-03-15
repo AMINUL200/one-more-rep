@@ -34,6 +34,7 @@ import HandlePaymentSetup from "./pages/admin/payment/HandlePaymentSetup";
 import HandleOrderTract from "./pages/admin/track/HandleOrderTract";
 import OrderDetails from "./pages/product/OrderDetails";
 import { useAuth } from "./context/AuthContext";
+import ScrollToTop from "./component/common/ScrollToTop";
 
 // Protected Route Component for authenticated users only
 const ProtectedRoute = ({ children }) => {
@@ -115,6 +116,7 @@ const App = () => {
 
   return (
     <Router>
+       <ScrollToTop /> 
       <ToastContainer
         position="top-right"
         autoClose={3000}
