@@ -21,7 +21,8 @@ import "swiper/css/pagination";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { premiumFadeUp, premiumItem } from "../../animations/motionVariants";
-import { useCart } from "../../hooks/useCart";
+import { useCart } from "../../context/CartContext";
+// import { useCart } from "../../hooks/useCart";
 
 // Toast notification component
 const Toast = ({ message, type, onClose }) => {

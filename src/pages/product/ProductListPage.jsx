@@ -27,8 +27,9 @@ import PageLoader from "../../component/common/PageLoader";
 import PageHelmet from "../../component/common/PageHelmet";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCart } from "../../hooks/useCart";
+// import { useCart } from "../../hooks/useCart";
 import { api } from "../../utils/app";
+import { useCart } from "../../context/CartContext";
 
 // Toast notification component
 const Toast = ({ message, type, onClose }) => {

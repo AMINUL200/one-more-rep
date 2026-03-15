@@ -23,7 +23,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { premiumFadeUp, premiumItem } from "../../animations/motionVariants";
-import { useCart } from "../../hooks/useCart"; // Import the custom hook
+import { useCart } from "../../context/CartContext";
+// import { useCart } from "../../hooks/useCart"; // Import the custom hook
 
 // Toast notification component
 const Toast = ({ message, type, onClose }) => {
@@ -208,7 +209,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
 };
 
 const ProductSection = ({ productData }) => {
-  console.log("Product Data:: ", productData);
+  // console.log("Product Data:: ", productData);
   const navigate = useNavigate();
 
   const [activeCategory, setActiveCategory] = useState("all");

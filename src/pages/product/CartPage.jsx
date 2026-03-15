@@ -20,11 +20,12 @@ import {
 } from "lucide-react";
 import PageLoader from "../../component/common/PageLoader";
 import PageHelmet from "../../component/common/PageHelmet";
-import { useCart } from "../../hooks/useCart";
+// import { useCart } from "../../hooks/useCart";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import { api } from "../../utils/app";
+import { useCart } from "../../context/CartContext";
 
 const CartPage = () => {
   const [loading, setLoading] = useState(true);

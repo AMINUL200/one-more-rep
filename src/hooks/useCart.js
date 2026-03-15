@@ -1,8 +1,8 @@
 // hooks/useCart.js
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-const CART_STORAGE_KEY = 'cart';
-const WISHLIST_STORAGE_KEY = 'wishlist';
+const CART_STORAGE_KEY = "cart";
+const WISHLIST_STORAGE_KEY = "wishlist";
 
 export const useCart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -19,15 +19,15 @@ export const useCart = () => {
         if (savedCart) {
           const parsedCart = JSON.parse(savedCart);
           setCartItems(parsedCart);
-          console.log('Loaded cart from storage:', parsedCart);
+          console.log("Loaded cart from storage:", parsedCart);
         }
-        
+
         const savedWishlist = localStorage.getItem(WISHLIST_STORAGE_KEY);
         if (savedWishlist) {
           setWishlist(JSON.parse(savedWishlist));
         }
       } catch (error) {
-        console.error('Error loading cart from localStorage:', error);
+        console.error("Error loading cart from localStorage:", error);
       } finally {
         setIsLoaded(true);
       }
@@ -36,11 +36,26 @@ export const useCart = () => {
     loadFromStorage();
   }, []);
 
+  useEffect(() => {
+    const handleCartUpdate = () => {
+      const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+      if (savedCart) {
+        setCartItems(JSON.parse(savedCart));
+      }
+    };
+
+    window.addEventListener("cartUpdated", handleCartUpdate);
+
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+    };
+  }, []);
+
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
-      console.log('Saved cart to storage:', cartItems);
+      console.log("Saved cart to storage:", cartItems);
     }
   }, [cartItems, isLoaded]);
 
@@ -52,23 +67,26 @@ export const useCart = () => {
   }, [wishlist, isLoaded]);
 
   const addToCart = (product) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
-      
+    setCartItems((prevItems) => {
+      const existingItem = prevItems.find((item) => item.id === product.id);
+
       if (existingItem) {
-        const updatedItems = prevItems.map(item =>
+        const updatedItems = prevItems.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
-            : item
+            : item,
         );
         setShowToast({ message: "Quantity updated in cart!", type: "success" });
         return updatedItems;
       } else {
         setShowToast({ message: "Added to cart!", type: "success" });
-        return [...prevItems, { 
-          ...product, 
-          quantity: 1,
-        }];
+        return [
+          ...prevItems,
+          {
+            ...product,
+            quantity: 1,
+          },
+        ];
       }
     });
   };
@@ -78,36 +96,38 @@ export const useCart = () => {
       removeFromCart(productId);
       return;
     }
-    
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === productId ? { ...item, quantity: newQuantity } : item
-      )
+
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === productId ? { ...item, quantity: newQuantity } : item,
+      ),
     );
     setShowToast({ message: "Cart updated!", type: "success" });
   };
 
   const removeFromCart = (productId) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
+    setCartItems((prevItems) =>
+      prevItems.filter((item) => item.id !== productId),
+    );
     setShowToast({ message: "Removed from cart", type: "success" });
   };
 
   const toggleWishlist = (product) => {
-    if (wishlist.some(item => item.id === product.id)) {
-      setWishlist(prev => prev.filter(item => item.id !== product.id));
+    if (wishlist.some((item) => item.id === product.id)) {
+      setWishlist((prev) => prev.filter((item) => item.id !== product.id));
       setShowToast({ message: "Removed from wishlist", type: "success" });
     } else {
-      setWishlist(prev => [...prev, product]);
+      setWishlist((prev) => [...prev, product]);
       setShowToast({ message: "Added to wishlist!", type: "success" });
     }
   };
 
   const isInWishlist = (productId) => {
-    return wishlist.some(item => item.id === productId);
+    return wishlist.some((item) => item.id === productId);
   };
 
   const getCartQuantity = (productId) => {
-    const item = cartItems.find(item => item.id === productId);
+    const item = cartItems.find((item) => item.id === productId);
     return item ? item.quantity : 0;
   };
 
@@ -116,7 +136,7 @@ export const useCart = () => {
   };
 
   const getSubtotal = () => {
-    return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    return cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
 
   return {

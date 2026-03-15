@@ -19,24 +19,30 @@ import {
   ThumbsUp,
   User,
   IndianRupee,
+  Zap,
 } from "lucide-react";
 import PageLoader from "../../component/common/PageLoader";
 import { useParams, useNavigate } from "react-router-dom";
 import PageHelmet from "../../component/common/PageHelmet";
 import { api } from "../../utils/app";
 import { toast } from "react-toastify";
+import { useCart } from "../../hooks/useCart";
+import { useAuth } from "../../context/AuthContext";
 
 const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
   const [productData, setProductData] = useState(null);
   const { category, subcategory, PSlug } = useParams();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
 
   const [selectedMedia, setSelectedMedia] = useState(0);
   const [qty, setQty] = useState(1);
   const [activeTab, setActiveTab] = useState("details");
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [buyNowLoading, setBuyNowLoading] = useState(false);
   const videoRef = useRef(null);
 
   // Fetch product data based on slug
@@ -44,19 +50,16 @@ const ProductDetails = () => {
     const fetchProductDetails = async () => {
       setLoading(true);
       try {
-        // Use PSlug from params to fetch product
         const response = await api.get(`/products/${PSlug}`);
         
         if (response.data?.status) {
           setProductData(response.data.data);
         } else {
           toast.error("Product not found");
-          // navigate("/products");
         }
       } catch (error) {
         console.error("Error fetching product details:", error);
         toast.error("Failed to load product details");
-        // navigate("/products");
       } finally {
         setLoading(false);
       }
@@ -85,9 +88,7 @@ const ProductDetails = () => {
     
     const mediaArray = [];
     
-    // Add images from product.images
     if (productData.images && productData.images.length > 0) {
-      // Sort by sort_order
       const sortedImages = [...productData.images].sort((a, b) => a.sort_order - b.sort_order);
       
       sortedImages.forEach(img => {
@@ -99,7 +100,6 @@ const ProductDetails = () => {
         });
       });
     } else {
-      // Fallback image
       mediaArray.push({
         type: "image",
         src: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80",
@@ -153,7 +153,6 @@ const ProductDetails = () => {
       }));
     }
     
-    // Fallback specs
     return [
       { label: "Weight Range", value: "5-50 kg" },
       { label: "Material", value: "Steel + Rubber" },
@@ -172,7 +171,6 @@ const ProductDetails = () => {
       return productData.features.map(f => f.feature);
     }
     
-    // Fallback features
     return [
       "Quick-adjust weight system (5-50 kg)",
       "Premium anti-slip rubber grips",
@@ -200,8 +198,6 @@ const ProductDetails = () => {
           year: 'numeric'
         }),
         comment: review.review,
-        // verified: true,
-        // helpful: Math.floor(Math.random() * 20) + 5, // Random helpful count
       }));
     }
     
@@ -254,6 +250,69 @@ const ProductDetails = () => {
     return <div dangerouslySetInnerHTML={{ __html: htmlContent }} />;
   };
 
+  // Handle Buy Now
+  const handleBuyNow = async () => {
+    if (!isAuthenticated) {
+      navigate("/login", {
+        state: { from: location },
+      });
+      return;
+    }
+
+    if (!productData) {
+      toast.error("Product not available");
+      return;
+    }
+
+    if (productData.stock < qty) {
+      toast.error(`Only ${productData.stock} items available in stock`);
+      return;
+    }
+
+    setBuyNowLoading(true);
+
+    try {
+      // Prepare order data for single product
+      const orderData = {
+        products: [
+          {
+            product_id: productData.id,
+            qty: qty,
+            price: productData.sale_price ? parseFloat(productData.sale_price) : parseFloat(productData.price)
+          }
+        ]
+      };
+
+      console.log("Buy Now Order Data:", orderData);
+
+      const response = await api.post("/user/checkout", orderData);
+
+      if (response.data?.status) {
+        toast.success("Order placed successfully!");
+        navigate(`/checkout/${response.data.data?.id}`);
+      } else {
+        toast.error(response.data?.message || "Failed to place order");
+      }
+    } catch (error) {
+      console.error("Buy Now error:", error);
+      
+      if (error.response?.status === 422) {
+        const errors = error.response.data?.errors;
+        if (errors) {
+          Object.values(errors).forEach(msg => {
+            toast.error(msg[0]);
+          });
+        } else {
+          toast.error("Please check your order details");
+        }
+      } else {
+        toast.error(error.response?.data?.message || "Failed to place order. Please try again.");
+      }
+    } finally {
+      setBuyNowLoading(false);
+    }
+  };
+
   if (loading) return <PageLoader />;
   
   if (!productData) {
@@ -295,7 +354,7 @@ const ProductDetails = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* ================= LEFT : MEDIA GALLERY ================= */}
+            {/* LEFT : MEDIA GALLERY */}
             <div>
               {/* Main Media Display */}
               <div className="bg-[#141414] border border-[#262626] rounded-2xl overflow-hidden relative">
@@ -382,7 +441,7 @@ const ProductDetails = () => {
               )}
             </div>
 
-            {/* ================= RIGHT : PRODUCT INFO ================= */}
+            {/* RIGHT : PRODUCT INFO */}
             <div>
               <p className="text-[#E10600] text-sm font-semibold mb-2 uppercase tracking-wider">
                 {productData.category?.name || "Premium Equipment"}
@@ -473,6 +532,7 @@ const ProductDetails = () => {
                     <button
                       onClick={() => setQty((q) => Math.max(1, q - 1))}
                       className="px-5 py-3 hover:bg-[#0B0B0B] transition-colors"
+                      disabled={buyNowLoading}
                     >
                       -
                     </button>
@@ -482,6 +542,7 @@ const ProductDetails = () => {
                     <button
                       onClick={() => setQty((q) => q + 1)}
                       className="px-5 py-3 hover:bg-[#0B0B0B] transition-colors"
+                      disabled={buyNowLoading}
                     >
                       +
                     </button>
@@ -494,32 +555,48 @@ const ProductDetails = () => {
 
               {/* CTA Buttons */}
               <div className="flex gap-4 mb-10">
-                <button className="flex-1 bg-[#E10600] hover:bg-[#C10500] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:shadow-lg hover:shadow-[#E10600]/30 active:scale-[0.98]">
-                  <ShoppingCart size={20} /> Add to Cart
+             
+
+                {/* Buy Now Button */}
+                <button
+                  onClick={handleBuyNow}
+                  disabled={buyNowLoading || productData.stock < qty}
+                  className="flex-1 bg-[#E10600] hover:bg-[#C10500] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:shadow-lg hover:shadow-[#E10600]/30 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {buyNowLoading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <Zap size={20} />
+                      Buy Now
+                    </>
+                  )}
                 </button>
 
-                <button className="w-16 h-16 border-2 border-[#262626] rounded-xl flex items-center justify-center hover:border-[#E10600] hover:bg-[#E10600]/10 transition-all group">
-                  <Heart
-                    size={20}
-                    className={`${
-                      isFavorite ? "fill-[#E10600] text-[#E10600]" : ""
-                    }`}
-                    onClick={() => setIsFavorite(!isFavorite)}
-                  />
-                </button>
+             
               </div>
 
-            
+              {/* Stock Warning */}
+              {productData.stock < qty && (
+                <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                  <p className="text-sm text-red-500">
+                    Only {productData.stock} items available. Please reduce quantity.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* ================= TABBED CONTENT SECTION ================= */}
+          {/* TABBED CONTENT SECTION */}
           <div className="mt-16">
             {/* Tab Navigation */}
             <div className="flex border-b border-[#262626] mb-8">
               {[
                 { id: "details", label: "Product Details" },
-                { id: "reviews", label: `Reviews (${productData.rating || 0})` },
+                { id: "reviews", label: `Reviews (${productData.review_count || 0})` },
                 { id: "shipping", label: "Shipping & Returns" },
               ].map((tab) => (
                 <button
@@ -542,9 +619,6 @@ const ProductDetails = () => {
               {activeTab === "details" && (
                 <div className="grid md:grid-cols-2 gap-12">
                   <div>
-                    {/* <h3 className="text-2xl font-bold mb-6 text-white">
-                      Features & Benefits
-                    </h3> */}
                     {productData.description ? (
                       renderHTML(productData.description)
                     ) : (
@@ -560,7 +634,6 @@ const ProductDetails = () => {
                       </ul>
                     )}
                   </div>
-                 
                 </div>
               )}
 
@@ -590,12 +663,11 @@ const ProductDetails = () => {
                             ))}
                           </div>
                           <p className="text-sm text-[#B3B3B3] mt-2">
-                            Based on   {productData.review_count || 0} Reviews
+                            Based on {productData.review_count || 0} Reviews
                           </p>
                         </div>
                       </div>
                     </div>
-                   
                   </div>
 
                   {reviews.length > 0 ? (
@@ -628,15 +700,9 @@ const ProductDetails = () => {
                                   <span className="text-sm text-[#B3B3B3]">
                                     {review.date}
                                   </span>
-                                  {review.verified && (
-                                    <span className="text-xs px-2 py-1 rounded-full bg-[#22C55E]/20 text-[#22C55E]">
-                                      Verified Purchase
-                                    </span>
-                                  )}
                                 </div>
                               </div>
                             </div>
-                           
                           </div>
                           <p className="text-[#B3B3B3]">{review.comment}</p>
                         </div>
@@ -654,7 +720,6 @@ const ProductDetails = () => {
               {activeTab === "shipping" && (
                 <div className="grid md:grid-cols-2 gap-12">
                   <div>
-                  
                     {productData.shipping_policy ? (
                       renderHTML(productData.shipping_policy)
                     ) : (
@@ -672,7 +737,6 @@ const ProductDetails = () => {
                     )}
                   </div>
                   <div>
-                    
                     {productData.return_policy ? (
                       renderHTML(productData.return_policy)
                     ) : (
