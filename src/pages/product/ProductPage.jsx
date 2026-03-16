@@ -640,7 +640,7 @@ const ProductPage = () => {
 
                         {/* Quick Actions */}
                         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
+                          {/* <button
                             className="w-8 h-8 rounded-full flex items-center justify-center mb-2"
                             style={{
                               backgroundColor: colors.cardBg,
@@ -655,7 +655,7 @@ const ProductPage = () => {
                               size={16} 
                               className={isInWishlist(product.id) ? "fill-white text-white" : ""}
                             />
-                          </button>
+                          </button> */}
                           <button
                             className="w-8 h-8 rounded-full flex items-center justify-center"
                             style={{
