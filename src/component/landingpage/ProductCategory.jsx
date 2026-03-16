@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { fadeInUp, premiumItem } from "../../animations/motionVariants";
 
 const ProductCategory = ({ categoryData }) => {
+  console.log("productCate:: ", categoryData)
   const navigate = useNavigate();
   const sliderRef = useRef(null);
   const isDown = useRef(false);
@@ -94,7 +95,7 @@ const ProductCategory = ({ categoryData }) => {
       ];
 
   // 🔁 Duplicate for infinite loop
-  const loopedCategories = [...categories, ...categories];
+  const loopedCategories = [...categories];
 
   /* ================= AUTO SCROLL ================= */
   useEffect(() => {
