@@ -329,6 +329,7 @@ const ProductListPage = () => {
             stock: product.stock,
             description: product.description,
             features: product.features?.map(f => f.feature) || [],
+            variants: product.variants || [],
           }));
           
           setProducts(mappedProducts);

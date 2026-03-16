@@ -18,7 +18,7 @@ const LoginPage = () => {
   
   const navigate = useNavigate();
   const location = useLocation();
-  const redirectTo = location.state?.from?.pathname || "/";
+  const redirectTo = location.state?.from || "/";
 
   console.log("Redirect to:", redirectTo);
   console.log("Location state:", location.state);

@@ -19,7 +19,7 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  console.log("Sidebar Category Data:", categoryData);
+  // console.log("Sidebar Category Data:", categoryData);
 
   /* ================= ICON MAPPING FOR CATEGORIES ================= */
   const getCategoryIcon = (categoryName) => {

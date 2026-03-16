@@ -322,6 +322,7 @@ const ProductPage = () => {
     stock: product.stock || 10,
     colors: product.images?.slice(0, 3).map(img => "#E10600") || ["#E10600"],
     sizes: ["S", "M", "L", "XL"],
+    variants: product.variants || [],
   })) || [];
 
   // Filter options

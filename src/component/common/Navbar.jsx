@@ -24,7 +24,7 @@ import { useCart } from "../../context/CartContext";
 // import { useCart } from "../../hooks/useCart";
 
 const Navbar = ({ toggleMenu, categoryData , contactData}) => {
-   console.log("Contact Data:: ", contactData)
+  //  console.log("Contact Data:: ", contactData)
   const { user, isAuthenticated, logout } = useAuth();
   const { getTotalItems } = useCart(); 
   const navigate = useNavigate();

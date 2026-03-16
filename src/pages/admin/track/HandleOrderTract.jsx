@@ -356,8 +356,8 @@ const HandleOrderTract = () => {
               border: `1px solid ${colors.border}`,
             }}
           >
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="max-w-[400px] md:max-w-[700px] lg:max-w-[1140px] overflow-x-auto">
+              <table className="w-full min-w-[700px]">
                 <thead>
                   <tr style={{ backgroundColor: `${colors.background}` }}>
                     <th

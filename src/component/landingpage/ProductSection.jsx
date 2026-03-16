@@ -347,6 +347,7 @@ const ProductSection = ({ productData }) => {
       badge: getProductBadge(product),
       slug: product.slug,
       stock: product.stock || 10,
+      variants: product.variants || [],
     }));
   }, [productData, getProductImage, getProductBadge]);
 
@@ -622,8 +623,6 @@ const ProductSection = ({ productData }) => {
                           </span>
                         </div>
                       </div>
-
-                     
 
                       {/* Features */}
                       <div className="mb-6">

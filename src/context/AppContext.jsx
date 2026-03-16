@@ -41,7 +41,7 @@ export const AppProvider = ({ children }) => {
       setGoalData(goalRes.data.data);
       setCategoryData(categoryRes.data.data);
       setProductData(productRes.data.data);
-      setContactData(contactRes.data.data)
+      setContactData(contactRes.data.data.settings)
     } catch (error) {
       console.error("Landing API Error:", error.message);
     } finally {

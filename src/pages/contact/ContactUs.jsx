@@ -10,10 +10,15 @@ import {
   Facebook,
   Twitter,
   Instagram,
+  Linkedin,
   Youtube,
   ChevronDown,
   ChevronUp,
   AlertCircle,
+  Globe,
+  Building2,
+  PhoneCall,
+  // Fax,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import PageLoader from "../../component/common/PageLoader";
@@ -23,23 +28,24 @@ import { api } from "../../utils/app";
 const ContactUs = () => {
   const [loading, setLoading] = useState(true);
   const [contactData, setContactData] = useState(null);
+  const [faqs, setFaqs] = useState([]);
 
   // 🔥 Fetch contact data from API
   useEffect(() => {
     const fetchContactData = async () => {
       try {
-        // You can fetch contact info from your API if available
-        // const response = await api.get("/contact-info");
-        // if (response.data?.status) {
-        //   setContactData(response.data.data);
-        // }
+        // Fetch website settings from API
+        const response = await api.get("/website-settings");
+        console.log("Contact data:", response.data);
         
-        // Simulate API call (2 seconds)
-        setTimeout(() => {
-          setLoading(false);
-        }, 2000);
+        if (response.data?.status && response.data?.data) {
+          setContactData(response.data.data.settings);
+          setFaqs(response.data.data.faqs || []);
+        }
       } catch (error) {
         console.error("Error fetching contact data:", error);
+        toast.error("Failed to load contact information");
+      } finally {
         setLoading(false);
       }
     };
@@ -74,65 +80,74 @@ const ContactUs = () => {
     danger: "#EF4444",
   };
   
-  const contactInfo = [
-    {
-      icon: Phone,
-      title: "Phone Number",
-      details: "+1 (555) 123-4567",
-      description: "Available 24/7 for urgent inquiries",
-    },
-    {
-      icon: Mail,
-      title: "Email Address",
-      details: "support@gymstore.com",
-      description: "Response within 24 hours",
-    },
-    {
-      icon: MapPin,
-      title: "Our Location",
-      details: "123 Fitness Street",
-      description: "Miami, FL 33101, USA",
-    },
-    {
-      icon: Clock,
-      title: "Working Hours",
-      details: "Mon - Fri: 9AM - 8PM",
-      description: "Sat - Sun: 10AM - 6PM",
-    },
-  ];
+  // Generate contact info from API data
+  const getContactInfo = () => {
+    if (!contactData) return [];
+    
+    return [
+      {
+        icon: Phone,
+        title: "Phone Number",
+        details: contactData.phone || "+1 (555) 123-4567",
+        description: "Available 24/7 for urgent inquiries",
+      },
+      {
+        icon: PhoneCall,
+        title: "Landline",
+        details: contactData.landline || "Not available",
+        description: "Office hours: Mon - Fri, 9AM - 6PM",
+      },
+      {
+        icon: Mail,
+        title: "Email Address",
+        details: contactData.email || "support@gymstore.com",
+        description: "Response within 24 hours",
+      },
+      {
+        icon: Mail,
+        title: "Fax",
+        details: contactData.fax || "Not available",
+        description: "For official documents",
+      },
+      {
+        icon: MapPin,
+        title: "Our Location",
+        details: contactData.street_address || "123 Fitness Street",
+        description: `${contactData.city || "Miami"}, ${contactData.state || "FL"} ${contactData.zip || "33101"}, ${contactData.country || "USA"}`,
+      },
+      {
+        icon: Clock,
+        title: "Working Hours",
+        details: "Mon - Fri: 9AM - 8PM",
+        description: "Sat - Sun: 10AM - 6PM",
+      },
+    ];
+  };
   
-  const faqItems = [
-    {
-      question: "What is your return policy for gym equipment?",
-      answer:
-      "We offer a 30-day return policy for all gym equipment. Items must be in original condition with all packaging. For large equipment, we provide free pickup service for returns.",
-    },
-    {
-      question: "Do you offer installation services?",
-      answer:
-      "Yes, we offer professional installation services for all large equipment purchases. Installation is free with purchases over $500. Our certified technicians ensure proper setup and safety checks.",
-    },
-    {
-      question: "What payment methods do you accept?",
-      answer:
-      "We accept all major credit cards (Visa, MasterCard, American Express), PayPal, Apple Pay, Google Pay, and offer financing options through Affirm for qualified purchases.",
-    },
-    {
-      question: "How long does shipping take?",
-      answer:
-      "Standard shipping takes 3-7 business days. Express shipping (2-3 business days) is available for an additional fee. Large equipment may take 7-14 days for delivery and installation scheduling.",
-    },
-    {
-      question: "Do you offer commercial gym equipment?",
-      answer:
-      "Yes, we specialize in both residential and commercial gym equipment. Contact our commercial sales team for bulk pricing, custom configurations, and commercial warranties.",
-    },
-    {
-      question: "What is your warranty policy?",
-      answer:
-      "All our equipment comes with a minimum 1-year warranty. Premium equipment has extended warranties up to 5 years. Warranty covers manufacturing defects and includes parts replacement.",
-    },
-  ];
+  // Get social media links from API data
+  const getSocialLinks = () => {
+    if (!contactData) return [];
+    
+    const socialLinks = [];
+    
+    if (contactData.facebook) {
+      socialLinks.push({ icon: Facebook, label: "Facebook", url: contactData.facebook });
+    }
+    if (contactData.instagram) {
+      socialLinks.push({ icon: Instagram, label: "Instagram", url: contactData.instagram });
+    }
+    if (contactData.twitter) {
+      socialLinks.push({ icon: Twitter, label: "Twitter", url: contactData.twitter });
+    }
+    if (contactData.linkedin) {
+      socialLinks.push({ icon: Linkedin, label: "LinkedIn", url: contactData.linkedin });
+    }
+    if (contactData.pinterest) {
+      socialLinks.push({ icon: Instagram, label: "Pinterest", url: contactData.pinterest });
+    }
+    
+    return socialLinks;
+  };
   
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -243,9 +258,12 @@ const ContactUs = () => {
   
   if (loading) return <PageLoader />;
   
+  const contactInfo = getContactInfo();
+  const socialLinks = getSocialLinks();
+  
   return (
     <>
-      <PageHelmet title="Contact Us - ONE REP MORE" />
+      <PageHelmet title={`Contact Us - ${contactData?.site_name || "ONE REP MORE"}`} />
       <div
         style={{ backgroundColor: colors.background }}
         className="min-h-screen pt-30"
@@ -303,7 +321,7 @@ const ContactUs = () => {
         <div className="py-16 px-4 md:px-8">
           <div className="max-w-7xl mx-auto">
             {/* Contact Info Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
               {contactInfo.map((item, index) => (
                 <div
                   key={index}
@@ -439,7 +457,7 @@ const ContactUs = () => {
                           }`,
                           color: colors.text,
                         }}
-                        placeholder="john@example.com"
+                        placeholder={contactData?.email || "john@example.com"}
                       />
                       {errors.email && (
                         <p
@@ -475,7 +493,7 @@ const ContactUs = () => {
                         }`,
                         color: colors.text,
                       }}
-                      placeholder="+1 (555) 123-4567"
+                      placeholder={contactData?.phone || "+1 (555) 123-4567"}
                     />
                     {errors.phone_number && (
                       <p
@@ -611,7 +629,10 @@ const ContactUs = () => {
                           Our Location
                         </h3>
                         <p style={{ color: colors.muted }}>
-                          123 Fitness Street, Miami, FL 33101
+                          {contactData?.street_address || "123 Fitness Street"}, {contactData?.city || "Miami"}, {contactData?.state || "FL"} {contactData?.zip || "33101"}
+                        </p>
+                        <p style={{ color: colors.muted }}>
+                          {contactData?.country || "USA"}
                         </p>
                       </div>
                     </div>
@@ -649,138 +670,137 @@ const ContactUs = () => {
                 </div>
 
                 {/* Social Media */}
-                <div
-                  className="rounded-2xl p-6"
-                  style={{
-                    backgroundColor: colors.cardBg,
-                    border: `1px solid ${colors.border}`,
-                  }}
-                >
-                  <h3
-                    className="text-lg font-semibold mb-4"
-                    style={{ color: colors.text }}
+                {socialLinks.length > 0 && (
+                  <div
+                    className="rounded-2xl p-6"
+                    style={{
+                      backgroundColor: colors.cardBg,
+                      border: `1px solid ${colors.border}`,
+                    }}
                   >
-                    Connect With Us
-                  </h3>
-                  <p className="text-sm mb-6" style={{ color: colors.muted }}>
-                    Follow us on social media for the latest equipment releases,
-                    fitness tips, and exclusive offers.
-                  </p>
-                  <div className="flex gap-4">
-                    {[
-                      { icon: Facebook, label: "Facebook", url: "https://facebook.com" },
-                      { icon: Instagram, label: "Instagram", url: "https://instagram.com" },
-                      { icon: Twitter, label: "Twitter", url: "https://twitter.com" },
-                      { icon: Youtube, label: "YouTube", url: "https://youtube.com" },
-                    ].map((social, index) => (
-                      <a
-                        key={index}
-                        href={social.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-300 hover:transform hover:-translate-y-1"
-                        style={{
-                          backgroundColor: `${colors.primary}10`,
-                          border: `1px solid ${colors.border}`,
-                        }}
-                        aria-label={social.label}
-                      >
-                        <social.icon
-                          size={20}
-                          className="transition-colors group-hover:text-white"
-                          style={{ color: colors.primary }}
-                        />
-                      </a>
-                    ))}
+                    <h3
+                      className="text-lg font-semibold mb-4"
+                      style={{ color: colors.text }}
+                    >
+                      Connect With Us
+                    </h3>
+                    <p className="text-sm mb-6" style={{ color: colors.muted }}>
+                      Follow us on social media for the latest equipment releases,
+                      fitness tips, and exclusive offers.
+                    </p>
+                    <div className="flex gap-4">
+                      {socialLinks.map((social, index) => (
+                        <a
+                          key={index}
+                          href={social.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-300 hover:transform hover:-translate-y-1"
+                          style={{
+                            backgroundColor: `${colors.primary}10`,
+                            border: `1px solid ${colors.border}`,
+                          }}
+                          aria-label={social.label}
+                        >
+                          <social.icon
+                            size={20}
+                            className="transition-colors group-hover:text-white"
+                            style={{ color: colors.primary }}
+                          />
+                        </a>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
 
             {/* FAQ Section */}
-            <div className="mb-20">
-              <div className="text-center mb-12">
-                <div
-                  className="inline-block mb-4 px-4 py-2 rounded-full"
-                  style={{
-                    backgroundColor: `${colors.primary}20`,
-                    border: `1px solid ${colors.primary}30`,
-                  }}
-                >
-                  <span
-                    className="text-sm font-semibold uppercase tracking-wider"
-                    style={{ color: colors.primary }}
-                  >
-                    Common Questions
-                  </span>
-                </div>
-                <h2
-                  className="text-3xl md:text-4xl font-bold mb-4"
-                  style={{ color: colors.text }}
-                >
-                  Frequently Asked Questions
-                </h2>
-                <p
-                  className="text-lg max-w-2xl mx-auto"
-                  style={{ color: colors.muted }}
-                >
-                  Find answers to the most common questions about our gym
-                  equipment and services.
-                </p>
-              </div>
-
-              <div className="max-w-3xl mx-auto">
-                {faqItems.map((item, index) => (
+            {faqs.length > 0 && (
+              <div className="mb-20">
+                <div className="text-center mb-12">
                   <div
-                    key={index}
-                    className={`mb-4 rounded-xl transition-all duration-300 ${
-                      openFaq === index ? "border-[#E10600]" : ""
-                    }`}
+                    className="inline-block mb-4 px-4 py-2 rounded-full"
                     style={{
-                      backgroundColor: colors.cardBg,
-                      border: `1px solid ${
-                        openFaq === index ? colors.primary : colors.border
-                      }`,
+                      backgroundColor: `${colors.primary}20`,
+                      border: `1px solid ${colors.primary}30`,
                     }}
                   >
-                    <button
-                      onClick={() => toggleFaq(index)}
-                      className="w-full px-6 py-5 flex items-center justify-between text-left"
+                    <span
+                      className="text-sm font-semibold uppercase tracking-wider"
+                      style={{ color: colors.primary }}
                     >
-                      <span
-                        className="text-lg font-semibold pr-8"
-                        style={{ color: colors.text }}
-                      >
-                        {item.question}
-                      </span>
-                      {openFaq === index ? (
-                        <ChevronUp size={20} style={{ color: colors.primary }} />
-                      ) : (
-                        <ChevronDown size={20} style={{ color: colors.muted }} />
-                      )}
-                    </button>
+                      Common Questions
+                    </span>
+                  </div>
+                  <h2
+                    className="text-3xl md:text-4xl font-bold mb-4"
+                    style={{ color: colors.text }}
+                  >
+                    Frequently Asked Questions
+                  </h2>
+                  <p
+                    className="text-lg max-w-2xl mx-auto"
+                    style={{ color: colors.muted }}
+                  >
+                    Find answers to the most common questions about our gym
+                    equipment and services.
+                  </p>
+                </div>
 
+                <div className="max-w-3xl mx-auto">
+                  {faqs.map((item, index) => (
                     <div
-                      className={`px-6 overflow-hidden transition-all duration-300 ${
-                        openFaq === index
-                          ? "pb-5 opacity-100"
-                          : "max-h-0 opacity-0"
+                      key={item.id}
+                      className={`mb-4 rounded-xl transition-all duration-300 ${
+                        openFaq === index ? "border-[#E10600]" : ""
                       }`}
+                      style={{
+                        backgroundColor: colors.cardBg,
+                        border: `1px solid ${
+                          openFaq === index ? colors.primary : colors.border
+                        }`,
+                      }}
                     >
-                      <div
-                        className="pt-4 border-t"
-                        style={{
-                          borderColor: colors.border,
-                          color: colors.muted,
-                        }}
+                      <button
+                        onClick={() => toggleFaq(index)}
+                        className="w-full px-6 py-5 flex items-center justify-between text-left"
                       >
-                        {item.answer}
+                        <span
+                          className="text-lg font-semibold pr-8"
+                          style={{ color: colors.text }}
+                        >
+                          {item.faq_question}
+                        </span>
+                        {openFaq === index ? (
+                          <ChevronUp size={20} style={{ color: colors.primary }} />
+                        ) : (
+                          <ChevronDown size={20} style={{ color: colors.muted }} />
+                        )}
+                      </button>
+
+                      <div
+                        className={`px-6 overflow-hidden transition-all duration-300 ${
+                          openFaq === index
+                            ? "pb-5 opacity-100"
+                            : "max-h-0 opacity-0"
+                        }`}
+                      >
+                        <div
+                          className="pt-4 border-t"
+                          style={{
+                            borderColor: colors.border,
+                            color: colors.muted,
+                          }}
+                        >
+                          <div dangerouslySetInnerHTML={{ __html: item.faq_answer }} />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

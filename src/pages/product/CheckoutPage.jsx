@@ -67,6 +67,19 @@ const CheckoutPage = () => {
               receiver_phone: user.phone || ''
             }));
           }
+          
+          // Pre-fill receiver info if available
+          if (orderResponse.data.data.receiver_name) {
+            setFormData(prev => ({
+              ...prev,
+              receiver_name: orderResponse.data.data.receiver_name || '',
+              receiver_phone: orderResponse.data.data.receiver_phone || '',
+              address: orderResponse.data.data.address || '',
+              city: orderResponse.data.data.city || '',
+              state: orderResponse.data.data.state || '',
+              pincode: orderResponse.data.data.pincode || ''
+            }));
+          }
         } else {
           toast.error('Order not found');
           navigate('/cart');
@@ -264,16 +277,29 @@ const CheckoutPage = () => {
   };
 
   // Get product image
-  const getProductImage = (product) => {
-    if (product.images && product.images.length > 0) {
+  const getProductImage = (item) => {
+    if (item.product.images && item.product.images.length > 0) {
       const storageUrl = import.meta.env.VITE_STORAGE_URL || '';
-      const thumbnail = product.images.find(img => img.is_thumbnail === 1);
+      const thumbnail = item.product.images.find(img => img.is_thumbnail === 1);
       if (thumbnail) {
         return `${storageUrl}/${thumbnail.image}`;
       }
-      return `${storageUrl}/${product.images[0].image}`;
+      return `${storageUrl}/${item.product.images[0].image}`;
     }
     return "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=200&h=200&fit=crop";
+  };
+
+  // Get product name with variant
+  const getProductDisplayName = (item) => {
+    if (item.variant) {
+      return `${item.product.name} - ${item.variant.variant_name}`;
+    }
+    return item.product.name;
+  };
+
+  // Get product price display
+  const getProductPrice = (item) => {
+    return parseFloat(item.price);
   };
 
   // Calculate totals
@@ -281,7 +307,6 @@ const CheckoutPage = () => {
     if (!orderData) return { subtotal: 0, shipping: 0, tax: 0, total: 0 };
     
     const subtotal = parseFloat(orderData.total_amount);
-    // const shipping = subtotal > 2000 ? 0 : 199;
     const shipping = 0;
     const tax = 0;
     const total = subtotal + shipping + tax;
@@ -638,7 +663,7 @@ const CheckoutPage = () => {
                         </div>
                       </label>
 
-                      {/* COD Option */}
+                      {/* COD Option - Commented out as per your code */}
                       {/* <label
                         className={`flex items-center gap-4 p-6 rounded-lg cursor-pointer transition-all border-2 ${
                           paymentMethod === 'cod' 
@@ -961,7 +986,7 @@ const CheckoutPage = () => {
                       <div key={item.id} className="flex gap-4">
                         <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
                           <img
-                            src={getProductImage(item.product)}
+                            src={getProductImage(item)}
                             alt={item.product.name}
                             className="w-full h-full object-cover"
                             onError={(e) => {
@@ -971,22 +996,33 @@ const CheckoutPage = () => {
                         </div>
                         <div className="flex-1">
                           <h4 className="font-medium mb-1" style={{ color: colors.text }}>
-                            {item.product.name}
+                            {getProductDisplayName(item)}
                           </h4>
-                          <div className="flex items-center gap-4 text-sm">
+                          <div className="flex items-center gap-2 text-sm mb-1">
                             <span style={{ color: colors.muted }}>Qty: {item.qty}</span>
-                            {item.product.sale_price && (
-                              <span style={{ color: colors.muted }}>
-                                Was: ₹{parseFloat(item.product.price).toLocaleString()}
-                              </span>
+                            {item.variant && (
+                              <>
+                                <span className="w-1 h-1 rounded-full" style={{ backgroundColor: colors.muted }} />
+                                <span style={{ color: colors.muted }}>{item.variant.color} / {item.variant.size}</span>
+                              </>
                             )}
                           </div>
+                          {item.product.sale_price && !item.variant && (
+                            <div className="text-xs" style={{ color: colors.muted }}>
+                              Was: ₹{parseFloat(item.product.price).toLocaleString()}
+                            </div>
+                          )}
+                          {item.variant && parseFloat(item.variant.price) > parseFloat(item.price) && (
+                            <div className="text-xs" style={{ color: colors.muted }}>
+                              Was: ₹{parseFloat(item.variant.price).toLocaleString()}
+                            </div>
+                          )}
                         </div>
                         <div className="text-right">
                           <div className="font-bold" style={{ color: colors.text }}>
                             ₹{(parseFloat(item.price) * item.qty).toLocaleString()}
                           </div>
-                          <div className="text-sm" style={{ color: colors.muted }}>
+                          <div className="text-xs" style={{ color: colors.muted }}>
                             ₹{parseFloat(item.price).toLocaleString()} each
                           </div>
                         </div>
@@ -1002,12 +1038,6 @@ const CheckoutPage = () => {
                       <span style={{ color: colors.muted }}>Subtotal</span>
                       <span style={{ color: colors.text }}>₹{totals.subtotal.toLocaleString()}</span>
                     </div>
-                    {/* <div className="flex justify-between">
-                      <span style={{ color: colors.muted }}>Shipping</span>
-                      <span style={{ color: totals.shipping === 0 ? colors.success : colors.text }}>
-                        {totals.shipping === 0 ? 'FREE' : `₹${totals.shipping}`}
-                      </span>
-                    </div> */}
                     
                     {totals.subtotal > 2000 && (
                       <div className="flex justify-between">

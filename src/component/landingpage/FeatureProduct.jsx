@@ -309,6 +309,7 @@ const FeatureProduct = ({ featureProduct }) => {
           reviews: product.review_count || 0,
           slug: product.slug,
           stock: product.stock || 10,
+          variants: product.variants || [],
         }))
       : [];
 

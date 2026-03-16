@@ -500,8 +500,8 @@ const HandleYourGoalsSection = () => {
 
         {/* Goals List Table */}
         <div className="bg-white rounded-xl shadow-sm border overflow-hidden" style={{ borderColor: colors.border }}>
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="max-w-[400px] md:max-w-[700px] lg:max-w-[1140px] overflow-x-auto">
+              <table className="w-full min-w-[700px]">
               <thead style={{ backgroundColor: colors.background }}>
                 <tr style={{ borderBottom: `1px solid ${colors.border}` }}>
                   <th className="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider" style={{ color: colors.textLight }}>ID</th>

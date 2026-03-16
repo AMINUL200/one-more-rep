@@ -22,7 +22,7 @@ import {
   Zap,
 } from "lucide-react";
 import PageLoader from "../../component/common/PageLoader";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import PageHelmet from "../../component/common/PageHelmet";
 import { api } from "../../utils/app";
 import { toast } from "react-toastify";
@@ -34,6 +34,7 @@ const ProductDetails = () => {
   const [productData, setProductData] = useState(null);
   const { category, subcategory, PSlug } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { addToCart } = useCart();
   const { isAuthenticated } = useAuth();
 
@@ -45,6 +46,10 @@ const ProductDetails = () => {
   const [buyNowLoading, setBuyNowLoading] = useState(false);
   const videoRef = useRef(null);
 
+  // New state for variant selection
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [availableVariants, setAvailableVariants] = useState([]);
+
   // Fetch product data based on slug
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -53,7 +58,15 @@ const ProductDetails = () => {
         const response = await api.get(`/products/${PSlug}`);
         
         if (response.data?.status) {
-          setProductData(response.data.data);
+          const product = response.data.data;
+          setProductData(product);
+          
+          // Set available variants from product data
+          if (product.variants && product.variants.length > 0) {
+            setAvailableVariants(product.variants);
+            // Set first variant as default selected if variants exist
+            setSelectedVariant(product.variants[0]);
+          }
         } else {
           toast.error("Product not found");
         }
@@ -116,16 +129,40 @@ const ProductDetails = () => {
     return parseFloat(price).toLocaleString('en-IN');
   }, []);
 
+  // Get current price based on selected variant or product
+  const currentPrice = useMemo(() => {
+    if (selectedVariant) {
+      return selectedVariant.sale_price || selectedVariant.price;
+    }
+    return productData?.sale_price || productData?.price;
+  }, [selectedVariant, productData]);
+
+  // Get original price based on selected variant or product
+  const originalPrice = useMemo(() => {
+    if (selectedVariant) {
+      return selectedVariant.price;
+    }
+    return productData?.price;
+  }, [selectedVariant, productData]);
+
   // Calculate discount percentage
   const discountPercentage = useMemo(() => {
     if (!productData) return 0;
-    const price = parseFloat(productData.price);
-    const salePrice = productData.sale_price ? parseFloat(productData.sale_price) : price;
+    const price = parseFloat(originalPrice);
+    const salePrice = parseFloat(currentPrice);
     if (salePrice < price) {
       return Math.round(((price - salePrice) / price) * 100);
     }
     return 0;
-  }, [productData]);
+  }, [productData, originalPrice, currentPrice]);
+
+  // Get current stock based on selected variant or product
+  const currentStock = useMemo(() => {
+    if (selectedVariant) {
+      return selectedVariant.stock;
+    }
+    return productData?.stock;
+  }, [selectedVariant, productData]);
 
   const handleVideoPlay = () => {
     if (videoRef.current) {
@@ -140,6 +177,12 @@ const ProductDetails = () => {
 
   const handleVideoEnd = () => {
     setIsPlaying(false);
+  };
+
+  // Handle variant selection
+  const handleVariantSelect = (variant) => {
+    setSelectedVariant(variant);
+    setQty(1); // Reset quantity when variant changes
   };
 
   // Prepare specifications from product.specifications
@@ -250,11 +293,31 @@ const ProductDetails = () => {
     return <div dangerouslySetInnerHTML={{ __html: htmlContent }} />;
   };
 
+  // Handle Add to Cart
+  const handleAddToCart = () => {
+    if (currentStock < qty) {
+      toast.error(`Only ${currentStock} items available in stock`);
+      return;
+    }
+
+    const cartItem = {
+      product_id: productData.id,
+      qty: qty,
+      variant_id: selectedVariant?.id,
+      name: selectedVariant ? `${productData.name} - ${selectedVariant.variant_name}` : productData.name,
+      price: currentPrice,
+      original_price: originalPrice,
+    };
+
+    addToCart(cartItem);
+    toast.success("Added to cart successfully!");
+  };
+
   // Handle Buy Now
   const handleBuyNow = async () => {
     if (!isAuthenticated) {
       navigate("/login", {
-        state: { from: location },
+        state: { from: location.pathname },
       });
       return;
     }
@@ -264,21 +327,21 @@ const ProductDetails = () => {
       return;
     }
 
-    if (productData.stock < qty) {
-      toast.error(`Only ${productData.stock} items available in stock`);
+    if (currentStock < qty) {
+      toast.error(`Only ${currentStock} items available in stock`);
       return;
     }
 
     setBuyNowLoading(true);
 
     try {
-      // Prepare order data for single product
+      // Prepare order data for single product with variant support
       const orderData = {
         products: [
           {
             product_id: productData.id,
             qty: qty,
-            price: productData.sale_price ? parseFloat(productData.sale_price) : parseFloat(productData.price)
+            ...(selectedVariant && { variant_id: selectedVariant.id })
           }
         ]
       };
@@ -480,7 +543,7 @@ const ProductDetails = () => {
                 <div className="h-6 w-px bg-[#262626]" />
                 <span className="text-[#22C55E] flex items-center gap-1">
                   <CheckCircle size={16} />
-                  {productData.stock > 0 ? "In Stock" : "Out of Stock"}
+                  {currentStock > 0 ? "In Stock" : "Out of Stock"}
                 </span>
               </div>
 
@@ -490,15 +553,15 @@ const ProductDetails = () => {
                   <div className="flex items-center">
                     <IndianRupee className="w-8 h-8 text-[#E10600]" />
                     <span className="text-4xl font-bold text-[#E10600] ml-1">
-                      {formatPrice(productData.sale_price || productData.price)}
+                      {formatPrice(currentPrice)}
                     </span>
                   </div>
-                  {productData.sale_price && (
+                  {originalPrice > currentPrice && (
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex items-center">
                         <IndianRupee className="w-4 h-4 text-[#B3B3B3]" />
                         <span className="line-through text-[#B3B3B3] ml-1">
-                          {formatPrice(productData.price)}
+                          {formatPrice(originalPrice)}
                         </span>
                       </div>
                       {discountPercentage > 0 && (
@@ -510,6 +573,47 @@ const ProductDetails = () => {
                   )}
                 </div>
               </div>
+
+              {/* Variant Selection */}
+              {availableVariants.length > 0 && (
+                <div className="mb-8">
+                  <span className="font-semibold block mb-3">Select Variant</span>
+                  <div className="grid grid-cols-2 gap-3">
+                    {availableVariants.map((variant) => (
+                      <button
+                        key={variant.id}
+                        onClick={() => handleVariantSelect(variant)}
+                        className={`p-4 rounded-xl border-2 transition-all text-left ${
+                          selectedVariant?.id === variant.id
+                            ? "border-[#E10600] bg-[#E10600]/10"
+                            : "border-[#262626] hover:border-[#404040] bg-[#141414]"
+                        }`}
+                      >
+                        <p className="font-semibold text-white mb-1">{variant.variant_name}</p>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-[#E10600] font-bold">
+                              ₹{formatPrice(variant.sale_price || variant.price)}
+                            </span>
+                            {variant.sale_price && (
+                              <span className="text-xs text-[#B3B3B3] line-through ml-2">
+                                ₹{formatPrice(variant.price)}
+                              </span>
+                            )}
+                          </div>
+                          <span className={`text-xs px-2 py-1 rounded ${
+                            variant.stock > 0 
+                              ? "bg-green-500/10 text-green-500" 
+                              : "bg-red-500/10 text-red-500"
+                          }`}>
+                            {variant.stock > 0 ? `${variant.stock} left` : "Out"}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Product Specifications Grid */}
               <div className="grid grid-cols-2 gap-4 mb-8">
@@ -548,19 +652,18 @@ const ProductDetails = () => {
                     </button>
                   </div>
                   <span className="text-[#B3B3B3] text-sm">
-                    Only {productData.stock} left in stock
+                    Only {currentStock} left in stock
                   </span>
                 </div>
               </div>
 
               {/* CTA Buttons */}
               <div className="flex gap-4 mb-10">
-             
-
+                
                 {/* Buy Now Button */}
                 <button
                   onClick={handleBuyNow}
-                  disabled={buyNowLoading || productData.stock < qty}
+                  disabled={buyNowLoading || currentStock < qty}
                   className="flex-1 bg-[#E10600] hover:bg-[#C10500] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:shadow-lg hover:shadow-[#E10600]/30 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {buyNowLoading ? (
@@ -575,15 +678,13 @@ const ProductDetails = () => {
                     </>
                   )}
                 </button>
-
-             
               </div>
 
               {/* Stock Warning */}
-              {productData.stock < qty && (
+              {currentStock < qty && (
                 <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
                   <p className="text-sm text-red-500">
-                    Only {productData.stock} items available. Please reduce quantity.
+                    Only {currentStock} items available. Please reduce quantity.
                   </p>
                 </div>
               )}
@@ -648,14 +749,14 @@ const ProductDetails = () => {
                       <div className="flex items-center gap-4">
                         <div className="text-center">
                           <div className="text-5xl font-bold text-white">
-                             {productData.rating?.toFixed(1) || "4.8"}
+                            {productData.rating?.toFixed(1) || "4.8"}
                           </div>
                           <div className="flex items-center justify-center gap-1 mt-1">
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
                                 className={`w-4 h-4 ${
-                                  i <  (productData.rating || 0)
+                                  i < (productData.rating || 0)
                                     ? "text-[#FACC15] fill-[#FACC15]"
                                     : "text-[#262626]"
                                 }`}
