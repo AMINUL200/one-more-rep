@@ -17,61 +17,82 @@ import { motion } from "framer-motion";
 
 const Footer = ({ categoryData, contactData }) => {
   console.log("Contact Data:", contactData);
-  
+
   // Generate shop links from categoryData
-  const shopLinks = categoryData && categoryData.length > 0 
-    ? categoryData.slice(0, 9).map(category => ({
-        name: category.name,
-        url: `/products/${category.slug}`,
-      }))
-    : [
-        { name: "Strength Equipment", url: "/products/strength" },
-        { name: "Cardio Machines", url: "/products/cardio" },
-        { name: "Yoga & Pilates", url: "/products/yoga" },
-        { name: "Accessories", url: "/products/accessories" },
-        { name: "Supplements", url: "/products/supplements" },
-        { name: "Apparel", url: "/products/apparel" },
-      ];
+  const shopLinks =
+    categoryData && categoryData.length > 0
+      ? categoryData.slice(0, 9).map((category) => ({
+          name: category.name,
+          url: `/products/${category.slug}`,
+        }))
+      : [
+          { name: "Strength Equipment", url: "/products/strength" },
+          { name: "Cardio Machines", url: "/products/cardio" },
+          { name: "Yoga & Pilates", url: "/products/yoga" },
+          { name: "Accessories", url: "/products/accessories" },
+          { name: "Supplements", url: "/products/supplements" },
+          { name: "Apparel", url: "/products/apparel" },
+        ];
 
   // Generate social links from contactData
   const socialLinks = [
-    { icon: Facebook, url: contactData?.facebook || "https://facebook.com", label: "Facebook", active: !!contactData?.facebook },
-    { icon: Twitter, url: contactData?.twitter || "https://twitter.com", label: "Twitter", active: !!contactData?.twitter },
-    { icon: Instagram, url: contactData?.instagram || "https://instagram.com", label: "Instagram", active: !!contactData?.instagram },
-    { icon: Linkedin, url: contactData?.linkedin || "https://linkedin.com", label: "LinkedIn", active: !!contactData?.linkedin },
+    {
+      icon: Facebook,
+      url: contactData?.facebook || "https://facebook.com",
+      label: "Facebook",
+      active: !!contactData?.facebook,
+    },
+    {
+      icon: Twitter,
+      url: contactData?.twitter || "https://twitter.com",
+      label: "Twitter",
+      active: !!contactData?.twitter,
+    },
+    {
+      icon: Instagram,
+      url: contactData?.instagram || "https://instagram.com",
+      label: "Instagram",
+      active: !!contactData?.instagram,
+    },
+    {
+      icon: Linkedin,
+      url: contactData?.linkedin || "https://linkedin.com",
+      label: "LinkedIn",
+      active: !!contactData?.linkedin,
+    },
     { icon: Youtube, url: "#", label: "YouTube", active: false },
-  ].filter(social => social.active); // Only show active social links
+  ].filter((social) => social.active); // Only show active social links
 
   // Generate contact info from contactData
   const contactInfo = [
-    { 
-      icon: Phone, 
-      text: contactData?.phone || "+91 1800-123-4567", 
-      url: `tel:${contactData?.phone?.replace(/\s/g, '') || "+9118001234567"}` 
+    {
+      icon: Phone,
+      text: contactData?.phone || "+91 1800-123-4567",
+      url: `tel:${contactData?.phone?.replace(/\s/g, "") || "+9118001234567"}`,
     },
-    { 
-      icon: Mail, 
-      text: contactData?.email || "support@onerepmore.com", 
-      url: `mailto:${contactData?.email || "support@onerepmore.com"}` 
+    {
+      icon: Mail,
+      text: contactData?.email || "support@onerepmore.com",
+      url: `mailto:${contactData?.email || "support@onerepmore.com"}`,
     },
-    { 
-      icon: MapPin, 
-      text: `${contactData?.street_address || "Mumbai"}, ${contactData?.city || "Maharashtra"} ${contactData?.zip || "400001"}`, 
-      url: "#" 
+    {
+      icon: MapPin,
+      text: `${contactData?.street_address || "Mumbai"}, ${contactData?.city || "Maharashtra"} ${contactData?.zip || "400001"}`,
+      url: "#",
     },
   ];
 
   // Format full address
   const getFullAddress = () => {
     if (!contactData) return "Mumbai, Maharashtra 400001";
-    
+
     const parts = [];
     if (contactData.street_address) parts.push(contactData.street_address);
     if (contactData.city) parts.push(contactData.city);
     if (contactData.state) parts.push(contactData.state);
     if (contactData.zip) parts.push(contactData.zip);
     if (contactData.country) parts.push(contactData.country);
-    
+
     return parts.join(", ") || "Mumbai, Maharashtra 400001";
   };
 
@@ -124,8 +145,16 @@ const Footer = ({ categoryData, contactData }) => {
                   </div>
                   <div>
                     <h2 className="text-2xl sm:text-3xl font-bold">
-                      <span className="text-white">{contactData?.site_name?.split(' ')[0] || "ONE"}</span>
-                      <span className="text-[#E10600]"> {contactData?.site_name?.split(' ').slice(1).join(' ') || "REP MORE"}</span>
+                      <span className="text-white">
+                        {contactData?.site_name?.split(" ")[0] || "ONE"}
+                      </span>
+                      <span className="text-[#E10600]">
+                        {" "}
+                        {contactData?.site_name
+                          ?.split(" ")
+                          .slice(1)
+                          .join(" ") || "REP MORE"}
+                      </span>
                     </h2>
                     <p className="text-[#B3B3B3] text-xs sm:text-sm mt-1">
                       Premium Fitness Equipment
@@ -158,11 +187,11 @@ const Footer = ({ categoryData, contactData }) => {
                     </span>
                   </motion.a>
                 ))}
-                
+
                 {/* Additional Contact Info (if available) */}
                 {contactData?.landline && (
                   <motion.a
-                    href={`tel:${contactData.landline.replace(/\s/g, '')}`}
+                    href={`tel:${contactData.landline.replace(/\s/g, "")}`}
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
@@ -235,7 +264,7 @@ const Footer = ({ categoryData, contactData }) => {
                   Shop Categories
                   <span className="absolute -bottom-2 left-0 w-12 h-0.5 bg-[#E10600] rounded-full" />
                 </h3>
-                
+
                 <div className="grid grid-cols-2 gap-x-8 gap-y-3">
                   {shopLinks.map((link, index) => (
                     <motion.a
@@ -260,7 +289,8 @@ const Footer = ({ categoryData, contactData }) => {
                   Get Fitness Tips & Offers
                 </h4>
                 <p className="text-sm text-[#B3B3B3] mb-4">
-                  Subscribe to our newsletter for exclusive deals and fitness advice
+                  Subscribe to our newsletter for exclusive deals and fitness
+                  advice
                 </p>
                 <form className="flex flex-col sm:flex-row gap-3">
                   <input
@@ -288,7 +318,7 @@ const Footer = ({ categoryData, contactData }) => {
             className="mt-12 pt-8 border-t border-[#262626]"
           >
             {/* Payment Methods */}
-            <div className="mb-6">
+            {/* <div className="mb-6">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <span className="text-sm text-[#B3B3B3] text-center sm:text-left">
                   We Accept:
@@ -302,11 +332,11 @@ const Footer = ({ categoryData, contactData }) => {
                       >
                         {method}
                       </div>
-                    )
+                    ),
                   )}
                 </div>
               </div>
-            </div>
+            </div> */}
 
             {/* Copyright & Links */}
             <div className="flex flex-col items-center gap-4 text-sm">
@@ -332,8 +362,10 @@ const Footer = ({ categoryData, contactData }) => {
               </div>
               <p className="text-[#B3B3B3] text-xs sm:text-sm text-center">
                 © {new Date().getFullYear()}{" "}
-                <span className="text-white font-semibold">{contactData?.site_name || "ONE REP MORE"}</span>.
-                All rights reserved.
+                <span className="text-white font-semibold">
+                  {contactData?.site_name || "ONE REP MORE"}
+                </span>
+                . All rights reserved.
               </p>
             </div>
 
@@ -343,9 +375,15 @@ const Footer = ({ categoryData, contactData }) => {
                 <div className="w-5 h-5 rounded-full bg-gradient-to-r from-[#FF9933] via-white to-[#138808] flex items-center justify-center flex-shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-blue-600" />
                 </div>
-                <span className="text-sm text-[#B3B3B3] whitespace-nowrap">
-                  Made in SWC
-                </span>
+
+                <a
+                  href="https://skilledworkerscloud.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-[#B3B3B3] hover:text-white transition-colors whitespace-nowrap"
+                >
+                  Developed by Skilled Workers Cloud
+                </a>
               </div>
             </div>
           </motion.div>
