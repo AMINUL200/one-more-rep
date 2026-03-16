@@ -16,7 +16,8 @@ import {
 import { motion } from "framer-motion";
 
 const Footer = ({ categoryData, contactData }) => {
-  console.log("Contact Data:", contactData);
+  // console.log("Contact Data:", contactData);
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL
 
   // Generate shop links from categoryData
   const shopLinks =
@@ -133,7 +134,8 @@ const Footer = ({ categoryData, contactData }) => {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
                   <div className="w-16 h-16 sm:w-14 sm:h-14 rounded-lg overflow-hidden flex-shrink-0">
                     <img
-                      src="/image/gym_logo.png"
+                      // src="/image/gym_logo.png"
+                      src={`${STORAGE_URL}/${contactData?.site_web_logo}`}
                       alt={contactData?.site_logo_alt || "ONE REP MORE Logo"}
                       className="w-full h-full object-cover"
                       onError={(e) => {
@@ -156,15 +158,15 @@ const Footer = ({ categoryData, contactData }) => {
                           .join(" ") || "REP MORE"}
                       </span>
                     </h2>
-                    <p className="text-[#B3B3B3] text-xs sm:text-sm mt-1">
+                    {/* <p className="text-[#B3B3B3] text-xs sm:text-sm mt-1">
                       Premium Fitness Equipment
-                    </p>
+                    </p> */}
                   </div>
                 </div>
-                <p className="text-[#B3B3B3] text-sm max-w-md">
+                {/* <p className="text-[#B3B3B3] text-sm max-w-md">
                   India's premier destination for premium gym equipment and
                   fitness gear. Quality equipment for serious athletes.
-                </p>
+                </p> */}
               </motion.div>
 
               {/* Contact Information */}

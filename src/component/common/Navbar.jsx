@@ -16,17 +16,20 @@ import {
   LogOut,
   ChevronDown,
   ChevronRight,
+  Instagram,
+  MapPin,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
 // import { useCart } from "../../hooks/useCart";
 
-const Navbar = ({ toggleMenu, categoryData }) => {
-  
+const Navbar = ({ toggleMenu, categoryData , contactData}) => {
+   console.log("Contact Data:: ", contactData)
   const { user, isAuthenticated, logout } = useAuth();
   const { getTotalItems } = useCart(); 
   const navigate = useNavigate();
   const location = useLocation();
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
   const [scrolled, setScrolled] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -145,6 +148,29 @@ const Navbar = ({ toggleMenu, categoryData }) => {
   // Get cart count
   const cartCount = getTotalItems();
 
+  // Format phone number for display
+  const formatPhone = (phone) => {
+    return phone || "+91 98765 43210"; // Fallback if not available
+  };
+
+  // Get social media icon based on platform
+  const getSocialIcon = (platform, url) => {
+    if (!url) return null;
+    
+    switch(platform) {
+      case 'facebook':
+        return <Facebook key="fb" size={14} className="cursor-pointer opacity-90 hover:opacity-100" onClick={() => window.open(url, '_blank')} />;
+      case 'twitter':
+        return <Twitter key="tw" size={14} className="cursor-pointer opacity-90 hover:opacity-100" onClick={() => window.open(url, '_blank')} />;
+      case 'linkedin':
+        return <Linkedin key="li" size={14} className="cursor-pointer opacity-90 hover:opacity-100" onClick={() => window.open(url, '_blank')} />;
+      case 'instagram':
+        return <Instagram key="ig" size={14} className="cursor-pointer opacity-90 hover:opacity-100" onClick={() => window.open(url, '_blank')} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <header className="fixed top-0 left-0 w-full z-50">
       {/* ================= TOP INFO BAR ================= */}
@@ -158,22 +184,37 @@ const Navbar = ({ toggleMenu, categoryData }) => {
           }}
         >
           <div className="flex gap-4 items-center">
+            {/* Phone */}
             <span className="flex gap-1 items-center">
-              <Phone size={12} /> +91 98765 43210
+              <Phone size={12} /> 
+              {formatPhone(contactData?.phone)}
             </span>
+            
+            {/* Email */}
             <span className="hidden md:flex gap-1 items-center">
-              <Mail size={12} /> info@gymstore.com
+              <Mail size={12} /> 
+              {contactData?.email || "info@gymstore.com"}
             </span>
+
+            {/* Landline (if available) */}
+            {contactData?.landline && (
+              <span className="hidden lg:flex gap-1 items-center">
+                <Phone size={12} /> 
+                {contactData.landline}
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-3">
-            {[Facebook, Twitter, Linkedin].map((Icon, i) => (
-              <Icon
-                key={i}
-                size={14}
-                className="cursor-pointer opacity-90 hover:opacity-100"
-              />
-            ))}
+            {/* Social Media Icons */}
+            <div className="flex items-center gap-2">
+              {contactData?.facebook && getSocialIcon('facebook', contactData.facebook)}
+              {contactData?.twitter && getSocialIcon('twitter', contactData.twitter)}
+              {contactData?.linkedin && getSocialIcon('linkedin', contactData.linkedin)}
+              {contactData?.instagram && getSocialIcon('instagram', contactData.instagram)}
+            </div>
+
+            {/* Dark Mode Toggle */}
             <button onClick={() => setDarkMode(!darkMode)}>
               {darkMode ? <Sun size={14} /> : <Moon size={14} />}
             </button>
@@ -197,12 +238,26 @@ const Navbar = ({ toggleMenu, categoryData }) => {
           onClick={() => navigate("/")}
         >
           <div className="relative">
-            <img
-              src="/image/gym_logo.png"
-              alt="One Rep More"
-              className="h-20 w-20 object-contain rounded-full p-2 bg-[#141414] transition-all duration-300 hover:border-[#FF0800] hover:shadow-[0_0_15px_rgba(225,6,0,0.4)]"
-            />
+            {contactData?.site_web_logo ? (
+              <img
+                src={`${STORAGE_URL}/${contactData.site_web_logo}`}
+                alt={contactData?.site_name || "One Rep More"}
+                className="h-20 w-auto object-contain rounded-full  p-2 bg-[#141414] transition-all duration-300 hover:border-[#FF0800] hover:shadow-[0_0_15px_rgba(225,6,0,0.4)]"
+              />
+            ) : (
+              <img
+                src="/image/gym_logo.png"
+                alt="One Rep More"
+                className="h-20 w-20 object-contain rounded-2xl p-2 bg-[#141414] transition-all duration-300 hover:border-[#FF0800] hover:shadow-[0_0_15px_rgba(225,6,0,0.4)]"
+              />
+            )}
           </div>
+          {/* Site Name (optional display) */}
+          {/* {contactData?.site_name && !scrolled && (
+            <span className="hidden lg:block text-white font-bold text-lg">
+              {contactData.site_name}
+            </span>
+          )} */}
         </div>
 
         {/* CENTER: NAV LINKS */}
