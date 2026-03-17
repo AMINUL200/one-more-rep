@@ -706,11 +706,14 @@ const HandleProduct = () => {
   };
 
   // Validate review form
+  // Validate review form
   const validateReviewForm = () => {
     const errors = {};
 
     if (!reviewFormData.customer_name.trim()) {
       errors.customer_name = "Customer name is required";
+      toast.error("Customer name is required");
+      return false;
     }
     if (
       !reviewFormData.rating ||
@@ -718,14 +721,24 @@ const HandleProduct = () => {
       reviewFormData.rating > 5
     ) {
       errors.rating = "Please select a valid rating";
+      toast.error("Please select a valid rating");
+      return false;
     }
     if (!reviewFormData.review.trim()) {
       errors.review = "Review is required";
+      toast.error("Review is required");
+      return false;
     } else if (reviewFormData.review.trim().length < 10) {
       errors.review = "Review must be at least 10 characters";
+      toast.error(
+        "Review must be at least 10 characters (currently " +
+          reviewFormData.review.trim().length +
+          " characters)",
+      );
+      return false;
     }
 
-    return Object.keys(errors).length === 0;
+    return true;
   };
 
   // Handle form submit (Add/Edit)
@@ -779,8 +792,14 @@ const HandleProduct = () => {
   // Handle review submit (Add/Edit)
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
+    console.log("Review submit triggered", { reviewFormData, editingReview });
 
-    if (!validateReviewForm()) return;
+    if (!validateReviewForm()) {
+      console.log("Validation failed");
+      return;
+    }
+
+    // if (!validateReviewForm()) return;
 
     setSubmittingReview(true);
 
