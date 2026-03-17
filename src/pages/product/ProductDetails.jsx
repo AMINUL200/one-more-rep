@@ -564,11 +564,11 @@ const ProductDetails = () => {
                           {formatPrice(originalPrice)}
                         </span>
                       </div>
-                      {discountPercentage > 0 && (
+                      {/* {discountPercentage > 0 && (
                         <span className="bg-[#E10600] text-white px-3 py-1 text-sm font-bold rounded-full">
                           {discountPercentage}% OFF
                         </span>
-                      )}
+                      )} */}
                     </div>
                   )}
                 </div>

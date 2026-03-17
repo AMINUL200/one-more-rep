@@ -434,12 +434,12 @@ const HandleProduct = () => {
     if (!variantFormData.variant_name.trim()) {
       errors.variant_name = "Variant name is required";
     }
-    if (!variantFormData.color.trim()) {
-      errors.color = "Color is required";
-    }
-    if (!variantFormData.size.trim()) {
-      errors.size = "Size is required";
-    }
+    // if (!variantFormData.color.trim()) {
+    //   errors.color = "Color is required";
+    // }
+    // if (!variantFormData.size.trim()) {
+    //   errors.size = "Size is required";
+    // }
     if (!variantFormData.price) {
       errors.price = "Price is required";
     } else if (
