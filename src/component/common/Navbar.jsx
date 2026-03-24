@@ -236,7 +236,7 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
       {/* ================= MAIN NAVBAR ================= */}
       <div
         className={`flex justify-between items-center px-6 md:px-6 transition-all bg-main ${
-          scrolled ? "py-2 shadow-custom" : "py-3"
+          scrolled ? "py-1 shadow-custom" : "py-3"
         }`}
         style={{
           borderBottom: "1px solid var(--bg-border)",
@@ -247,20 +247,35 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
           className="flex items-center gap-3 cursor-pointer"
           onClick={() => navigate("/")}
         >
+          {/* Logo Image */}
           <div className="relative">
             {contactData?.site_web_logo ? (
               <img
                 src={`${STORAGE_URL}/${contactData.site_web_logo}`}
                 alt={contactData?.site_name || "One Rep More"}
-                className="h-20 w-auto object-contain rounded-full p-2 bg-card hover-lift hover-glow transition-all duration-300"
+                className="h-22 w-auto object-contain rounded-full p-1 bg-card"
               />
             ) : (
               <img
                 src="/image/gym_logo.png"
                 alt="One Rep More"
-                className="h-20 w-20 object-contain rounded-2xl p-2 bg-card hover-lift hover-glow transition-all duration-300"
+                className="h-14 w-14 object-contain rounded-full p-1 bg-card"
               />
             )}
+          </div>
+
+          {/* Brand Text */}
+          <div className="flex flex-col leading-tight">
+            <h1 className="text-lg font-black text-primary">
+              {contactData?.site_name?.split(" ").map((word, index) => (
+                <span key={index} className={index === 0 ? "" : "text-brand"}>
+                  {word}{" "}
+                </span>
+              ))}
+            </h1>
+            <span className="text-[10px] md:text-xs text-muted tracking-widest">
+              FITNESS STORE
+            </span>
           </div>
         </div>
 
@@ -279,7 +294,9 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
                     ref={productButtonRef}
                     onClick={handleProductClick}
                     className={`nav-link flex items-center gap-1 text-sm font-semibold tracking-wide transition px-2 py-1 ${
-                      active || productDropdownOpen ? "text-brand active" : "text-primary"
+                      active || productDropdownOpen
+                        ? "text-brand active"
+                        : "text-primary"
                     }`}
                   >
                     {item.label}
