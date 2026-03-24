@@ -674,17 +674,7 @@ const ProductSection = ({ productData, title }) => {
                                 </div>
                               )}
                           </div>
-                          {/* {product.originalPrice &&
-                            product.originalPrice !== product.price && (
-                              <div className="mt-1">
-                                <span className="text-success text-sm font-semibold">
-                                  Save ₹
-                                  {(
-                                    product.originalPrice - product.price
-                                  ).toLocaleString("en-IN")}
-                                </span>
-                              </div>
-                            )} */}
+                         
                         </div>
                       </div>
 

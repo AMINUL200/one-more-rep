@@ -10,19 +10,6 @@ const OrderSuccessful = () => {
   const [timeLeft, setTimeLeft] = useState(10);
   const [showConfetti, setShowConfetti] = useState(true);
 
-  // Color Schema
-  const colors = {
-    primary: "#E10600",
-    background: "#0B0B0B",
-    cardBg: "#141414",
-    border: "#262626",
-    text: "#FFFFFF",
-    muted: "#B3B3B3",
-    success: "#22C55E",
-    warning: "#FACC15",
-    accent: "#3B82F6",
-  };
-
   // Confetti effect
   useEffect(() => {
     if (showConfetti) {
@@ -40,7 +27,7 @@ const OrderSuccessful = () => {
   }, [timeLeft]);
 
   return (
-    <div style={{ backgroundColor: colors.background }} className="min-h-screen pt-30 md:pt-40">
+    <div className="min-h-screen pt-30 md:pt-40 bg-main">
       {/* Confetti Effect */}
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none z-40">
@@ -49,7 +36,7 @@ const OrderSuccessful = () => {
               key={i}
               className="absolute w-2 h-2 rounded-full animate-confetti"
               style={{
-                backgroundColor: [colors.primary, colors.success, colors.warning][i % 3],
+                backgroundColor: [ 'var(--color-primary)', 'var(--color-success)', 'var(--color-warning)' ][i % 3],
                 left: `${Math.random() * 100}%`,
                 top: '-10px',
                 animationDelay: `${i * 0.1}s`,
@@ -65,37 +52,38 @@ const OrderSuccessful = () => {
           <div className="relative inline-block mb-8">
             <div className="relative w-32 h-32 mx-auto">
               <div className="absolute inset-0 rounded-full animate-ping-slow"
-                style={{ backgroundColor: colors.success, opacity: 0.2 }}
+                style={{ backgroundColor: 'var(--color-success)', opacity: 0.2 }}
               />
               <div className="absolute inset-4 rounded-full flex items-center justify-center animate-scaleIn"
                 style={{
-                  backgroundColor: colors.success,
-                  boxShadow: `0 0 60px ${colors.success}80`,
+                  backgroundColor: 'var(--color-success)',
+                  boxShadow: `0 0 60px var(--color-success)`,
+                  opacity: 0.8,
                 }}
               >
-                <CheckCircle size={64} style={{ color: colors.text }} />
+                <CheckCircle size={64} className="text-primary" />
               </div>
             </div>
             
             {/* Floating Elements */}
             <div className="absolute -top-4 -right-4 w-12 h-12 rounded-full animate-bounce"
-              style={{ backgroundColor: colors.primary }}
+              style={{ backgroundColor: 'var(--color-primary)' }}
             >
-              <Gift size={24} className="text-white m-3" />
+              <Gift size={24} className="text-primary m-3" />
             </div>
             <div className="absolute -bottom-4 -left-4 w-12 h-12 rounded-full animate-bounce-delayed"
-              style={{ backgroundColor: colors.warning }}
+              style={{ backgroundColor: 'var(--color-warning)' }}
             >
-              <Star size={24} className="text-white m-3" />
+              <Star size={24} className="text-primary m-3" />
             </div>
           </div>
 
           {/* Success Message */}
-          <h1 className="text-4xl md:text-6xl font-bold mb-4" style={{ color: colors.text }}>
-            Order <span style={{ color: colors.success }}>Confirmed!</span>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 text-primary">
+            Order <span className="text-success">Confirmed!</span>
           </h1>
           
-          <p className="text-xl mb-8 max-w-2xl mx-auto" style={{ color: colors.muted }}>
+          <p className="text-xl mb-8 max-w-2xl mx-auto text-muted">
             Thank you for choosing One Rep More! Your gym equipment order has been successfully placed.
             You will receive a confirmation email shortly with your order details.
           </p>
@@ -104,59 +92,39 @@ const OrderSuccessful = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link 
               to="/"
-              className="px-8 py-4 rounded-lg font-semibold text-white transition-all hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2"
-              style={{
-                background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-              }}
+              className="px-8 py-4 rounded-lg font-semibold text-primary transition-all hover:shadow-primary-hover hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 bg-gradient-primary"
             >
               Return to Home
               <ArrowRight size={18} />
             </Link>
-
-           
           </div>
 
           {/* Auto Redirect */}
-          <div 
-            className="rounded-2xl p-6 text-center max-w-md mx-auto"
-            style={{
-              background: `linear-gradient(135deg, ${colors.cardBg} 0%, #1a1a1a 100%)`,
-              border: `1px solid ${colors.border}`,
-            }}
-          >
+          <div className="rounded-2xl p-6 text-center max-w-md mx-auto bg-gradient-to-r from-card to-main border border-theme">
             <div className="flex items-center gap-4 justify-center mb-4">
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center"
-                style={{
-                  backgroundColor: `${colors.success}20`,
-                  border: `1px solid ${colors.success}30`,
-                }}
-              >
-                <Shield size={24} style={{ color: colors.success }} />
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-success/20 border border-success/30">
+                <Shield size={24} className="text-success" />
               </div>
               <div className="text-left">
-                <h3 className="text-lg font-semibold mb-1" style={{ color: colors.text }}>
+                <h3 className="text-lg font-semibold mb-1 text-primary">
                   Order Secured
                 </h3>
-                <p className="text-sm" style={{ color: colors.muted }}>
+                <p className="text-sm text-muted">
                   Your order is confirmed and secure
                 </p>
               </div>
             </div>
             
             <div className="text-center">
-              <div className="text-2xl font-bold mb-2" style={{ color: colors.text }}>
+              <div className="text-2xl font-bold mb-2 text-primary">
                 {timeLeft}s
               </div>
-              <p className="text-sm mb-4" style={{ color: colors.muted }}>
+              <p className="text-sm mb-4 text-muted">
                 Redirecting to home page in {timeLeft} seconds
               </p>
               <Link 
                 to="/"
-                className="inline-block px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-lg"
-                style={{
-                  backgroundColor: colors.primary,
-                  color: colors.text,
-                }}
+                className="inline-block px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-primary-hover bg-gradient-primary text-primary"
               >
                 Go Home Now
               </Link>
@@ -164,16 +132,11 @@ const OrderSuccessful = () => {
           </div>
 
           {/* Support Note */}
-          <div className="mt-8 p-4 rounded-lg flex items-start justify-center gap-3 max-w-md mx-auto"
-            style={{
-              backgroundColor: `${colors.primary}10`,
-              border: `1px solid ${colors.primary}30`,
-            }}
-          >
-            <MessageSquare size={18} style={{ color: colors.primary }} />
-            <p className="text-sm" style={{ color: colors.text }}>
+          <div className="mt-8 p-4 rounded-lg flex items-start justify-center gap-3 max-w-md mx-auto bg-primary-light border border-primary/30">
+            <MessageSquare size={18} className="text-brand" />
+            <p className="text-sm text-primary">
               Need help? Contact our 24/7 support at{' '}
-              <a href="mailto:support@onerepmore.com" className="font-semibold hover:underline" style={{ color: colors.primary }}>
+              <a href="mailto:support@onerepmore.com" className="font-semibold hover:underline text-brand">
                 support@onerepmore.com
               </a>
             </p>

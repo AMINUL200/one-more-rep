@@ -101,6 +101,7 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
       hasDropdown: true,
     },
     { id: "contact", label: "Contact Us", path: "/contact" },
+    { id: "about", label: "About Us", path: "/about" },
     { id: "blogs", label: "Blogs", path: "/blogs" },
   ];
 
@@ -186,7 +187,7 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
       {/* ================= TOP INFO BAR ================= */}
       {!scrolled && (
         <div
-          className="text-xs md:text-sm py-2 px-6 md:px-10 flex justify-between items-center section-cta"
+          className="text-xs md:text-sm py-2 px-6 md:px-10 flex justify-between items-center section-cta bg-primary"
           style={{
             borderBottom: "1px solid var(--bg-border)",
           }}
@@ -297,7 +298,7 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
                         ref={productDropdownRef}
                         className="absolute top-full left-0 mt-2 rounded-lg shadow-xl animate-fadeIn bg-card border-theme"
                         style={{
-                          minWidth: "260px",
+                          minWidth: "265px",
                           maxHeight: "400px",
                           overflowY: "auto",
                           zIndex: 100,

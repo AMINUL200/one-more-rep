@@ -251,13 +251,13 @@ const HandleHeroSection = () => {
   const validateForm = () => {
     const errors = {};
 
-    if (!formData.title.trim()) {
-      errors.title = "Title is required";
-    }
+    // if (!formData.title.trim()) {
+    //   errors.title = "Title is required";
+    // }
 
-    if (!formData.description.trim()) {
-      errors.description = "Description is required";
-    }
+    // if (!formData.description.trim()) {
+    //   errors.description = "Description is required";
+    // }
 
     // Validate based on banner type
     if (formData.banner_type === "image") {
@@ -756,14 +756,14 @@ const HandleHeroSection = () => {
                       }}
                       placeholder="Enter hero title"
                     />
-                    {formErrors.title && (
+                    {/* {formErrors.title && (
                       <p
                         className="mt-1 text-xs"
                         style={{ color: colors.danger }}
                       >
                         {formErrors.title}
                       </p>
-                    )}
+                    )} */}
                   </div>
 
                   {/* Description */}
@@ -788,14 +788,14 @@ const HandleHeroSection = () => {
                       }}
                       placeholder="Enter hero description"
                     />
-                    {formErrors.description && (
+                    {/* {formErrors.description && (
                       <p
                         className="mt-1 text-xs"
                         style={{ color: colors.danger }}
                       >
                         {formErrors.description}
                       </p>
-                    )}
+                    )} */}
                   </div>
 
                   {/* Image Upload - Only show for image type */}

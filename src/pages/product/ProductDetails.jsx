@@ -20,6 +20,8 @@ import {
   User,
   IndianRupee,
   Zap,
+  Award,
+  Crown,
 } from "lucide-react";
 import PageLoader from "../../component/common/PageLoader";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
@@ -267,7 +269,7 @@ const ProductDetails = () => {
       {
         icon: Truck,
         title: "Free Shipping",
-        description: productData?.shipping_policy || "On orders above ₹2,000. Delivered in 3-7 business days.",
+        description: productData?.shipping_policy ? "Free shipping across India" : "On orders above ₹2,000. Delivered in 3-7 business days.",
       },
       {
         icon: Package,
@@ -277,7 +279,7 @@ const ProductDetails = () => {
       {
         icon: RotateCcw,
         title: productData?.return_policy ? "Return Policy" : "30-Day Returns",
-        description: productData?.return_policy || "Not satisfied? Return within 30 days for full refund.",
+        description: productData?.return_policy ? "7 day return policy for unused products." : "Not satisfied? Return within 30 days for full refund.",
       },
       {
         icon: ShieldCheck,
@@ -380,7 +382,7 @@ const ProductDetails = () => {
   
   if (!productData) {
     return (
-      <div className="bg-[#0B0B0B] text-white min-h-screen pt-40 px-4">
+      <div className="bg-main text-primary min-h-screen pt-40 px-4">
         <div className="max-w-7xl mx-auto text-center">
           <h2 className="text-2xl">Product not found</h2>
         </div>
@@ -388,24 +390,28 @@ const ProductDetails = () => {
     );
   }
 
+  // Calculate average rating from review_summary
+  const averageRating = productData.review_summary?.average_rating || productData.rating || 4.5;
+  const totalReviews = productData.review_summary?.total_reviews || productData.review_count || 0;
+
   return (
     <>
       <PageHelmet title={`${productData.name} - ONE REP MORE`} />
 
-      <div className="bg-[#0B0B0B] text-white min-h-screen pt-40 px-4 md:px-10">
+      <div className="bg-main text-primary min-h-screen pt-40 px-4 md:px-10">
         <div className="max-w-7xl mx-auto">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-[#B3B3B3] mb-8">
-            <span className="hover:text-white cursor-pointer" onClick={() => navigate("/")}>Home</span>
+          <div className="flex items-center gap-2 text-sm text-muted mb-8">
+            <span className="hover:text-primary cursor-pointer" onClick={() => navigate("/")}>Home</span>
             <ChevronRight size={14} />
-            <span className="hover:text-white cursor-pointer" onClick={() => navigate("/products")}>
+            <span className="hover:text-primary cursor-pointer" onClick={() => navigate("/products")}>
               Products
             </span>
             <ChevronRight size={14} />
             {productData.category && (
               <>
                 <span 
-                  className="hover:text-white cursor-pointer"
+                  className="hover:text-primary cursor-pointer"
                   onClick={() => navigate(`/products/${productData.category.slug}`)}
                 >
                   {productData.category.name}
@@ -413,14 +419,30 @@ const ProductDetails = () => {
                 <ChevronRight size={14} />
               </>
             )}
-            <span className="text-white">{productData.name}</span>
+            <span className="text-primary">{productData.name}</span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* LEFT : MEDIA GALLERY */}
             <div>
               {/* Main Media Display */}
-              <div className="bg-[#141414] border border-[#262626] rounded-2xl overflow-hidden relative">
+              <div className="bg-card border border-theme rounded-2xl overflow-hidden relative">
+                {/* Badge Section - Premium and Tag Line */}
+                <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+                  {productData.premium_product === 1 && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-primary text-primary shadow-primary">
+                      <Crown size={16} />
+                      <span className="text-xs font-bold uppercase">Premium</span>
+                    </div>
+                  )}
+                  {productData.tag_line && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-success/20 border border-success/30 text-success">
+                      <Award size={14} />
+                      <span className="text-xs font-semibold">{productData.tag_line}</span>
+                    </div>
+                  )}
+                </div>
+
                 {media[selectedMedia]?.type === "image" ? (
                   <img
                     src={media[selectedMedia].src}
@@ -437,29 +459,29 @@ const ProductDetails = () => {
                       onEnded={handleVideoEnd}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                    <div className="absolute bottom-4 left-4 text-white">
+                    <div className="absolute bottom-4 left-4 text-primary">
                       <h3 className="text-lg font-bold">
                         {media[selectedMedia].title || "Product Demonstration"}
                       </h3>
-                      <p className="text-sm text-[#B3B3B3]">
+                      <p className="text-sm text-muted">
                         How to use
                       </p>
                     </div>
                     <button
                       onClick={handleVideoPlay}
-                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-[#E10600] flex items-center justify-center hover:bg-[#C10500] transition-all group"
+                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full bg-primary flex items-center justify-center hover:bg-primary-hover transition-all group"
                     >
                       {isPlaying ? (
-                        <Pause size={24} />
+                        <Pause size={24} className="text-primary" />
                       ) : (
-                        <Play size={24} className="ml-1" />
+                        <Play size={24} className="text-primary ml-1" />
                       )}
                     </button>
                     <div className="absolute bottom-4 right-4 flex gap-2">
-                      <button className="w-10 h-10 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70">
+                      <button className="w-10 h-10 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 text-primary">
                         <Volume2 size={20} />
                       </button>
-                      <button className="w-10 h-10 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70">
+                      <button className="w-10 h-10 rounded-full bg-black/50 flex items-center justify-center hover:bg-black/70 text-primary">
                         <Maximize size={20} />
                       </button>
                     </div>
@@ -477,8 +499,8 @@ const ProductDetails = () => {
                       className={`flex flex-col items-center border rounded-xl overflow-hidden w-28 h-28 transition-all group relative
                         ${
                           selectedMedia === i
-                            ? "border-[#E10600]"
-                            : "border-[#262626] hover:border-[#404040]"
+                            ? "border-brand"
+                            : "border-theme hover:border-border"
                         }`}
                     >
                       <div className="relative w-full h-full">
@@ -489,13 +511,13 @@ const ProductDetails = () => {
                         />
                         {item.type === "video" && (
                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                            <Play size={20} className="text-white" />
+                            <Play size={20} className="text-primary" />
                           </div>
                         )}
                       </div>
                       {item.type === "video" && (
-                        <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[#E10600] flex items-center justify-center">
-                          <Play size={10} />
+                        <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                          <Play size={10} className="text-primary" />
                         </div>
                       )}
                     </button>
@@ -506,14 +528,14 @@ const ProductDetails = () => {
 
             {/* RIGHT : PRODUCT INFO */}
             <div>
-              <p className="text-[#E10600] text-sm font-semibold mb-2 uppercase tracking-wider">
+              <p className="text-brand text-sm font-semibold mb-2 uppercase tracking-wider">
                 {productData.category?.name || "Premium Equipment"}
               </p>
 
-              <h1 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">
+              <h1 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight text-primary">
                 {productData.name}
                 {productData.name_meta && (
-                  <span className="block text-lg text-[#B3B3B3] font-normal mt-2">
+                  <span className="block text-lg text-muted font-normal mt-2">
                     {productData.name_meta}
                   </span>
                 )}
@@ -526,22 +548,22 @@ const ProductDetails = () => {
                     <Star
                       key={i}
                       className={`w-5 h-5 ${
-                        i < (productData.rating || 0)
-                          ? "text-[#FACC15] fill-[#FACC15]"
-                          : "text-[#262626]"
+                        i < averageRating
+                          ? "text-warning fill-warning"
+                          : "text-border"
                       }`}
                     />
                   ))}
-                  <span className="ml-2 text-lg font-bold text-white">
-                    {productData.rating?.toFixed(1) || "4.8"}
+                  <span className="ml-2 text-lg font-bold text-primary">
+                    {averageRating.toFixed(1)}
                   </span>
                 </div>
-                <div className="h-6 w-px bg-[#262626]" />
-                <span className="text-[#B3B3B3] hover:text-white cursor-pointer">
-                  {productData.review_count || 0} Reviews
+                <div className="h-6 w-px bg-theme" />
+                <span className="text-muted hover:text-primary cursor-pointer">
+                  {totalReviews} Reviews
                 </span>
-                <div className="h-6 w-px bg-[#262626]" />
-                <span className="text-[#22C55E] flex items-center gap-1">
+                <div className="h-6 w-px bg-theme" />
+                <span className="text-success flex items-center gap-1">
                   <CheckCircle size={16} />
                   {currentStock > 0 ? "In Stock" : "Out of Stock"}
                 </span>
@@ -551,24 +573,24 @@ const ProductDetails = () => {
               <div className="flex items-center gap-4 mb-8">
                 <div>
                   <div className="flex items-center">
-                    <IndianRupee className="w-8 h-8 text-[#E10600]" />
-                    <span className="text-4xl font-bold text-[#E10600] ml-1">
+                    <IndianRupee className="w-8 h-8 text-brand" />
+                    <span className="text-4xl font-bold text-brand ml-1">
                       {formatPrice(currentPrice)}
                     </span>
                   </div>
                   {originalPrice > currentPrice && (
                     <div className="flex items-center gap-2 mt-1">
                       <div className="flex items-center">
-                        <IndianRupee className="w-4 h-4 text-[#B3B3B3]" />
-                        <span className="line-through text-[#B3B3B3] ml-1">
+                        <IndianRupee className="w-4 h-4 text-muted" />
+                        <span className="line-through text-muted ml-1">
                           {formatPrice(originalPrice)}
                         </span>
                       </div>
-                      {/* {discountPercentage > 0 && (
-                        <span className="bg-[#E10600] text-white px-3 py-1 text-sm font-bold rounded-full">
+                      {discountPercentage > 0 && (
+                        <span className="bg-primary text-primary px-3 py-1 text-sm font-bold rounded-full">
                           {discountPercentage}% OFF
                         </span>
-                      )} */}
+                      )}
                     </div>
                   )}
                 </div>
@@ -577,7 +599,7 @@ const ProductDetails = () => {
               {/* Variant Selection */}
               {availableVariants.length > 0 && (
                 <div className="mb-8">
-                  <span className="font-semibold block mb-3">Select Variant</span>
+                  <span className="font-semibold block mb-3 text-primary">Select Variant</span>
                   <div className="grid grid-cols-2 gap-3">
                     {availableVariants.map((variant) => (
                       <button
@@ -585,26 +607,26 @@ const ProductDetails = () => {
                         onClick={() => handleVariantSelect(variant)}
                         className={`p-4 rounded-xl border-2 transition-all text-left ${
                           selectedVariant?.id === variant.id
-                            ? "border-[#E10600] bg-[#E10600]/10"
-                            : "border-[#262626] hover:border-[#404040] bg-[#141414]"
+                            ? "border-brand bg-primary-light"
+                            : "border-theme hover:border-border bg-card"
                         }`}
                       >
-                        <p className="font-semibold text-white mb-1">{variant.variant_name}</p>
+                        <p className="font-semibold text-primary mb-1">{variant.variant_name}</p>
                         <div className="flex items-center justify-between">
                           <div>
-                            <span className="text-[#E10600] font-bold">
+                            <span className="text-brand font-bold">
                               ₹{formatPrice(variant.sale_price || variant.price)}
                             </span>
                             {variant.sale_price && (
-                              <span className="text-xs text-[#B3B3B3] line-through ml-2">
+                              <span className="text-xs text-muted line-through ml-2">
                                 ₹{formatPrice(variant.price)}
                               </span>
                             )}
                           </div>
                           <span className={`text-xs px-2 py-1 rounded ${
                             variant.stock > 0 
-                              ? "bg-green-500/10 text-green-500" 
-                              : "bg-red-500/10 text-red-500"
+                              ? "bg-success/10 text-success" 
+                              : "bg-error/10 text-error"
                           }`}>
                             {variant.stock > 0 ? `${variant.stock} left` : "Out"}
                           </span>
@@ -620,38 +642,38 @@ const ProductDetails = () => {
                 {productSpecs.slice(0, 6).map((spec, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between p-3 rounded-lg bg-[#141414] border border-[#262626]"
+                    className="flex items-center justify-between p-3 rounded-lg bg-card border border-theme"
                   >
-                    <span className="text-sm text-[#B3B3B3]">{spec.label}</span>
-                    <span className="font-semibold">{spec.value}</span>
+                    <span className="text-sm text-muted">{spec.label}</span>
+                    <span className="font-semibold text-primary">{spec.value}</span>
                   </div>
                 ))}
               </div>
 
               {/* Quantity */}
               <div className="mb-8">
-                <span className="font-semibold block mb-3">Quantity</span>
+                <span className="font-semibold block mb-3 text-primary">Quantity</span>
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center border border-[#262626] rounded-xl overflow-hidden">
+                  <div className="flex items-center border border-theme rounded-xl overflow-hidden">
                     <button
                       onClick={() => setQty((q) => Math.max(1, q - 1))}
-                      className="px-5 py-3 hover:bg-[#0B0B0B] transition-colors"
+                      className="px-5 py-3 hover:bg-main transition-colors text-primary"
                       disabled={buyNowLoading}
                     >
                       -
                     </button>
-                    <span className="px-5 py-3 font-bold min-w-[60px] text-center">
+                    <span className="px-5 py-3 font-bold min-w-[60px] text-center text-primary">
                       {qty}
                     </span>
                     <button
                       onClick={() => setQty((q) => q + 1)}
-                      className="px-5 py-3 hover:bg-[#0B0B0B] transition-colors"
+                      className="px-5 py-3 hover:bg-main transition-colors text-primary"
                       disabled={buyNowLoading}
                     >
                       +
                     </button>
                   </div>
-                  <span className="text-[#B3B3B3] text-sm">
+                  <span className="text-muted text-sm">
                     Only {currentStock} left in stock
                   </span>
                 </div>
@@ -659,16 +681,15 @@ const ProductDetails = () => {
 
               {/* CTA Buttons */}
               <div className="flex gap-4 mb-10">
-                
                 {/* Buy Now Button */}
                 <button
                   onClick={handleBuyNow}
                   disabled={buyNowLoading || currentStock < qty}
-                  className="flex-1 bg-[#E10600] hover:bg-[#C10500] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:shadow-lg hover:shadow-[#E10600]/30 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-primary hover:bg-primary-hover text-primary py-4 rounded-xl font-bold flex items-center justify-center gap-3 transition-all hover:shadow-primary-hover active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {buyNowLoading ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                       Processing...
                     </>
                   ) : (
@@ -682,8 +703,8 @@ const ProductDetails = () => {
 
               {/* Stock Warning */}
               {currentStock < qty && (
-                <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-                  <p className="text-sm text-red-500">
+                <div className="mb-4 p-3 rounded-lg bg-error/10 border border-error/20">
+                  <p className="text-sm text-error">
                     Only {currentStock} items available. Please reduce quantity.
                   </p>
                 </div>
@@ -694,10 +715,10 @@ const ProductDetails = () => {
           {/* TABBED CONTENT SECTION */}
           <div className="mt-16">
             {/* Tab Navigation */}
-            <div className="flex border-b border-[#262626] mb-8">
+            <div className="flex border-b border-theme mb-8">
               {[
                 { id: "details", label: "Product Details" },
-                { id: "reviews", label: `Reviews (${productData.review_count || 0})` },
+                { id: "reviews", label: `Reviews (${totalReviews})` },
                 { id: "shipping", label: "Shipping & Returns" },
               ].map((tab) => (
                 <button
@@ -705,8 +726,8 @@ const ProductDetails = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`px-8 py-4 font-semibold border-b-2 transition-all ${
                     activeTab === tab.id
-                      ? "border-[#E10600] text-white"
-                      : "border-transparent text-[#B3B3B3] hover:text-white"
+                      ? "border-brand text-primary"
+                      : "border-transparent text-muted hover:text-primary"
                   }`}
                 >
                   {tab.label}
@@ -715,7 +736,7 @@ const ProductDetails = () => {
             </div>
 
             {/* Tab Content */}
-            <div className="bg-[#141414] border border-[#262626] rounded-2xl p-8">
+            <div className="bg-card border border-theme rounded-2xl p-8">
               {/* Product Details Tab */}
               {activeTab === "details" && (
                 <div className="grid md:grid-cols-2 gap-12">
@@ -726,14 +747,25 @@ const ProductDetails = () => {
                       <ul className="space-y-4">
                         {features.map((feature, index) => (
                           <li key={index} className="flex items-start gap-3">
-                            <div className="w-6 h-6 rounded-full bg-[#E10600] flex items-center justify-center flex-shrink-0 mt-0.5">
-                              <CheckCircle size={14} />
+                            <div className="w-6 h-6 rounded-full bg-brand flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <CheckCircle size={14} className="text-primary" />
                             </div>
-                            <span className="text-[#B3B3B3]">{feature}</span>
+                            <span className="text-muted">{feature}</span>
                           </li>
                         ))}
                       </ul>
                     )}
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-4 text-primary">Technical Specifications</h3>
+                    <div className="space-y-3">
+                      {technicalSpecs.map((spec, idx) => (
+                        <div key={idx} className="flex justify-between py-2 border-b border-theme">
+                          <span className="text-muted">{spec.label}</span>
+                          <span className="font-medium text-primary">{spec.value}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -743,28 +775,28 @@ const ProductDetails = () => {
                 <div>
                   <div className="flex items-center justify-between mb-8">
                     <div>
-                      <h3 className="text-2xl font-bold mb-2 text-white">
+                      <h3 className="text-2xl font-bold mb-2 text-primary">
                         Customer Reviews
                       </h3>
                       <div className="flex items-center gap-4">
                         <div className="text-center">
-                          <div className="text-5xl font-bold text-white">
-                            {productData.rating?.toFixed(1) || "4.8"}
+                          <div className="text-5xl font-bold text-primary">
+                            {averageRating.toFixed(1)}
                           </div>
                           <div className="flex items-center justify-center gap-1 mt-1">
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
                                 className={`w-4 h-4 ${
-                                  i < (productData.rating || 0)
-                                    ? "text-[#FACC15] fill-[#FACC15]"
-                                    : "text-[#262626]"
+                                  i < averageRating
+                                    ? "text-warning fill-warning"
+                                    : "text-border"
                                 }`}
                               />
                             ))}
                           </div>
-                          <p className="text-sm text-[#B3B3B3] mt-2">
-                            Based on {productData.review_count || 0} Reviews
+                          <p className="text-sm text-muted mt-2">
+                            Based on {totalReviews} Reviews
                           </p>
                         </div>
                       </div>
@@ -776,15 +808,15 @@ const ProductDetails = () => {
                       {reviews.map((review) => (
                         <div
                           key={review.id}
-                          className="p-6 rounded-xl border border-[#262626]"
+                          className="p-6 rounded-xl border border-theme"
                         >
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-12 h-12 rounded-full bg-[#262626] flex items-center justify-center">
-                                <User size={20} />
+                              <div className="w-12 h-12 rounded-full bg-border flex items-center justify-center">
+                                <User size={20} className="text-muted" />
                               </div>
                               <div>
-                                <h4 className="font-bold text-white">{review.name}</h4>
+                                <h4 className="font-bold text-primary">{review.name}</h4>
                                 <div className="flex items-center gap-2 mt-1">
                                   <div className="flex items-center gap-1">
                                     {[...Array(5)].map((_, i) => (
@@ -792,26 +824,26 @@ const ProductDetails = () => {
                                         key={i}
                                         className={`w-4 h-4 ${
                                           i < review.rating
-                                            ? "text-[#FACC15] fill-[#FACC15]"
-                                            : "text-[#262626]"
+                                            ? "text-warning fill-warning"
+                                            : "text-border"
                                         }`}
                                       />
                                     ))}
                                   </div>
-                                  <span className="text-sm text-[#B3B3B3]">
+                                  <span className="text-sm text-muted">
                                     {review.date}
                                   </span>
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <p className="text-[#B3B3B3]">{review.comment}</p>
+                          <p className="text-muted">{review.comment}</p>
                         </div>
                       ))}
                     </div>
                   ) : (
                     <div className="text-center py-12">
-                      <p className="text-[#B3B3B3]">No reviews yet. Be the first to review this product!</p>
+                      <p className="text-muted">No reviews yet. Be the first to review this product!</p>
                     </div>
                   )}
                 </div>
@@ -825,14 +857,14 @@ const ProductDetails = () => {
                       renderHTML(productData.shipping_policy)
                     ) : (
                       <div className="space-y-6">
-                        <div className="p-6 rounded-xl border border-[#262626]">
+                        <div className="p-6 rounded-xl border border-theme">
                           <div className="flex items-center gap-3 mb-4">
-                            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-[#E10600]/10">
-                              <Truck size={20} className="text-[#E10600]" />
+                            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary-light">
+                              <Truck size={20} className="text-brand" />
                             </div>
-                            <h4 className="text-xl font-bold text-white">Delivery</h4>
+                            <h4 className="text-xl font-bold text-primary">Delivery</h4>
                           </div>
-                          <p className="text-[#B3B3B3]">Free shipping across India within 5-7 days.</p>
+                          <p className="text-muted">Free shipping across India within 5-7 days.</p>
                         </div>
                       </div>
                     )}
@@ -842,14 +874,14 @@ const ProductDetails = () => {
                       renderHTML(productData.return_policy)
                     ) : (
                       <div className="space-y-6">
-                        <div className="p-6 rounded-xl border border-[#262626]">
+                        <div className="p-6 rounded-xl border border-theme">
                           <div className="flex items-center gap-3 mb-4">
-                            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-[#E10600]/10">
-                              <RotateCcw size={20} className="text-[#E10600]" />
+                            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary-light">
+                              <RotateCcw size={20} className="text-brand" />
                             </div>
-                            <h4 className="text-xl font-bold text-white">Return Policy</h4>
+                            <h4 className="text-xl font-bold text-primary">Return Policy</h4>
                           </div>
-                          <p className="text-[#B3B3B3]">7 day return policy for unused products.</p>
+                          <p className="text-muted">7 day return policy for unused products.</p>
                         </div>
                       </div>
                     )}

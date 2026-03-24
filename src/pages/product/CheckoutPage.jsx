@@ -37,18 +37,6 @@ const CheckoutPage = () => {
     agreeWarranty: false
   });
 
-  // Color Schema
-  const colors = {
-    primary: "#E10600",
-    background: "#0B0B0B",
-    cardBg: "#141414",
-    border: "#262626",
-    text: "#FFFFFF",
-    muted: "#B3B3B3",
-    success: "#22C55E",
-    warning: "#FACC15",
-  };
-
   // Fetch order data based on ID
   useEffect(() => {
     const fetchOrderData = async () => {
@@ -192,7 +180,7 @@ const CheckoutPage = () => {
         order_number: checkoutData.order_number
       },
       theme: {
-        color: colors.primary,
+        color: 'var(--color-primary)',
       },
       modal: {
         ondismiss: function() {
@@ -327,24 +315,19 @@ const CheckoutPage = () => {
   return (
     <>
       <PageHelmet title="Checkout - ONE REP MORE" />
-      <div style={{ backgroundColor: colors.background }} className="min-h-screen py-8 px-4 md:px-8 pt-30 md:pt-40">
+      <div className="min-h-screen py-8 px-4 md:px-8 pt-30 md:pt-40 bg-main">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center"
-                style={{
-                  backgroundColor: `${colors.primary}20`,
-                  border: `1px solid ${colors.primary}30`,
-                }}
-              >
-                <Lock size={24} style={{ color: colors.primary }} />
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary-light border border-primary/30">
+                <Lock size={24} className="text-brand" />
               </div>
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold" style={{ color: colors.text }}>
+                <h1 className="text-3xl md:text-4xl font-bold text-primary">
                   Secure Checkout
                 </h1>
-                <p className="text-lg" style={{ color: colors.muted }}>
+                <p className="text-lg text-muted">
                   Order #{orderData?.order_number}
                 </p>
               </div>
@@ -357,23 +340,23 @@ const CheckoutPage = () => {
                   <div className="flex flex-col items-center relative z-10">
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-all duration-300 ${
                       step >= stepItem.number 
-                        ? 'scale-110 shadow-lg' 
+                        ? 'scale-110 shadow-primary' 
                         : 'opacity-50'
                     }`}
                       style={{
-                        backgroundColor: step >= stepItem.number ? colors.primary : colors.cardBg,
-                        border: `2px solid ${step >= stepItem.number ? colors.primary : colors.border}`,
+                        backgroundColor: step >= stepItem.number ? 'var(--color-primary)' : 'var(--bg-card)',
+                        border: `2px solid ${step >= stepItem.number ? 'var(--color-primary)' : 'var(--bg-border)'}`,
                       }}
                     >
                       <stepItem.icon 
                         size={20} 
                         style={{ 
-                          color: step >= stepItem.number ? colors.text : colors.muted 
+                          color: step >= stepItem.number ? 'var(--text-primary)' : 'var(--text-muted)' 
                         }}
                       />
                     </div>
                     <span className={`text-sm font-medium transition-colors ${
-                      step >= stepItem.number ? 'text-white' : 'text-[#B3B3B3]'
+                      step >= stepItem.number ? 'text-primary' : 'text-muted'
                     }`}>
                       {stepItem.title}
                     </span>
@@ -381,12 +364,12 @@ const CheckoutPage = () => {
                   
                   {index < steps.length - 1 && (
                     <div className="flex-1 h-1 mx-4 relative">
-                      <div className="absolute inset-0 bg-[#262626] rounded-full" />
+                      <div className="absolute inset-0 bg-border rounded-full" />
                       <div 
                         className="absolute inset-0 rounded-full transition-all duration-500"
                         style={{
                           width: step > stepItem.number ? '100%' : '0%',
-                          backgroundColor: colors.primary,
+                          backgroundColor: 'var(--color-primary)',
                         }}
                       />
                     </div>
@@ -403,39 +386,31 @@ const CheckoutPage = () => {
               {step === 1 && (
                 <div>
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 rounded-lg" style={{ backgroundColor: `${colors.primary}20` }}>
-                      <Truck size={20} style={{ color: colors.primary }} />
+                    <div className="p-2 rounded-lg bg-primary-light">
+                      <Truck size={20} className="text-brand" />
                     </div>
-                    <h2 className="text-2xl font-bold" style={{ color: colors.text }}>
+                    <h2 className="text-2xl font-bold text-primary">
                       Delivery Information
                     </h2>
                   </div>
 
-                  <div 
-                    className="rounded-2xl p-6 mb-6"
-                    style={{
-                      backgroundColor: colors.cardBg,
-                      border: `1px solid ${colors.border}`,
-                    }}
-                  >
+                  <div className="rounded-2xl p-6 mb-6 bg-card border border-theme">
                     <form className="space-y-6">
                       {/* Receiver Name */}
                       <div>
-                        <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+                        <label className="block text-sm font-medium mb-2 text-primary">
                           Receiver Name *
                         </label>
                         <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2" size={18} style={{ color: colors.muted }} />
+                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted" size={18} />
                           <input
                             type="text"
                             name="receiver_name"
                             value={formData.receiver_name}
                             onChange={handleInputChange}
-                            className="w-full pl-12 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E10600] transition-all"
+                            className="w-full pl-12 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand transition-all bg-main border-theme text-primary"
                             style={{
-                              backgroundColor: colors.background,
-                              border: `1px solid ${colors.border}`,
-                              color: colors.text,
+                              border: `1px solid var(--bg-border)`,
                             }}
                             placeholder="Ranjan Sharma"
                             required
@@ -445,21 +420,19 @@ const CheckoutPage = () => {
 
                       {/* Receiver Phone */}
                       <div>
-                        <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+                        <label className="block text-sm font-medium mb-2 text-primary">
                           Receiver Phone *
                         </label>
                         <div className="relative">
-                          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2" size={18} style={{ color: colors.muted }} />
+                          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted" size={18} />
                           <input
                             type="tel"
                             name="receiver_phone"
                             value={formData.receiver_phone}
                             onChange={handleInputChange}
-                            className="w-full pl-12 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E10600] transition-all"
+                            className="w-full pl-12 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand transition-all bg-main border-theme text-primary"
                             style={{
-                              backgroundColor: colors.background,
-                              border: `1px solid ${colors.border}`,
-                              color: colors.text,
+                              border: `1px solid var(--bg-border)`,
                             }}
                             placeholder="9876543210"
                             required
@@ -469,21 +442,19 @@ const CheckoutPage = () => {
 
                       {/* Address */}
                       <div>
-                        <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+                        <label className="block text-sm font-medium mb-2 text-primary">
                           Address *
                         </label>
                         <div className="relative">
-                          <MapPin className="absolute left-3 top-3" size={18} style={{ color: colors.muted }} />
+                          <MapPin className="absolute left-3 top-3 text-muted" size={18} />
                           <textarea
                             name="address"
                             value={formData.address}
                             onChange={handleInputChange}
                             rows="2"
-                            className="w-full pl-12 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E10600] transition-all resize-none"
+                            className="w-full pl-12 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand transition-all resize-none bg-main border-theme text-primary"
                             style={{
-                              backgroundColor: colors.background,
-                              border: `1px solid ${colors.border}`,
-                              color: colors.text,
+                              border: `1px solid var(--bg-border)`,
                             }}
                             placeholder="Salt Lake Sector 5"
                             required
@@ -493,7 +464,7 @@ const CheckoutPage = () => {
 
                       {/* City */}
                       <div>
-                        <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+                        <label className="block text-sm font-medium mb-2 text-primary">
                           City *
                         </label>
                         <input
@@ -501,11 +472,9 @@ const CheckoutPage = () => {
                           name="city"
                           value={formData.city}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E10600] transition-all"
+                          className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand transition-all bg-main border-theme text-primary"
                           style={{
-                            backgroundColor: colors.background,
-                            border: `1px solid ${colors.border}`,
-                            color: colors.text,
+                            border: `1px solid var(--bg-border)`,
                           }}
                           placeholder="Kolkata"
                           required
@@ -514,7 +483,7 @@ const CheckoutPage = () => {
 
                       {/* State */}
                       <div>
-                        <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+                        <label className="block text-sm font-medium mb-2 text-primary">
                           State *
                         </label>
                         <input
@@ -522,11 +491,9 @@ const CheckoutPage = () => {
                           name="state"
                           value={formData.state}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E10600] transition-all"
+                          className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand transition-all bg-main border-theme text-primary"
                           style={{
-                            backgroundColor: colors.background,
-                            border: `1px solid ${colors.border}`,
-                            color: colors.text,
+                            border: `1px solid var(--bg-border)`,
                           }}
                           placeholder="West Bengal"
                           required
@@ -535,7 +502,7 @@ const CheckoutPage = () => {
 
                       {/* PIN Code */}
                       <div>
-                        <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+                        <label className="block text-sm font-medium mb-2 text-primary">
                           PIN Code *
                         </label>
                         <input
@@ -543,11 +510,9 @@ const CheckoutPage = () => {
                           name="pincode"
                           value={formData.pincode}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#E10600] transition-all"
+                          className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand transition-all bg-main border-theme text-primary"
                           style={{
-                            backgroundColor: colors.background,
-                            border: `1px solid ${colors.border}`,
-                            color: colors.text,
+                            border: `1px solid var(--bg-border)`,
                           }}
                           placeholder="700091"
                           required
@@ -560,14 +525,12 @@ const CheckoutPage = () => {
                           id="save-info"
                           checked={saveInfo}
                           onChange={(e) => setSaveInfo(e.target.checked)}
-                          className="w-4 h-4 rounded"
+                          className="w-4 h-4 rounded bg-main border-theme"
                           style={{
-                            backgroundColor: colors.background,
-                            borderColor: colors.border,
-                            color: colors.primary,
+                            accentColor: 'var(--color-primary)',
                           }}
                         />
-                        <label htmlFor="save-info" className="text-sm" style={{ color: colors.muted }}>
+                        <label htmlFor="save-info" className="text-sm text-muted">
                           Save this information for next time
                         </label>
                       </div>
@@ -577,21 +540,14 @@ const CheckoutPage = () => {
                   <div className="flex justify-between">
                     <Link 
                       to="/cart"
-                      className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:bg-white/5"
-                      style={{
-                        color: colors.text,
-                        border: `1px solid ${colors.border}`,
-                      }}
+                      className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:bg-white/5 text-primary border border-theme"
                     >
                       <ArrowLeft size={18} />
                       Back to Cart
                     </Link>
                     <button
                       onClick={() => setStep(2)}
-                      className="px-8 py-3 rounded-lg font-semibold text-white transition-all hover:shadow-xl"
-                      style={{
-                        background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-                      }}
+                      className="px-8 py-3 rounded-lg font-semibold text-primary transition-all hover:shadow-primary-hover bg-gradient-primary"
                     >
                       Continue to Payment
                       <ChevronRight size={18} className="inline ml-2" />
@@ -600,33 +556,27 @@ const CheckoutPage = () => {
                 </div>
               )}
 
-              {/* Step 2: Payment Method - Razorpay and COD */}
+              {/* Step 2: Payment Method */}
               {step === 2 && (
                 <div>
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 rounded-lg" style={{ backgroundColor: `${colors.primary}20` }}>
-                      <CreditCard size={20} style={{ color: colors.primary }} />
+                    <div className="p-2 rounded-lg bg-primary-light">
+                      <CreditCard size={20} className="text-brand" />
                     </div>
-                    <h2 className="text-2xl font-bold" style={{ color: colors.text }}>
+                    <h2 className="text-2xl font-bold text-primary">
                       Select Payment Method
                     </h2>
                   </div>
 
-                  <div 
-                    className="rounded-2xl p-6 mb-6"
-                    style={{
-                      backgroundColor: colors.cardBg,
-                      border: `1px solid ${colors.border}`,
-                    }}
-                  >
+                  <div className="rounded-2xl p-6 mb-6 bg-card border border-theme">
                     {/* Payment Options */}
                     <div className="space-y-4 mb-8">
                       {/* Razorpay Option */}
                       <label
                         className={`flex items-center gap-4 p-6 rounded-lg cursor-pointer transition-all border-2 ${
                           paymentMethod === 'razorpay' 
-                            ? 'border-[#E10600] bg-[#E10600]/10' 
-                            : 'border-[#262626] hover:border-[#E10600]/50'
+                            ? 'border-brand bg-primary-light' 
+                            : 'border-theme hover:border-brand/50'
                         }`}
                       >
                         <input
@@ -637,120 +587,54 @@ const CheckoutPage = () => {
                           onChange={(e) => setPaymentMethod(e.target.value)}
                           className="w-5 h-5"
                           style={{
-                            color: colors.primary,
+                            accentColor: 'var(--color-primary)',
                           }}
                         />
                         <div className="flex items-center gap-4 flex-1">
-                          <div className="w-12 h-12 rounded-lg flex items-center justify-center"
-                            style={{
-                              backgroundColor: `${colors.primary}20`,
-                              border: `1px solid ${colors.primary}`,
-                            }}
-                          >
-                            <Wallet size={24} style={{ color: colors.primary }} />
+                          <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary-light border border-brand">
+                            <Wallet size={24} className="text-brand" />
                           </div>
                           <div className="flex-1">
-                            <h3 className="text-lg font-bold text-white mb-1">
+                            <h3 className="text-lg font-bold text-primary mb-1">
                               Razorpay
                             </h3>
-                            <p className="text-sm" style={{ color: colors.muted }}>
+                            <p className="text-sm text-muted">
                               Pay via Credit/Debit Card, UPI, Net Banking, Wallet
                             </p>
                           </div>
-                          <span className="text-xs px-2 py-1 bg-[#E10600] text-white rounded-full">
+                          <span className="text-xs px-2 py-1 bg-brand text-primary rounded-full">
                             Recommended
                           </span>
                         </div>
                       </label>
-
-                      {/* COD Option - Commented out as per your code */}
-                      {/* <label
-                        className={`flex items-center gap-4 p-6 rounded-lg cursor-pointer transition-all border-2 ${
-                          paymentMethod === 'cod' 
-                            ? 'border-[#E10600] bg-[#E10600]/10' 
-                            : 'border-[#262626] hover:border-[#E10600]/50'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="paymentMethod"
-                          value="cod"
-                          checked={paymentMethod === 'cod'}
-                          onChange={(e) => setPaymentMethod(e.target.value)}
-                          className="w-5 h-5"
-                          style={{
-                            color: colors.primary,
-                          }}
-                        />
-                        <div className="flex items-center gap-4 flex-1">
-                          <div className="w-12 h-12 rounded-lg flex items-center justify-center"
-                            style={{
-                              backgroundColor: `${colors.primary}20`,
-                              border: `1px solid ${colors.primary}`,
-                            }}
-                          >
-                            <DollarSign size={24} style={{ color: colors.primary }} />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-lg font-bold text-white mb-1">
-                              Cash on Delivery
-                            </h3>
-                            <p className="text-sm" style={{ color: colors.muted }}>
-                              Pay with cash when your order is delivered
-                            </p>
-                          </div>
-                        </div>
-                      </label> */}
                     </div>
 
                     {/* Payment Features for Razorpay */}
                     {paymentMethod === 'razorpay' && (
                       <div className="grid grid-cols-2 gap-4 mb-6">
-                        <div className="p-3 rounded-lg" style={{ backgroundColor: `${colors.primary}10` }}>
-                          <p className="text-xs text-white font-medium">100% Secure</p>
-                          <p className="text-xs" style={{ color: colors.muted }}>SSL Encrypted</p>
+                        <div className="p-3 rounded-lg bg-primary-light">
+                          <p className="text-xs text-primary font-medium">100% Secure</p>
+                          <p className="text-xs text-muted">SSL Encrypted</p>
                         </div>
-                        <div className="p-3 rounded-lg" style={{ backgroundColor: `${colors.primary}10` }}>
-                          <p className="text-xs text-white font-medium">Fast Checkout</p>
-                          <p className="text-xs" style={{ color: colors.muted }}>One-click payments</p>
+                        <div className="p-3 rounded-lg bg-primary-light">
+                          <p className="text-xs text-primary font-medium">Fast Checkout</p>
+                          <p className="text-xs text-muted">One-click payments</p>
                         </div>
-                        <div className="p-3 rounded-lg" style={{ backgroundColor: `${colors.primary}10` }}>
-                          <p className="text-xs text-white font-medium">Multiple Options</p>
-                          <p className="text-xs" style={{ color: colors.muted }}>Cards, UPI, Wallets</p>
+                        <div className="p-3 rounded-lg bg-primary-light">
+                          <p className="text-xs text-primary font-medium">Multiple Options</p>
+                          <p className="text-xs text-muted">Cards, UPI, Wallets</p>
                         </div>
-                        <div className="p-3 rounded-lg" style={{ backgroundColor: `${colors.primary}10` }}>
-                          <p className="text-xs text-white font-medium">Instant Refunds</p>
-                          <p className="text-xs" style={{ color: colors.muted }}>Easy returns</p>
+                        <div className="p-3 rounded-lg bg-primary-light">
+                          <p className="text-xs text-primary font-medium">Instant Refunds</p>
+                          <p className="text-xs text-muted">Easy returns</p>
                         </div>
-                      </div>
-                    )}
-
-                    {/* COD Info */}
-                    {paymentMethod === 'cod' && (
-                      <div 
-                        className="p-4 rounded-lg mb-6"
-                        style={{
-                          backgroundColor: `${colors.warning}10`,
-                          border: `1px solid ${colors.warning}30`,
-                        }}
-                      >
-                        <p className="text-sm" style={{ color: colors.warning }}>
-                          <span className="font-bold">Note:</span> Cash on Delivery orders require exact change. 
-                          A nominal fee of ₹50 may be applicable for orders below ₹500.
-                        </p>
                       </div>
                     )}
 
                     {/* Security Note */}
-                    <div 
-                      className="p-4 rounded-lg flex items-start gap-3"
-                      style={{
-                        backgroundColor: `${colors.success}10`,
-                        border: `1px solid ${colors.success}30`,
-                      }}
-                    >
-                      <Shield size={16} style={{ color: colors.success }} className="mt-0.5 flex-shrink-0" />
-                      <p className="text-sm" style={{ color: colors.success }}>
+                    <div className="p-4 rounded-lg flex items-start gap-3 bg-success/10 border border-success/30">
+                      <Shield size={16} className="text-success mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-success">
                         Your payment is secure and encrypted. We never store your card details.
                       </p>
                     </div>
@@ -759,21 +643,14 @@ const CheckoutPage = () => {
                   <div className="flex justify-between">
                     <button
                       onClick={() => setStep(1)}
-                      className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:bg-white/5"
-                      style={{
-                        color: colors.text,
-                        border: `1px solid ${colors.border}`,
-                      }}
+                      className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:bg-white/5 text-primary border border-theme"
                     >
                       <ArrowLeft size={18} />
                       Back to Delivery
                     </button>
                     <button
                       onClick={() => setStep(3)}
-                      className="px-8 py-3 rounded-lg font-semibold text-white transition-all hover:shadow-xl"
-                      style={{
-                        background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-                      }}
+                      className="px-8 py-3 rounded-lg font-semibold text-primary transition-all hover:shadow-primary-hover bg-gradient-primary"
                     >
                       Review Order
                       <ChevronRight size={18} className="inline ml-2" />
@@ -786,35 +663,29 @@ const CheckoutPage = () => {
               {step === 3 && (
                 <div>
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 rounded-lg" style={{ backgroundColor: `${colors.primary}20` }}>
-                      <CheckCircle size={20} style={{ color: colors.primary }} />
+                    <div className="p-2 rounded-lg bg-primary-light">
+                      <CheckCircle size={20} className="text-brand" />
                     </div>
-                    <h2 className="text-2xl font-bold" style={{ color: colors.text }}>
+                    <h2 className="text-2xl font-bold text-primary">
                       Order Confirmation
                     </h2>
                   </div>
 
-                  <div 
-                    className="rounded-2xl p-6 mb-6"
-                    style={{
-                      backgroundColor: colors.cardBg,
-                      border: `1px solid ${colors.border}`,
-                    }}
-                  >
+                  <div className="rounded-2xl p-6 mb-6 bg-card border border-theme">
                     <div className="space-y-6">
                       {/* Order Summary */}
                       <div>
-                        <h3 className="text-lg font-semibold mb-4" style={{ color: colors.text }}>
+                        <h3 className="text-lg font-semibold mb-4 text-primary">
                           Order Summary
                         </h3>
                         <div className="space-y-3">
                           <div className="flex justify-between">
-                            <span style={{ color: colors.muted }}>Order ID</span>
-                            <span style={{ color: colors.text }}>#{orderData?.order_number}</span>
+                            <span className="text-muted">Order ID</span>
+                            <span className="text-primary">#{orderData?.order_number}</span>
                           </div>
                           <div className="flex justify-between">
-                            <span style={{ color: colors.muted }}>Order Date</span>
-                            <span style={{ color: colors.text }}>
+                            <span className="text-muted">Order Date</span>
+                            <span className="text-primary">
                               {new Date(orderData?.created_at).toLocaleDateString('en-IN', {
                                 year: 'numeric',
                                 month: 'short',
@@ -823,24 +694,24 @@ const CheckoutPage = () => {
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span style={{ color: colors.muted }}>Payment Method</span>
-                            <span style={{ color: colors.text }} className="capitalize">
+                            <span className="text-muted">Payment Method</span>
+                            <span className="text-primary capitalize">
                               {paymentMethod === 'razorpay' ? 'Razorpay (Online Payment)' : 'Cash on Delivery'}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span style={{ color: colors.muted }}>Estimated Delivery</span>
-                            <span style={{ color: colors.success }}>3-5 business days</span>
+                            <span className="text-muted">Estimated Delivery</span>
+                            <span className="text-success">3-5 business days</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Delivery Address Summary */}
                       <div>
-                        <h3 className="text-lg font-semibold mb-2" style={{ color: colors.text }}>
+                        <h3 className="text-lg font-semibold mb-2 text-primary">
                           Delivery Address
                         </h3>
-                        <p className="text-sm" style={{ color: colors.muted }}>
+                        <p className="text-sm text-muted">
                           <span className="font-medium">Receiver:</span> {formData.receiver_name}<br />
                           <span className="font-medium">Phone:</span> {formData.receiver_phone}<br />
                           {formData.address}<br />
@@ -857,14 +728,12 @@ const CheckoutPage = () => {
                             name="agreeTerms"
                             checked={formData.agreeTerms}
                             onChange={handleInputChange}
-                            className="w-4 h-4 mt-1 rounded"
+                            className="w-4 h-4 mt-1 rounded bg-main border-theme"
                             style={{
-                              backgroundColor: colors.background,
-                              borderColor: colors.border,
-                              color: colors.primary,
+                              accentColor: 'var(--color-primary)',
                             }}
                           />
-                          <label htmlFor="terms" className="text-sm" style={{ color: colors.muted }}>
+                          <label htmlFor="terms" className="text-sm text-muted">
                             I agree to the Terms of Service and Privacy Policy
                           </label>
                         </div>
@@ -875,30 +744,22 @@ const CheckoutPage = () => {
                             name="agreeWarranty"
                             checked={formData.agreeWarranty}
                             onChange={handleInputChange}
-                            className="w-4 h-4 mt-1 rounded"
+                            className="w-4 h-4 mt-1 rounded bg-main border-theme"
                             style={{
-                              backgroundColor: colors.background,
-                              borderColor: colors.border,
-                              color: colors.primary,
+                              accentColor: 'var(--color-primary)',
                             }}
                           />
-                          <label htmlFor="warranty" className="text-sm" style={{ color: colors.muted }}>
+                          <label htmlFor="warranty" className="text-sm text-muted">
                             I understand the 2-year warranty terms and conditions
                           </label>
                         </div>
                       </div>
 
                       {/* Final Note */}
-                      <div 
-                        className="p-4 rounded-lg"
-                        style={{
-                          backgroundColor: `${colors.primary}10`,
-                          border: `1px solid ${colors.primary}30`,
-                        }}
-                      >
+                      <div className="p-4 rounded-lg bg-primary-light border border-primary/30">
                         <div className="flex items-start gap-3">
-                          <AlertCircle size={16} style={{ color: colors.primary }} className="mt-0.5 flex-shrink-0" />
-                          <p className="text-sm" style={{ color: colors.text }}>
+                          <AlertCircle size={16} className="text-brand mt-0.5 flex-shrink-0" />
+                          <p className="text-sm text-primary">
                             By placing this order, you agree to receive email and SMS updates about your order status.
                           </p>
                         </div>
@@ -909,11 +770,7 @@ const CheckoutPage = () => {
                   <div className="flex justify-between">
                     <button
                       onClick={() => setStep(2)}
-                      className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:bg-white/5"
-                      style={{
-                        color: colors.text,
-                        border: `1px solid ${colors.border}`,
-                      }}
+                      className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:bg-white/5 text-primary border border-theme"
                       disabled={processing}
                     >
                       <ArrowLeft size={18} />
@@ -922,15 +779,14 @@ const CheckoutPage = () => {
                     <button
                       onClick={handlePlaceOrder}
                       disabled={processing || !formData.agreeTerms || !formData.agreeWarranty}
-                      className="px-8 py-3 rounded-lg font-semibold text-white transition-all hover:shadow-xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      className="px-8 py-3 rounded-lg font-semibold text-primary transition-all hover:shadow-primary-hover hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 bg-gradient-primary"
                       style={{
-                        background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-                        boxShadow: `0 0 40px ${colors.primary}40`,
+                        boxShadow: `0 0 40px var(--color-primary-glow)`,
                       }}
                     >
                       {processing ? (
                         <>
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                           Processing...
                         </>
                       ) : (
@@ -956,25 +812,13 @@ const CheckoutPage = () => {
 
             {/* Right Column: Order Summary & Cart */}
             <div>
-              <div 
-                className="rounded-2xl overflow-hidden sticky top-24"
-                style={{
-                  backgroundColor: colors.cardBg,
-                  border: `1px solid ${colors.border}`,
-                }}
-              >
+              <div className="rounded-2xl overflow-hidden sticky top-24 bg-card border border-theme">
                 {/* Header */}
-                <div 
-                  className="p-6 border-b"
-                  style={{ 
-                    borderColor: colors.border,
-                    background: `linear-gradient(135deg, ${colors.primary}20, transparent)`
-                  }}
-                >
-                  <h3 className="text-xl font-bold" style={{ color: colors.text }}>
+                <div className="p-6 border-b border-theme bg-gradient-to-r from-primary-light to-transparent">
+                  <h3 className="text-xl font-bold text-primary">
                     Order Summary
                   </h3>
-                  <p className="text-sm mt-1" style={{ color: colors.muted }}>
+                  <p className="text-sm mt-1 text-muted">
                     {orderData?.items?.length || 0} {orderData?.items?.length === 1 ? 'item' : 'items'} in your order
                   </p>
                 </div>
@@ -995,34 +839,34 @@ const CheckoutPage = () => {
                           />
                         </div>
                         <div className="flex-1">
-                          <h4 className="font-medium mb-1" style={{ color: colors.text }}>
+                          <h4 className="font-medium mb-1 text-primary">
                             {getProductDisplayName(item)}
                           </h4>
                           <div className="flex items-center gap-2 text-sm mb-1">
-                            <span style={{ color: colors.muted }}>Qty: {item.qty}</span>
+                            <span className="text-muted">Qty: {item.qty}</span>
                             {item.variant && (
                               <>
-                                <span className="w-1 h-1 rounded-full" style={{ backgroundColor: colors.muted }} />
-                                <span style={{ color: colors.muted }}>{item.variant.color} / {item.variant.size}</span>
+                                <span className="w-1 h-1 rounded-full bg-muted" />
+                                <span className="text-muted">{item.variant.color} / {item.variant.size}</span>
                               </>
                             )}
                           </div>
                           {item.product.sale_price && !item.variant && (
-                            <div className="text-xs" style={{ color: colors.muted }}>
+                            <div className="text-xs text-muted">
                               Was: ₹{parseFloat(item.product.price).toLocaleString()}
                             </div>
                           )}
                           {item.variant && parseFloat(item.variant.price) > parseFloat(item.price) && (
-                            <div className="text-xs" style={{ color: colors.muted }}>
+                            <div className="text-xs text-muted">
                               Was: ₹{parseFloat(item.variant.price).toLocaleString()}
                             </div>
                           )}
                         </div>
                         <div className="text-right">
-                          <div className="font-bold" style={{ color: colors.text }}>
+                          <div className="font-bold text-primary">
                             ₹{(parseFloat(item.price) * item.qty).toLocaleString()}
                           </div>
-                          <div className="text-xs" style={{ color: colors.muted }}>
+                          <div className="text-xs text-muted">
                             ₹{parseFloat(item.price).toLocaleString()} each
                           </div>
                         </div>
@@ -1032,30 +876,30 @@ const CheckoutPage = () => {
                 </div>
 
                 {/* Price Breakdown */}
-                <div className="p-6 border-t" style={{ borderColor: colors.border }}>
+                <div className="p-6 border-t border-theme">
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span style={{ color: colors.muted }}>Subtotal</span>
-                      <span style={{ color: colors.text }}>₹{totals.subtotal.toLocaleString()}</span>
+                      <span className="text-muted">Subtotal</span>
+                      <span className="text-primary">₹{totals.subtotal.toLocaleString()}</span>
                     </div>
                     
                     {totals.subtotal > 2000 && (
                       <div className="flex justify-between">
-                        <span style={{ color: colors.success }}>Shipping Discount</span>
-                        <span style={{ color: colors.success }}>-₹199</span>
+                        <span className="text-success">Shipping Discount</span>
+                        <span className="text-success">-₹199</span>
                       </div>
                     )}
 
-                    <div className="pt-4 border-t" style={{ borderColor: colors.border }}>
+                    <div className="pt-4 border-t border-theme">
                       <div className="flex justify-between items-center">
-                        <span className="text-lg font-bold" style={{ color: colors.text }}>
+                        <span className="text-lg font-bold text-primary">
                           Total Amount
                         </span>
                         <div className="text-right">
-                          <div className="text-2xl font-bold" style={{ color: colors.text }}>
+                          <div className="text-2xl font-bold text-primary">
                             ₹{totals.total.toLocaleString()}
                           </div>
-                          <div className="text-sm" style={{ color: colors.muted }}>
+                          <div className="text-sm text-muted">
                             Includes all taxes
                           </div>
                         </div>
@@ -1065,35 +909,29 @@ const CheckoutPage = () => {
                 </div>
 
                 {/* Delivery Info */}
-                <div 
-                  className="p-6 border-t"
-                  style={{ 
-                    borderColor: colors.border,
-                    backgroundColor: `${colors.primary}05`
-                  }}
-                >
+                <div className="p-6 border-t border-theme bg-primary-light/5">
                   <div className="flex items-center gap-3 mb-4">
-                    <Truck size={18} style={{ color: colors.primary }} />
-                    <h4 className="font-semibold" style={{ color: colors.text }}>
+                    <Truck size={18} className="text-brand" />
+                    <h4 className="font-semibold text-primary">
                       Delivery Information
                     </h4>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <Clock size={14} style={{ color: colors.muted }} />
-                      <span className="text-sm" style={{ color: colors.muted }}>
+                      <Clock size={14} className="text-muted" />
+                      <span className="text-sm text-muted">
                         Estimated Delivery: 3-5 business days
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Package size={14} style={{ color: colors.muted }} />
-                      <span className="text-sm" style={{ color: colors.muted }}>
+                      <Package size={14} className="text-muted" />
+                      <span className="text-sm text-muted">
                         Free shipping on orders above ₹2,000
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Shield size={14} style={{ color: colors.muted }} />
-                      <span className="text-sm" style={{ color: colors.muted }}>
+                      <Shield size={14} className="text-muted" />
+                      <span className="text-sm text-muted">
                         All orders include 2-year warranty
                       </span>
                     </div>
@@ -1102,25 +940,14 @@ const CheckoutPage = () => {
               </div>
 
               {/* Need Help Section */}
-              <div 
-                className="mt-6 p-6 rounded-2xl"
-                style={{
-                  backgroundColor: colors.cardBg,
-                  border: `1px solid ${colors.border}`,
-                }}
-              >
-                <h4 className="font-semibold mb-3" style={{ color: colors.text }}>
+              <div className="mt-6 p-6 rounded-2xl bg-card border border-theme">
+                <h4 className="font-semibold mb-3 text-primary">
                   Need Help?
                 </h4>
-                <p className="text-sm mb-4" style={{ color: colors.muted }}>
+                <p className="text-sm mb-4 text-muted">
                   Contact our support team for assistance with your order.
                 </p>
-                <button className="w-full py-3 rounded-lg font-medium transition-all hover:bg-white/5"
-                  style={{
-                    color: colors.text,
-                    border: `1px solid ${colors.border}`,
-                  }}
-                >
+                <button className="w-full py-3 rounded-lg font-medium transition-all hover:bg-white/5 text-primary border border-theme">
                   Contact Support
                 </button>
               </div>
