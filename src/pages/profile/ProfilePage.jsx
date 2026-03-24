@@ -29,18 +29,6 @@ const ProfilePage = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  // Color Schema
-  const colors = {
-    primary: "#E10600",
-    background: "#0B0B0B",
-    cardBg: "#141414",
-    border: "#262626",
-    text: "#FFFFFF",
-    muted: "#B3B3B3",
-    success: "#22C55E",
-    warning: "#FACC15",
-  };
-
   // Fetch profile data
   useEffect(() => {
     const fetchProfile = async () => {
@@ -67,8 +55,8 @@ const ProfilePage = () => {
       }
     };
 
-      fetchProfile();
-  }, [ navigate]);
+    fetchProfile();
+  }, [navigate]);
 
   const handleSave = async () => {
     setUpdateLoading(true);
@@ -129,49 +117,31 @@ const ProfilePage = () => {
   return (
     <>
       <PageHelmet title="My Profile - ONE REP MORE" />
-      <div
-        style={{ backgroundColor: colors.background }}
-        className="min-h-screen py-8 px-4 md:px-8 pt-30 md:pt-40"
-      >
+      <div className="min-h-screen py-8 px-4 md:px-8 pt-30 md:pt-40 bg-main">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1
-              className="text-3xl md:text-4xl font-bold mb-2"
-              style={{ color: colors.text }}
-            >
+            <h1 className="text-3xl md:text-4xl font-bold mb-2 text-primary">
               My Profile
             </h1>
-            <p className="text-lg" style={{ color: colors.muted }}>
+            <p className="text-lg text-muted">
               Manage your account information
             </p>
           </div>
 
           {/* Profile Card */}
-          <div
-            className="rounded-2xl overflow-hidden"
-            style={{
-              backgroundColor: colors.cardBg,
-              border: `1px solid ${colors.border}`,
-            }}
-          >
+          <div className="rounded-2xl overflow-hidden bg-card border border-theme">
             {/* Profile Header */}
-            <div
-              className="h-32 relative"
-              style={{
-                background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-              }}
-            >
+            <div className="h-32 relative bg-gradient-primary">
               <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2">
                 <div className="relative">
                   <div
-                    className="w-24 h-24 rounded-full border-4 flex items-center justify-center"
-                    style={{ 
-                      borderColor: colors.cardBg,
-                      backgroundColor: colors.primary,
-                    }}
+                    className="w-24 h-24 rounded-full border-4 flex items-center justify-center bg-main z-10!"
+                    // style={{ 
+                    //   borderColor: 'var(--bg-card)',
+                    // }}
                   >
-                    <span className="text-3xl font-bold text-white">
+                    <span className="text-3xl font-bold text-primary">
                       {profileData?.name?.charAt(0) || "U"}
                     </span>
                   </div>
@@ -182,10 +152,7 @@ const ProfilePage = () => {
             {/* Profile Info */}
             <div className="pt-16 pb-8 px-8">
               <div className="text-center mb-8">
-                <h2
-                  className="text-2xl font-bold mb-1"
-                  style={{ color: colors.text }}
-                >
+                <h2 className="text-2xl font-bold mb-1 text-primary">
                   {isEditing ? (
                     <input
                       type="text"
@@ -194,8 +161,8 @@ const ProfilePage = () => {
                       onChange={handleChange}
                       className="w-full text-center bg-transparent border-b pb-1 focus:outline-none"
                       style={{
-                        color: colors.text,
-                        borderColor: colors.primary,
+                        color: 'var(--text-primary)',
+                        borderColor: 'var(--color-primary)',
                       }}
                       placeholder="Your name"
                     />
@@ -203,7 +170,7 @@ const ProfilePage = () => {
                     profileData?.name
                   )}
                 </h2>
-                <p className="text-sm" style={{ color: colors.muted }}>
+                <p className="text-sm text-muted">
                   {profileData?.role === "admin" ? "Administrator" : "Member"}
                 </p>
               </div>
@@ -212,11 +179,8 @@ const ProfilePage = () => {
               <div className="max-w-2xl mx-auto space-y-6 mb-8">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <Mail size={16} style={{ color: colors.muted }} />
-                    <label
-                      className="text-sm font-medium"
-                      style={{ color: colors.muted }}
-                    >
+                    <Mail size={16} className="text-muted" />
+                    <label className="text-sm font-medium text-muted">
                       Email Address
                     </label>
                   </div>
@@ -227,19 +191,14 @@ const ProfilePage = () => {
                       value={formData.email}
                       onChange={handleChange}
                       readOnly
-                      className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                      className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all bg-main border-theme text-primary"
                       style={{
-                        backgroundColor: `${colors.background}`,
-                        border: `1px solid ${colors.border}`,
-                        color: colors.text,
+                        border: '1px solid var(--bg-border)',
                       }}
                       placeholder="Your email"
                     />
                   ) : (
-                    <p
-                      className="text-lg font-medium px-4"
-                      style={{ color: colors.text }}
-                    >
+                    <p className="text-lg font-medium px-4 text-primary">
                       {profileData?.email}
                     </p>
                   )}
@@ -247,11 +206,8 @@ const ProfilePage = () => {
 
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <Phone size={16} style={{ color: colors.muted }} />
-                    <label
-                      className="text-sm font-medium"
-                      style={{ color: colors.muted }}
-                    >
+                    <Phone size={16} className="text-muted" />
+                    <label className="text-sm font-medium text-muted">
                       Phone Number
                     </label>
                   </div>
@@ -261,19 +217,14 @@ const ProfilePage = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                      className="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all bg-main border-theme text-primary"
                       style={{
-                        backgroundColor: `${colors.background}`,
-                        border: `1px solid ${colors.border}`,
-                        color: colors.text,
+                        border: '1px solid var(--bg-border)',
                       }}
                       placeholder="Your phone number"
                     />
                   ) : (
-                    <p
-                      className="text-lg font-medium px-4"
-                      style={{ color: colors.text }}
-                    >
+                    <p className="text-lg font-medium px-4 text-primary">
                       {profileData?.phone || "Not provided"}
                     </p>
                   )}
@@ -287,15 +238,12 @@ const ProfilePage = () => {
                     <button
                       onClick={handleSave}
                       disabled={updateLoading}
-                      className="flex-1 py-3 rounded-lg font-semibold text-white transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{
-                        background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-                      }}
+                      className="flex-1 py-3 rounded-lg font-semibold text-primary transition-all hover:shadow-primary-hover disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-primary"
                     >
                       <div className="flex items-center justify-center gap-2">
                         {updateLoading ? (
                           <>
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                             Updating...
                           </>
                         ) : (
@@ -309,11 +257,7 @@ const ProfilePage = () => {
                     <button
                       onClick={handleCancel}
                       disabled={updateLoading}
-                      className="flex-1 py-3 rounded-lg font-semibold transition-all hover:bg-white/5 disabled:opacity-50"
-                      style={{
-                        color: colors.text,
-                        border: `1px solid ${colors.border}`,
-                      }}
+                      className="flex-1 py-3 rounded-lg font-semibold transition-all hover:bg-white/5 disabled:opacity-50 text-primary border border-theme"
                     >
                       Cancel
                     </button>
@@ -322,22 +266,14 @@ const ProfilePage = () => {
                   <>
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="flex-1 py-3 rounded-lg font-semibold transition-all hover:bg-white/5 flex items-center justify-center gap-2"
-                      style={{
-                        color: colors.text,
-                        border: `1px solid ${colors.border}`,
-                      }}
+                      className="flex-1 py-3 rounded-lg font-semibold transition-all hover:bg-white/5 flex items-center justify-center gap-2 text-primary border border-theme"
                     >
                       <Edit size={16} />
                       Edit Profile
                     </button>
                     <button
                       onClick={handleLogout}
-                      className="flex-1 py-3 rounded-lg font-semibold transition-all hover:bg-red-600/10 flex items-center justify-center gap-2"
-                      style={{
-                        color: colors.primary,
-                        border: `1px solid ${colors.border}`,
-                      }}
+                      className="flex-1 py-3 rounded-lg font-semibold transition-all hover:bg-red-600/10 flex items-center justify-center gap-2 text-brand border border-theme"
                     >
                       <LogOut size={16} />
                       Sign Out
@@ -347,11 +283,11 @@ const ProfilePage = () => {
               </div>
 
               {/* Member Info */}
-              <div className="mt-8 pt-6 border-t text-center" style={{ borderColor: colors.border }}>
-                <p className="text-sm" style={{ color: colors.muted }}>
+              <div className="mt-8 pt-6 border-t text-center border-theme">
+                <p className="text-sm text-muted">
                   Member ID: #{profileData?.id}
                 </p>
-                <p className="text-sm" style={{ color: colors.muted }}>
+                <p className="text-sm text-muted">
                   Account type: {profileData?.role === "admin" ? "Administrator" : "Standard Member"}
                 </p>
               </div>

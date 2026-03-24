@@ -51,22 +51,22 @@ const WhyChooseUs = ({ choseData }) => {
 
   if (!choseData || choseData.length === 0) {
     return (
-      <section className="py-20 bg-gradient-to-b from-[#0B0B0B] to-[#141414]">
+      <section className="py-20 bg-gradient-to-b from-main to-card">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-[#B3B3B3]">No data available</p>
+          <p className="text-muted">No data available</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section className="py-20 bg-gradient-to-b from-[#0B0B0B] to-[#141414] relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-b from-main to-card relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: `radial-gradient(circle, #E10600 1px, transparent 1px)`,
+            backgroundImage: `radial-gradient(circle, var(--color-primary) 1px, transparent 1px)`,
             backgroundSize: "50px 50px",
           }}
         ></div>
@@ -82,17 +82,17 @@ const WhyChooseUs = ({ choseData }) => {
           className="text-center mb-16"
         >
           <div className="inline-block mb-4">
-            <span className="bg-[#E10600]/10 text-[#E10600] px-4 py-2 rounded-full text-sm font-bold border border-[#E10600]/20">
+            <span className="bg-primary-light text-brand px-4 py-2 rounded-full text-sm font-bold border border-primary/20">
               WHY US?
             </span>
           </div>
 
           <h2 className="text-5xl font-bold mb-6">
-            <span className="text-white">Why Choose </span>
-            <span className="text-[#E10600]">One Rep More</span>
+            <span className="text-primary">Why Choose </span>
+            <span className="text-brand">One Rep More</span>
           </h2>
 
-          <p className="text-[#B3B3B3] text-lg max-w-3xl mx-auto">
+          <p className="text-muted text-lg max-w-3xl mx-auto">
             We're not just a gym equipment store — we're your fitness partner.
           </p>
         </motion.div>
@@ -110,37 +110,37 @@ const WhyChooseUs = ({ choseData }) => {
                 whileInView="visible"
                 viewport={{ once: true }}
                 whileHover={{ y: -12, scale: 1.03 }}
-                className="group relative bg-[#141414] border-2 border-[#262626] rounded-2xl p-8 transition-all duration-500 hover:border-[#E10600] hover:shadow-[0_0_40px_rgba(225,6,0,0.3)] hover:-translate-y-2"
+                className="group relative bg-card border-2 border-theme rounded-2xl p-8 transition-all duration-500 hover:border-primary hover:shadow-primary-hover hover:-translate-y-2"
               >
                 {/* Icon Container */}
                 <div className="relative mb-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-[#E10600] to-[#FF0800] rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-[0_0_20px_rgba(225,6,0,0.4)]">
-                    <Icon className="w-8 h-8 text-white" />
+                  <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-primary">
+                    <Icon className="w-8 h-8 text-primary" />
                   </div>
                   {/* Glow Effect */}
-                  <div className="absolute inset-0 bg-[#E10600] opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 rounded-2xl"></div>
+                  <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500 rounded-2xl"></div>
                 </div>
 
                 {/* Content */}
                 <div>
-                  <h3 className="text-white text-2xl font-bold mb-3 group-hover:text-[#E10600] transition-colors duration-300">
+                  <h3 className="text-primary text-2xl font-bold mb-3 group-hover:text-brand transition-colors duration-300">
                     {item.title}
                   </h3>
-                  <p className="text-[#B3B3B3] leading-relaxed mb-4">
+                  <p className="text-muted leading-relaxed mb-4">
                     {item.description}
                   </p>
 
                   {/* Stats Badge */}
-                  <div className="inline-flex items-center gap-2 bg-[#0B0B0B] border border-[#262626] px-4 py-2 rounded-lg group-hover:border-[#E10600] transition-colors duration-300">
-                    <div className="w-2 h-2 bg-[#22C55E] rounded-full animate-pulse"></div>
-                    <span className="text-[#E10600] font-bold text-sm">
+                  <div className="inline-flex items-center gap-2 bg-main border border-theme px-4 py-2 rounded-lg group-hover:border-primary transition-colors duration-300">
+                    <div className="w-2 h-2 bg-success rounded-full animate-pulse"></div>
+                    <span className="text-brand font-bold text-sm">
                       {item.badge || "Featured"}
                     </span>
                   </div>
                 </div>
 
                 {/* Corner Accent */}
-                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#E10600]/10 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/10 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </motion.div>
             );
           })}
@@ -152,43 +152,41 @@ const WhyChooseUs = ({ choseData }) => {
           variants={fadeUpPremium}
           initial="hidden"
           animate={isStatsInView ? "visible" : "hidden"}
-          className="bg-gradient-to-r from-[#E10600] to-[#FF0800] rounded-3xl p-12 shadow-[0_0_60px_rgba(225,6,0,0.4)]"
+          className="bg-gradient-primary rounded-3xl p-12 shadow-primary-hover"
         >
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="text-5xl font-bold text-white mb-2">
+              <div className="text-5xl font-bold text-primary mb-2">
                 {isStatsInView && (
                   <CountUp start={0} end={10000} duration={2.5} separator="," />
                 )}
                 +
               </div>
-              <div className="text-white/80 font-medium">Happy Customers</div>
+              <div className="text-primary/80 font-medium">Happy Customers</div>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-bold text-white mb-2">
+              <div className="text-5xl font-bold text-primary mb-2">
                 {isStatsInView && (
                   <CountUp start={0} end={10000} duration={2.5} separator="," />
                 )}
               </div>
-              <div className="text-white/80 font-medium">Premium Products</div>
+              <div className="text-primary/80 font-medium">Premium Products</div>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-bold text-white mb-2">
+              <div className="text-5xl font-bold text-primary mb-2">
                 {isStatsInView && <CountUp start={0} end={98} duration={2} />}%
               </div>
-              <div className="text-white/80 font-medium">Satisfaction Rate</div>
+              <div className="text-primary/80 font-medium">Satisfaction Rate</div>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-bold text-white mb-2">
+              <div className="text-5xl font-bold text-primary mb-2">
                 {isStatsInView && <CountUp start={0} end={24} duration={1.5} />}
                 /7
               </div>
-              <div className="text-white/80 font-medium">Expert Support</div>
+              <div className="text-primary/80 font-medium">Expert Support</div>
             </div>
           </div>
         </motion.div>
-
-        
       </div>
 
       <style jsx>{`

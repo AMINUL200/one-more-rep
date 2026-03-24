@@ -46,9 +46,9 @@ const HowItWorks = ({ workData }) => {
   // If no data, show fallback UI
   if (!workData || workData.length === 0) {
     return (
-      <section className="bg-[#0B0B0B] py-20">
+      <section className="bg-main py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-[#B3B3B3]">No how it works data available</p>
+          <p className="text-muted">No how it works data available</p>
         </div>
       </section>
     );
@@ -77,7 +77,7 @@ const HowItWorks = ({ workData }) => {
   const embedUrl = getYouTubeEmbedUrl(activeItem.youtube_url);
 
   return (
-    <section className="bg-[#0B0B0B] py-20">
+    <section className="bg-main py-20">
       <div className="max-w-7xl mx-auto px-4">
         {/* HEADER */}
         <div className="text-center mb-14">
@@ -88,8 +88,8 @@ const HowItWorks = ({ workData }) => {
             viewport={{ once: true }}
             className="text-5xl font-bold mb-4"
           >
-            <span className="text-white">{workData[0]?.section_title || "How It "}</span>
-            <span className="text-[#E10600]">Works</span>
+            <span className="text-primary">{workData[0]?.section_title || "How It "}</span>
+            <span className="text-brand">Works</span>
           </motion.h2>
 
           <motion.p
@@ -98,7 +98,7 @@ const HowItWorks = ({ workData }) => {
             whileInView="visible"
             transition={{ delay: 0.15 }}
             viewport={{ once: true }}
-            className="text-[#B3B3B3] max-w-2xl mx-auto text-lg"
+            className="text-muted max-w-2xl mx-auto text-lg"
           >
             {workData[0]?.section_subtitle || "Learn how our gym equipment is designed to help you train smarter, safer, and stronger."}
           </motion.p>
@@ -117,8 +117,8 @@ const HowItWorks = ({ workData }) => {
               className={`px-6 py-3 rounded-xl border font-semibold transition-all
                 ${
                   activeTab === item.tab_name
-                    ? "bg-[#E10600] text-white border-transparent shadow-lg scale-105"
-                    : "bg-[#141414] border-[#262626] text-[#B3B3B3] hover:border-[#E10600] hover:text-white"
+                    ? "bg-primary text-primary border-transparent shadow-lg scale-105"
+                    : "bg-card border-theme text-muted hover:border-brand hover:text-primary"
                 }
               `}
             >
@@ -144,7 +144,7 @@ const HowItWorks = ({ workData }) => {
                 initial="hidden"
                 animate="visible"
                 transition={{ delay: 0.1 }}
-                className="relative rounded-2xl overflow-hidden border border-[#262626] bg-black"
+                className="relative rounded-2xl overflow-hidden border border-theme bg-main"
               >
                 <iframe
                   src={embedUrl}
@@ -153,7 +153,7 @@ const HowItWorks = ({ workData }) => {
                   allow="autoplay; encrypted-media"
                   allowFullScreen
                 />
-                <div className="absolute top-4 left-4 bg-[#E10600] px-4 py-2 rounded-full text-white font-bold text-sm flex items-center gap-2">
+                <div className="absolute top-4 left-4 bg-primary text-primary px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2">
                   <Play size={16} /> {activeItem.video_title || "Demo Video"}
                 </div>
               </motion.div>
@@ -161,7 +161,7 @@ const HowItWorks = ({ workData }) => {
 
             {/* STEPS */}
             <div>
-              <h3 className="text-3xl font-bold text-white mb-6">
+              <h3 className="text-3xl font-bold text-primary mb-6">
                 Using {activeItem.tab_name}
               </h3>
 
@@ -174,12 +174,12 @@ const HowItWorks = ({ workData }) => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.12 }}
-                      className="flex items-start gap-4 bg-[#141414] border border-[#262626] p-4 rounded-xl"
+                      className="flex items-start gap-4 bg-card border border-theme p-4 rounded-xl hover-lift hover-glow transition-all"
                     >
-                      <div className="w-8 h-8 rounded-full bg-[#E10600] text-white flex items-center justify-center font-bold">
+                      <div className="w-8 h-8 rounded-full bg-primary text-primary flex items-center justify-center font-bold shadow-primary">
                         {i + 1}
                       </div>
-                      <p className="text-[#B3B3B3]">{step}</p>
+                      <p className="text-muted">{step}</p>
                     </motion.li>
                   ))}
                 </ul>
@@ -193,10 +193,10 @@ const HowItWorks = ({ workData }) => {
                       key={i}
                       whileHover={{ y: -4 }}
                       transition={{ type: "spring", stiffness: 200 }}
-                      className="flex items-center gap-3 bg-[#141414] border border-[#262626] p-4 rounded-xl"
+                      className="flex items-center gap-3 bg-card border border-theme p-4 rounded-xl hover-lift hover-glow transition-all"
                     >
-                      <ShieldCheck className="text-[#E10600]" />
-                      <span className="text-white text-sm font-medium">
+                      <ShieldCheck className="text-brand" />
+                      <span className="text-primary text-sm font-medium">
                         {feature}
                       </span>
                     </motion.div>
@@ -211,10 +211,10 @@ const HowItWorks = ({ workData }) => {
                   whileTap={{ scale: 0.94 }}
                   transition={{ type: "spring", stiffness: 220 }}
                   onClick={() => navigate(activeItem.button_link || "/products")}
-                  className="inline-flex items-center gap-3 px-8 py-4 bg-[#E10600] hover:bg-red-700 text-white font-bold rounded-lg transition-all hover:shadow-[0_0_25px_rgba(225,6,0,0.5)]"
+                  className="inline-flex items-center gap-3 px-8 py-4 btn-primary rounded-lg group"
                 >
                   {activeItem.button_text}
-                  <ArrowRight />
+                  <ArrowRight className="transition-transform group-hover:translate-x-2" />
                 </motion.button>
               )}
             </div>

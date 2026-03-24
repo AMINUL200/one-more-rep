@@ -19,8 +19,6 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // console.log("Sidebar Category Data:", categoryData);
-
   /* ================= ICON MAPPING FOR CATEGORIES ================= */
   const getCategoryIcon = (categoryName) => {
     const name = categoryName?.toLowerCase() || "";
@@ -110,10 +108,10 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
             level > 1 ? "pl-10" : "pl-6"
           } ${
             active
-              ? "bg-[#E10600] text-white font-semibold"
+              ? "bg-brand text-primary font-semibold"
               : open
-              ? "bg-[#E10600]/10 text-[#E10600]"
-              : "text-[#B3B3B3] hover:bg-[#141414] hover:text-[#E10600]"
+              ? "bg-primary-light text-brand"
+              : "text-muted hover:bg-card hover:text-brand"
           }`}
         >
           <div className="flex items-center gap-2">
@@ -137,7 +135,7 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
               open ? "max-h-96" : "max-h-0"
             }`}
           >
-            <div className="border-l border-[#262626] ml-4">
+            <div className="border-l border-theme ml-4">
               {item.dropdown.map((sub) => renderDropdownItem(sub, level + 1))}
             </div>
           </div>
@@ -158,10 +156,10 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
           }
           className={`flex items-center justify-between px-4 py-3 mx-2 rounded-lg cursor-pointer transition ${
             active
-              ? "bg-[#E10600] text-white font-semibold"
+              ? "bg-brand text-primary font-semibold"
               : open
-              ? "bg-[#E10600]/10 text-[#E10600]"
-              : "text-[#B3B3B3] hover:bg-[#141414] hover:text-[#E10600]"
+              ? "bg-primary-light text-brand"
+              : "text-muted hover:bg-card hover:text-brand"
           }`}
         >
           <div className="flex items-center gap-3">
@@ -189,7 +187,7 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
 
         {/* Show message if products dropdown is empty */}
         {item.id === "products" && item.dropdown && item.dropdown.length === 0 && open && (
-          <div className="px-4 py-3 ml-8 text-sm text-[#B3B3B3] italic">
+          <div className="px-4 py-3 ml-8 text-sm text-muted italic">
             No categories available
           </div>
         )}
@@ -201,7 +199,7 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black/60 z-40 transition ${
+        className={`fixed inset-0 bg-overlay z-40 transition ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         } md:hidden`}
         onClick={toggleMenu}
@@ -209,7 +207,7 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 right-0 h-full w-80 bg-[#0B0B0B] z-50 transform transition-transform ${
+        className={`fixed top-0 right-0 h-full w-80 bg-main z-50 transform transition-transform ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         style={{
@@ -217,66 +215,62 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-[#262626] bg-[#141414]">
+        <div className="flex items-center justify-between p-6 border-b border-theme bg-card">
           <h2 className="text-xl font-bold">
-            <span className="text-white">ONE </span>
-            <span className="text-[#E10600]">REP MORE</span>
+            <span className="text-primary">ONE </span>
+            <span className="text-brand">REP MORE</span>
           </h2>
           <button 
             onClick={toggleMenu}
-            className="p-2 rounded-full hover:bg-[#262626] transition"
+            className="p-2 rounded-full hover:bg-border transition"
           >
-            <X className="text-white" size={20} />
+            <X className="text-primary" size={20} />
           </button>
         </div>
 
         {/* Category Count Badge (if needed) */}
         {categoryData && categoryData.length > 0 && (
-          <div className="px-6 py-2 border-b border-[#262626] bg-[#0B0B0B]">
-            <span className="text-xs text-[#B3B3B3]">
+          <div className="px-6 py-2 border-b border-theme bg-main">
+            <span className="text-xs text-muted">
               {categoryData.length} Categories Available
             </span>
           </div>
         )}
 
         {/* Nav */}
-        <nav className="flex-1 overflow-y-auto py-4 max-h-[calc(100vh-180px)]">
+        <nav className="flex-1 overflow-y-auto py-4 max-h-[calc(100vh-180px)] custom-scrollbar">
           {sidebarLinks.map(renderNavItem)}
         </nav>
 
         {/* Auth Section */}
         {!isAuthenticated ? (
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-[#262626] bg-[#141414]">
+          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-theme bg-card">
             <button
               onClick={() => {
                 navigate("/login");
                 toggleMenu();
               }}
-              className="w-full py-2 px-4 rounded-lg font-semibold transition hover:scale-105 text-white"
-              style={{
-                background: "linear-gradient(135deg, #E10600, #B30000)",
-              }}
+              className="w-full btn-primary py-2 px-4 rounded-lg font-semibold"
             >
               Login / Sign Up
             </button>
           </div>
         ) : (
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-[#262626] bg-[#141414]">
+          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-theme bg-card">
             <div className="flex items-center gap-3 mb-3">
               <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
-                style={{ backgroundColor: "#E10600" }}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-primary bg-brand"
               >
                 U
               </div>
               <div>
-                <p className="text-white font-medium">User Name</p>
-                <p className="text-xs text-[#B3B3B3]">user@example.com</p>
+                <p className="text-primary font-medium">User Name</p>
+                <p className="text-xs text-muted">user@example.com</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-[#DC2626] hover:bg-red-600/20 transition"
+              className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg text-error hover:bg-error/20 transition"
             >
               <LogOut size={18} />
               <span>Logout</span>
@@ -285,24 +279,28 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
         )}
       </aside>
 
-      {/* Custom Scrollbar Styles */}
+      {/* Custom Scrollbar Styles - Now using CSS variables */}
       <style jsx>{`
-        .overflow-y-auto::-webkit-scrollbar {
+        .custom-scrollbar::-webkit-scrollbar {
           width: 4px;
         }
         
-        .overflow-y-auto::-webkit-scrollbar-track {
-          background: #262626;
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: var(--bg-border);
         }
         
-        .overflow-y-auto::-webkit-scrollbar-thumb {
-          background: #E10600;
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: var(--color-primary);
           border-radius: 4px;
         }
         
-        .overflow-y-auto {
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: var(--color-primary-hover);
+        }
+        
+        .custom-scrollbar {
           scrollbar-width: thin;
-          scrollbar-color: #E10600 #262626;
+          scrollbar-color: var(--color-primary) var(--bg-border);
         }
       `}</style>
     </>

@@ -77,6 +77,8 @@ const HandleProduct = () => {
     return_policy: "",
     return_policy_meta: "",
     status: true,
+    tag_line: "",
+    premium_product: false,
   });
   const [formErrors, setFormErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -757,6 +759,9 @@ const HandleProduct = () => {
       price: parseFloat(formData.price),
       sale_price: formData.sale_price ? parseFloat(formData.sale_price) : null,
       stock: parseInt(formData.stock),
+
+      // ✅ NEW
+      premium_product: formData.premium_product ? 1 : 0,
     };
 
     try {
@@ -1001,6 +1006,9 @@ const HandleProduct = () => {
       return_policy: product.return_policy || "",
       return_policy_meta: product.return_policy_meta || "",
       status: product.status === 1 || product.status === true,
+      // ✅ NEW
+      tag_line: product.tag_line || "",
+      premium_product: product.premium_product === 1,
     });
     setShowModal(true);
   };
@@ -1334,6 +1342,9 @@ const HandleProduct = () => {
                         >
                           {product.name_meta}
                         </div>
+                      )}
+                      {product.premium_product === 1 && (
+                        <span className="text-brand ml-2">Premium</span>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -1706,7 +1717,48 @@ const HandleProduct = () => {
                   </p>
                 )}
               </div>
+              {/* Tag Line */}
+              <div>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text }}
+                >
+                  Tag Line
+                </label>
 
+                <input
+                  type="text"
+                  name="tag_line"
+                  value={formData.tag_line}
+                  onChange={handleInputChange}
+                  placeholder="Enter tagline (e.g., Best Quality Product)"
+                  className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                  style={{
+                    backgroundColor: colors.background,
+                    border: `1px solid ${colors.border}`,
+                    color: colors.text,
+                  }}
+                />
+              </div>
+
+              {/* Premium Product Checkbox */}
+              <div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="premium_product"
+                    checked={formData.premium_product}
+                    onChange={handleInputChange}
+                    className="w-4 h-4 rounded"
+                    style={{ accentColor: colors.primary }}
+                  />
+                  <span style={{ color: colors.text }}>Premium Product</span>
+                </label>
+
+                <p className="text-xs mt-1" style={{ color: colors.textLight }}>
+                  Enable if this is a premium product
+                </p>
+              </div>
               {/* Meta Name */}
               <div>
                 <label

@@ -23,35 +23,22 @@ const MyOrders = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  // Color Schema
-  const colors = {
-    primary: "#E10600",
-    background: "#0B0B0B",
-    cardBg: "#141414",
-    border: "#262626",
-    text: "#FFFFFF",
-    muted: "#B3B3B3",
-    success: "#22C55E",
-    warning: "#FACC15",
-    danger: "#DC2626",
-  };
-
-  // Status colors mapping
+  // Status colors mapping using CSS variables
   const getStatusColor = (status) => {
     switch(status?.toLowerCase()) {
       case 'delivered':
-        return colors.success;
+        return 'var(--color-success)';
       case 'processing':
       case 'pending':
-        return colors.warning;
+        return 'var(--color-warning)';
       case 'shipped':
-        return colors.primary;
+        return 'var(--color-primary)';
       case 'cancelled':
-        return colors.danger;
+        return '#DC2626';
       case 'paid':
-        return colors.success;
+        return 'var(--color-success)';
       default:
-        return colors.muted;
+        return 'var(--text-muted)';
     }
   };
 
@@ -197,25 +184,20 @@ const MyOrders = () => {
   return (
     <>
       <PageHelmet title="My Orders - ONE REP MORE" />
-      <div style={{ backgroundColor: colors.background }} className="min-h-screen py-8 px-4 md:px-8 pt-30 md:pt-40">
+      <div className="min-h-screen py-8 px-4 md:px-8 pt-30 md:pt-40 bg-main">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center"
-                  style={{
-                    backgroundColor: `${colors.primary}20`,
-                    border: `1px solid ${colors.primary}30`,
-                  }}
-                >
-                  <Package size={24} style={{ color: colors.primary }} />
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary-light border border-primary/30">
+                  <Package size={24} className="text-brand" />
                 </div>
                 <div>
-                  <h1 className="text-3xl md:text-4xl font-bold" style={{ color: colors.text }}>
+                  <h1 className="text-3xl md:text-4xl font-bold text-primary">
                     My Orders
                   </h1>
-                  <p className="text-lg" style={{ color: colors.muted }}>
+                  <p className="text-lg text-muted">
                     Track and manage your equipment orders
                   </p>
                 </div>
@@ -223,11 +205,7 @@ const MyOrders = () => {
               
               <Link 
                 to="/"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-lg"
-                style={{
-                  background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-                  color: colors.text,
-                }}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-primary-hover bg-gradient-primary text-primary"
               >
                 <ArrowRight size={20} className="rotate-180" />
                 Continue Shopping
@@ -239,17 +217,13 @@ const MyOrders = () => {
               {stats.map((stat, index) => (
                 <div 
                   key={index}
-                  className="p-4 rounded-xl"
-                  style={{
-                    backgroundColor: colors.cardBg,
-                    border: `1px solid ${colors.border}`,
-                  }}
+                  className="p-4 rounded-xl bg-card border border-theme"
                 >
-                  <p className="text-sm mb-1" style={{ color: colors.muted }}>
+                  <p className="text-sm mb-1 text-muted">
                     {stat.label}
                   </p>
                   <div className="flex items-end justify-between">
-                    <p className="text-2xl font-bold" style={{ color: colors.text }}>
+                    <p className="text-2xl font-bold text-primary">
                       {stat.value}
                     </p>
                   </div>
@@ -269,20 +243,20 @@ const MyOrders = () => {
                     onClick={() => setActiveFilter(filter.id)}
                     className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
                       activeFilter === filter.id 
-                        ? 'text-white' 
+                        ? 'text-primary' 
                         : 'hover:bg-white/5'
                     }`}
                     style={{
-                      backgroundColor: activeFilter === filter.id ? colors.primary : 'transparent',
-                      border: `1px solid ${activeFilter === filter.id ? colors.primary : colors.border}`,
-                      color: activeFilter === filter.id ? colors.text : colors.muted,
+                      backgroundColor: activeFilter === filter.id ? 'var(--color-primary)' : 'transparent',
+                      border: `1px solid ${activeFilter === filter.id ? 'var(--color-primary)' : 'var(--bg-border)'}`,
+                      color: activeFilter === filter.id ? 'var(--text-primary)' : 'var(--text-muted)',
                     }}
                   >
                     {filter.label}
                     <span className="px-1.5 py-0.5 rounded text-xs font-bold"
                       style={{
-                        backgroundColor: activeFilter === filter.id ? 'rgba(255,255,255,0.2)' : colors.border,
-                        color: activeFilter === filter.id ? colors.text : colors.muted,
+                        backgroundColor: activeFilter === filter.id ? 'rgba(255,255,255,0.2)' : 'var(--bg-border)',
+                        color: activeFilter === filter.id ? 'var(--text-primary)' : 'var(--text-muted)',
                       }}
                     >
                       {getFilterCount(filter.id)}
@@ -293,17 +267,15 @@ const MyOrders = () => {
 
               {/* Search */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" size={18} style={{ color: colors.muted }} />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted" size={18} />
                 <input
                   type="text"
                   placeholder="Search by order ID or name..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 rounded-lg focus:outline-none w-full sm:w-64"
+                  className="pl-10 pr-4 py-2 rounded-lg focus:outline-none w-full sm:w-64 bg-card border-theme text-primary"
                   style={{
-                    backgroundColor: colors.cardBg,
-                    border: `1px solid ${colors.border}`,
-                    color: colors.text,
+                    border: '1px solid var(--bg-border)',
                   }}
                 />
               </div>
@@ -311,7 +283,7 @@ const MyOrders = () => {
 
             {/* Order Count */}
             <div className="flex items-center justify-between mb-4">
-              <p className="text-sm" style={{ color: colors.muted }}>
+              <p className="text-sm text-muted">
                 Showing {filteredOrders.length} of {orders.length} orders
               </p>
             </div>
@@ -327,24 +299,20 @@ const MyOrders = () => {
                 return (
                   <div 
                     key={order.id}
-                    className="rounded-2xl overflow-hidden group cursor-pointer hover:border-[#E10600] transition-all duration-300"
-                    style={{
-                      backgroundColor: colors.cardBg,
-                      border: `1px solid ${colors.border}`,
-                    }}
+                    className="rounded-2xl overflow-hidden group cursor-pointer hover:border-primary transition-all duration-300 bg-card border border-theme"
                     onClick={() => navigate(`/order/${order.id}`)}
                   >
                     {/* Order Header */}
-                    <div className="p-6 border-b" style={{ borderColor: colors.border }}>
+                    <div className="p-6 border-b border-theme">
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                           <div className="flex items-center gap-3">
                             <StatusIcon size={20} style={{ color: statusColor }} />
                             <div>
-                              <h3 className="text-lg font-bold" style={{ color: colors.text }}>
+                              <h3 className="text-lg font-bold text-primary">
                                 Order {order.order_number}
                               </h3>
-                              <p className="text-sm" style={{ color: colors.muted }}>
+                              <p className="text-sm text-muted">
                                 Placed on {formatDate(order.created_at)}
                               </p>
                             </div>
@@ -362,15 +330,15 @@ const MyOrders = () => {
                         
                         <div className="flex items-center gap-4">
                           <div className="text-right">
-                            <p className="text-2xl font-bold mb-1 flex items-center justify-end" style={{ color: colors.text }}>
+                            <p className="text-2xl font-bold mb-1 flex items-center justify-end text-primary">
                               <IndianRupee size={18} />
                               {parseFloat(order.total_amount).toLocaleString('en-IN')}
                             </p>
-                            <p className="text-xs" style={{ color: colors.muted }}>
+                            <p className="text-xs text-muted">
                               Payment: {order.payment_method}
                             </p>
                           </div>
-                          <ChevronRight size={20} style={{ color: colors.muted }} className="group-hover:translate-x-1 transition-transform" />
+                          <ChevronRight size={20} className="text-muted group-hover:translate-x-1 transition-transform" />
                         </div>
                       </div>
                     </div>
@@ -380,31 +348,29 @@ const MyOrders = () => {
                       <div className="grid md:grid-cols-2 gap-6">
                         {/* Customer Details */}
                         <div>
-                          <h4 className="text-sm font-semibold mb-3 uppercase tracking-wider"
-                            style={{ color: colors.muted }}
-                          >
+                          <h4 className="text-sm font-semibold mb-3 uppercase tracking-wider text-muted">
                             Customer Details
                           </h4>
                           <div className="space-y-3">
                             <div className="flex items-center gap-2">
-                              <User size={14} style={{ color: colors.muted }} />
-                              <span className="text-sm" style={{ color: colors.text }}>
+                              <User size={14} className="text-muted" />
+                              <span className="text-sm text-primary">
                                 {order.receiver_name || order.customer_name}
                               </span>
                             </div>
                             
                             {(order.receiver_phone || order.phone) && (
                               <div className="flex items-center gap-2">
-                                <Phone size={14} style={{ color: colors.muted }} />
-                                <span className="text-sm" style={{ color: colors.text }}>
+                                <Phone size={14} className="text-muted" />
+                                <span className="text-sm text-primary">
                                   {order.receiver_phone || order.phone}
                                 </span>
                               </div>
                             )}
                             
                             <div className="flex items-start gap-2">
-                              <MapPin size={14} style={{ color: colors.muted }} className="mt-0.5" />
-                              <span className="text-sm" style={{ color: colors.text }}>
+                              <MapPin size={14} className="text-muted mt-0.5" />
+                              <span className="text-sm text-primary">
                                 {order.address}, {order.city}, {order.state} - {order.pincode}
                               </span>
                             </div>
@@ -413,22 +379,20 @@ const MyOrders = () => {
 
                         {/* Payment Details */}
                         <div>
-                          <h4 className="text-sm font-semibold mb-3 uppercase tracking-wider"
-                            style={{ color: colors.muted }}
-                          >
+                          <h4 className="text-sm font-semibold mb-3 uppercase tracking-wider text-muted">
                             Payment Details
                           </h4>
                           <div className="space-y-3">
                             <div className="flex items-center gap-2">
-                              <CreditCard size={14} style={{ color: colors.muted }} />
-                              <span className="text-sm" style={{ color: colors.text }}>
+                              <CreditCard size={14} className="text-muted" />
+                              <span className="text-sm text-primary">
                                 {order.payment_method} • {order.payment_status}
                               </span>
                             </div>
                             
                             <div className="flex items-center gap-2">
-                              <IndianRupee size={14} style={{ color: colors.muted }} />
-                              <span className="text-sm font-semibold" style={{ color: colors.primary }}>
+                              <IndianRupee size={14} className="text-muted" />
+                              <span className="text-sm font-semibold text-brand">
                                 Total: {formatCurrency(order.total_amount)}
                               </span>
                             </div>
@@ -437,17 +401,13 @@ const MyOrders = () => {
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex flex-wrap gap-3 mt-6 pt-6 border-t" style={{ borderColor: colors.border }}>
+                      <div className="flex flex-wrap gap-3 mt-6 pt-6 border-t border-theme">
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/order/${order.id}`);
                           }}
-                          className="px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors hover:bg-white/5"
-                          style={{
-                            color: colors.text,
-                            border: `1px solid ${colors.border}`,
-                          }}
+                          className="px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors hover:bg-white/5 text-primary border border-theme"
                         >
                           <Eye size={16} />
                           View Details
@@ -458,11 +418,7 @@ const MyOrders = () => {
                             e.stopPropagation();
                             // Support functionality
                           }}
-                          className="px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors hover:bg-white/5"
-                          style={{
-                            color: colors.text,
-                            border: `1px solid ${colors.border}`,
-                          }}
+                          className="px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-colors hover:bg-white/5 text-primary border border-theme"
                         >
                           <MessageSquare size={16} />
                           Support
@@ -474,25 +430,14 @@ const MyOrders = () => {
               })
             ) : (
               /* No Orders State */
-              <div 
-                className="rounded-2xl p-12 text-center"
-                style={{
-                  backgroundColor: colors.cardBg,
-                  border: `1px solid ${colors.border}`,
-                }}
-              >
-                <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
-                  style={{
-                    backgroundColor: `${colors.primary}20`,
-                    border: `1px solid ${colors.primary}30`,
-                  }}
-                >
-                  <Package size={32} style={{ color: colors.primary }} />
+              <div className="rounded-2xl p-12 text-center bg-card border border-theme">
+                <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center bg-primary-light border border-primary/30">
+                  <Package size={32} className="text-brand" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3" style={{ color: colors.text }}>
+                <h3 className="text-2xl font-bold mb-3 text-primary">
                   No orders found
                 </h3>
-                <p className="mb-8 max-w-md mx-auto" style={{ color: colors.muted }}>
+                <p className="mb-8 max-w-md mx-auto text-muted">
                   {searchTerm 
                     ? `No orders matching "${searchTerm}"`
                     : `You haven't placed any orders yet. Start building your dream gym!`
@@ -500,10 +445,7 @@ const MyOrders = () => {
                 </p>
                 <Link 
                   to="/products"
-                  className="inline-flex items-center gap-3 px-8 py-4 rounded-lg font-semibold text-white transition-all hover:shadow-xl"
-                  style={{
-                    background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-                  }}
+                  className="inline-flex items-center gap-3 px-8 py-4 rounded-lg font-semibold text-primary transition-all hover:shadow-primary-hover bg-gradient-primary"
                 >
                   Browse Equipment
                   <ArrowRight size={20} />
@@ -514,30 +456,20 @@ const MyOrders = () => {
 
           {/* Help Section */}
           <div className="mt-12">
-            <div 
-              className="rounded-2xl p-8"
-              style={{
-                background: `linear-gradient(135deg, ${colors.cardBg} 0%, #1a1a1a 100%)`,
-                border: `1px solid ${colors.border}`,
-              }}
-            >
+            <div className="rounded-2xl p-8 bg-gradient-to-r from-card to-main border border-theme">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                 <div>
-                  <h3 className="text-2xl font-bold mb-2" style={{ color: colors.text }}>
+                  <h3 className="text-2xl font-bold mb-2 text-primary">
                     Need help with your order?
                   </h3>
-                  <p className="mb-4" style={{ color: colors.muted }}>
+                  <p className="mb-4 text-muted">
                     Our support team is here to help with tracking, returns, or any questions.
                   </p>
                 </div>
                 <div className="flex gap-4">
                   <button 
                     onClick={() => navigate('/contact')}
-                    className="px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-lg"
-                    style={{
-                      background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-                      color: colors.text,
-                    }}
+                    className="px-6 py-3 rounded-lg font-semibold transition-all hover:shadow-primary-hover bg-gradient-primary text-primary"
                   >
                     Contact Support
                   </button>

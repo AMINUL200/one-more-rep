@@ -25,18 +25,6 @@ const LoginPage = () => {
 
   const { login, isAuthenticated, loading: authLoading, user } = useAuth();
 
-  // Color Schema
-  const colors = {
-    primary: "#E10600",
-    background: "#0B0B0B",
-    cardBg: "#141414",
-    border: "#262626",
-    text: "#FFFFFF",
-    muted: "#B3B3B3",
-    success: "#22C55E",
-    warning: "#FACC15",
-  };
-
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && !authLoading && !redirectAttempted) {
@@ -135,16 +123,13 @@ const LoginPage = () => {
   // Show loading while checking auth state
   if (authLoading) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: colors.background }}
-      >
+      <div className="min-h-screen flex items-center justify-center bg-main">
         <div className="text-center">
           <div
             className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
-            style={{ borderColor: colors.primary }}
+            style={{ borderColor: 'var(--color-primary)' }}
           ></div>
-          <p style={{ color: colors.muted }}>Checking authentication...</p>
+          <p className="text-muted">Checking authentication...</p>
         </div>
       </div>
     );
@@ -152,28 +137,25 @@ const LoginPage = () => {
 
   return (
     <>
-    <PageHelmet title="Login - ONE REP MORE" />
-      <div
-        className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
-        style={{ backgroundColor: colors.background }}
-      >
+      <PageHelmet title="Login - ONE REP MORE" />
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-main">
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div
             className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl opacity-10"
-            style={{ backgroundColor: colors.primary }}
+            style={{ backgroundColor: 'var(--color-primary)' }}
           ></div>
           <div
             className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl opacity-5"
-            style={{ backgroundColor: colors.primary }}
+            style={{ backgroundColor: 'var(--color-primary)' }}
           ></div>
 
           {/* Gym equipment decorative elements */}
           <div className="absolute top-1/4 left-10 opacity-5">
-            <Dumbbell size={60} style={{ color: colors.text }} />
+            <Dumbbell size={60} className="text-primary" />
           </div>
           <div className="absolute bottom-1/4 right-10 opacity-5">
-            <Dumbbell size={80} style={{ color: colors.text }} />
+            <Dumbbell size={80} className="text-primary" />
           </div>
         </div>
 
@@ -181,33 +163,18 @@ const LoginPage = () => {
           {/* Back button */}
           <button
             onClick={() => navigate("/")}
-            className="mb-6 flex items-center space-x-2 transition-colors group"
-            style={{ color: colors.muted }}
+            className="mb-6 flex items-center space-x-2 transition-colors group text-muted hover:text-primary"
           >
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-medium group-hover:text-white">
-              Back to Home
-            </span>
+            <span className="font-medium">Back to Home</span>
           </button>
 
           {/* Login Card */}
-          <div
-            className="rounded-2xl shadow-2xl p-8"
-            style={{
-              backgroundColor: colors.cardBg,
-              border: `1px solid ${colors.border}`,
-            }}
-          >
+          <div className="rounded-2xl shadow-2xl p-8 bg-card border border-theme">
             {/* Logo and Title */}
             <div className="text-center mb-8">
               <div className="flex justify-center mb-4">
-                <div
-                  className="p-2 rounded-2xl shadow-lg"
-                  style={{
-                    backgroundColor: colors.background,
-                    border: `2px solid ${colors.border}`,
-                  }}
-                >
+                <div className="p-2 rounded-2xl shadow-lg bg-main border-2 border-theme">
                   <img
                     src="/image/gym_logo.png"
                     alt="Gym Store"
@@ -215,31 +182,22 @@ const LoginPage = () => {
                   />
                 </div>
               </div>
-              <h2
-                className="text-3xl font-bold mb-2"
-                style={{ color: colors.text }}
-              >
+              <h2 className="text-3xl font-bold mb-2 text-primary">
                 Welcome Back
               </h2>
-              <p style={{ color: colors.muted }}>
+              <p className="text-muted">
                 Sign in to continue to GymStore
               </p>
             </div>
 
             {/* API Error Message */}
             {apiError && (
-              <div
-                className="mb-6 p-4 rounded-lg"
-                style={{
-                  backgroundColor: `${colors.primary}15`,
-                  border: `1px solid ${colors.primary}50`,
-                }}
-              >
+              <div className="mb-6 p-4 rounded-lg bg-primary-light border border-primary/50">
                 <div className="flex items-start">
                   <div className="flex-shrink-0">
                     <svg
                       className="h-5 w-5"
-                      style={{ color: colors.primary }}
+                      style={{ color: 'var(--color-primary)' }}
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -251,7 +209,7 @@ const LoginPage = () => {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <p className="text-sm" style={{ color: colors.primary }}>
+                    <p className="text-sm text-brand">
                       {apiError}
                     </p>
                   </div>
@@ -271,20 +229,14 @@ const LoginPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Enter your email"
-                  labelColor={colors.text}
-                  borderColor={errors.email ? colors.primary : colors.border}
-                  focusColor={colors.primary}
-                  placeholderColor={colors.muted}
+                  borderColor={errors.email ? 'var(--color-primary)' : 'var(--bg-border)'}
+                  focusColor="var(--color-primary)"
                   className="bg-transparent"
                 />
                 {errors.email && (
-                  <p
-                    className="mt-2 text-sm flex items-center"
-                    style={{ color: colors.primary }}
-                  >
+                  <p className="mt-2 text-sm flex items-center text-brand">
                     <span
-                      className="inline-block w-1 h-1 rounded-full mr-2"
-                      style={{ backgroundColor: colors.primary }}
+                      className="inline-block w-1 h-1 rounded-full mr-2 bg-brand"
                     ></span>
                     {errors.email}
                   </p>
@@ -301,20 +253,14 @@ const LoginPage = () => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Enter your password"
-                  labelColor={colors.text}
-                  borderColor={errors.password ? colors.primary : colors.border}
-                  focusColor={colors.primary}
-                  placeholderColor={colors.muted}
+                  borderColor={errors.password ? 'var(--color-primary)' : 'var(--bg-border)'}
+                  focusColor="var(--color-primary)"
                   className="bg-transparent"
                 />
                 {errors.password && (
-                  <p
-                    className="mt-2 text-sm flex items-center"
-                    style={{ color: colors.primary }}
-                  >
+                  <p className="mt-2 text-sm flex items-center text-brand">
                     <span
-                      className="inline-block w-1 h-1 rounded-full mr-2"
-                      style={{ backgroundColor: colors.primary }}
+                      className="inline-block w-1 h-1 rounded-full mr-2 bg-brand"
                     ></span>
                     {errors.password}
                   </p>
@@ -330,15 +276,14 @@ const LoginPage = () => {
                     type="checkbox"
                     className="h-4 w-4 border-gray-300 rounded cursor-pointer focus:ring-2 focus:ring-offset-0"
                     style={{
-                      color: colors.primary,
-                      borderColor: colors.border,
-                      backgroundColor: colors.cardBg,
+                      color: 'var(--color-primary)',
+                      borderColor: 'var(--bg-border)',
+                      backgroundColor: 'var(--bg-card)',
                     }}
                   />
                   <label
                     htmlFor="remember-me"
-                    className="ml-2 block text-sm cursor-pointer"
-                    style={{ color: colors.muted }}
+                    className="ml-2 block text-sm cursor-pointer text-muted"
                   >
                     Remember me
                   </label>
@@ -347,8 +292,7 @@ const LoginPage = () => {
                 <div className="text-sm">
                   <Link
                     to="/forgot-password"
-                    className="font-semibold transition-colors hover:text-white"
-                    style={{ color: colors.primary }}
+                    className="font-semibold transition-colors text-brand hover:text-primary"
                   >
                     Forgot password?
                   </Link>
@@ -359,14 +303,11 @@ const LoginPage = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center items-center space-x-2 py-3 px-4 rounded-lg shadow-lg text-white font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
-                style={{
-                  background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-                }}
+                className="w-full flex justify-center items-center space-x-2 py-3 px-4 rounded-lg shadow-lg text-primary font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-primary-hover hover:scale-[1.02] active:scale-[0.98] bg-gradient-primary"
               >
                 {isLoading ? (
                   <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
                     <span>Signing in...</span>
                   </>
                 ) : (
@@ -378,56 +319,15 @@ const LoginPage = () => {
               </button>
             </form>
 
-            {/* Divider */}
-            <div className="mt-6">
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div
-                    className="w-full border-t"
-                    style={{ borderColor: colors.border }}
-                  ></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span
-                    className="px-2"
-                    style={{
-                      backgroundColor: colors.cardBg,
-                      color: colors.muted,
-                    }}
-                  >
-                    Or continue with
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Security Note */}
-            <div
-              className="mt-6 p-3 rounded-lg flex items-start gap-2"
-              style={{
-                backgroundColor: `${colors.success}10`,
-                border: `1px solid ${colors.success}30`,
-              }}
-            >
-              <Shield
-                size={16}
-                style={{ color: colors.success }}
-                className="mt-0.5 flex-shrink-0"
-              />
-              <p className="text-xs" style={{ color: colors.success }}>
-                Your login is secure and encrypted. We never share your personal
-                information.
-              </p>
-            </div>
+          
 
             {/* Sign Up Link */}
             <div className="mt-6 text-center">
-              <p className="text-sm" style={{ color: colors.muted }}>
+              <p className="text-sm text-muted">
                 Don't have an account?{" "}
                 <Link
                   to="/register"
-                  className="font-semibold transition-colors hover:text-white"
-                  style={{ color: colors.primary }}
+                  className="font-semibold transition-colors text-brand hover:text-primary"
                 >
                   Sign up now
                 </Link>

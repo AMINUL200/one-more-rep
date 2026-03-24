@@ -18,6 +18,10 @@ import {
   Tag,
   Type,
   AlignLeft,
+  Youtube,
+  Video,
+  Image,
+  HelpCircle,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { api } from "../../../utils/app";
@@ -32,6 +36,7 @@ const HandleHeroSection = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [bannerType, setBannerType] = useState("image"); // image, video, youtube
 
   const [formData, setFormData] = useState({
     badge_text: "",
@@ -39,6 +44,9 @@ const HandleHeroSection = () => {
     description: "",
     image: null,
     image_alt: "",
+    video: null,
+    youtube_url: "",
+    banner_type: "image",
     button1_text: "",
     button1_link: "",
     button2_text: "",
@@ -65,6 +73,13 @@ const HandleHeroSection = () => {
     warning: "#F59E0B",
     danger: "#EF4444",
   };
+
+  // Banner type options
+  const bannerTypes = [
+    { value: "image", label: "Image", icon: Image, description: "Upload an image banner" },
+    { value: "video", label: "Video", icon: Video, description: "Upload a video file" },
+    { value: "youtube", label: "YouTube", icon: Youtube, description: "Embed a YouTube video" },
+  ];
 
   // API Base URL for images
   const API_URL = import.meta.env.VITE_STORAGE_URL;
@@ -108,6 +123,24 @@ const HandleHeroSection = () => {
     }
   };
 
+  // Handle banner type change
+  const handleBannerTypeChange = (type) => {
+    setBannerType(type);
+    setFormData((prev) => ({
+      ...prev,
+      banner_type: type,
+      // Clear other media fields when switching types
+      image: type === "image" ? prev.image : null,
+      video: type === "video" ? prev.video : null,
+      youtube_url: type === "youtube" ? prev.youtube_url : "",
+    }));
+    
+    // Clear preview if switching away from image
+    if (type !== "image") {
+      setImagePreview(null);
+    }
+  };
+
   // Handle image file change
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -143,6 +176,32 @@ const HandleHeroSection = () => {
     setUploadingImage(false);
   };
 
+  // Handle video file change
+  const handleVideoChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("video/")) {
+      toast.error("Please select a video file");
+      return;
+    }
+
+    // Validate file size (max 50MB for videos)
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error("Video size should be less than 50MB");
+      return;
+    }
+
+    // Update form data
+    setFormData((prev) => ({
+      ...prev,
+      video: file,
+    }));
+
+    toast.success("Video selected: " + file.name);
+  };
+
   // Remove image
   const handleRemoveImage = () => {
     setImagePreview(null);
@@ -152,10 +211,39 @@ const HandleHeroSection = () => {
     }));
   };
 
+  // Remove video
+  const handleRemoveVideo = () => {
+    setFormData((prev) => ({
+      ...prev,
+      video: null,
+    }));
+  };
+
+  // Get YouTube video ID from URL
+  const getYoutubeVideoId = (url) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+
+  // Validate YouTube URL
+  const validateYoutubeUrl = (url) => {
+    if (!url) return false;
+    const videoId = getYoutubeVideoId(url);
+    return videoId !== null;
+  };
+
   // Get image URL
   const getImageUrl = (path) => {
     if (!path) return null;
     if (path.startsWith("data:") || path.startsWith("http")) return path;
+    return `${API_URL}/${path}`;
+  };
+
+  // Get video URL
+  const getVideoUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith("http")) return path;
     return `${API_URL}/${path}`;
   };
 
@@ -169,6 +257,23 @@ const HandleHeroSection = () => {
 
     if (!formData.description.trim()) {
       errors.description = "Description is required";
+    }
+
+    // Validate based on banner type
+    if (formData.banner_type === "image") {
+      if (!formData.image && !editingHero?.image) {
+        errors.image = "Image is required";
+      }
+    } else if (formData.banner_type === "video") {
+      if (!formData.video && !editingHero?.video) {
+        errors.video = "Video file is required";
+      }
+    } else if (formData.banner_type === "youtube") {
+      if (!formData.youtube_url) {
+        errors.youtube_url = "YouTube URL is required";
+      } else if (!validateYoutubeUrl(formData.youtube_url)) {
+        errors.youtube_url = "Please enter a valid YouTube URL";
+      }
     }
 
     if (formData.button1_text && !formData.button1_link) {
@@ -207,6 +312,10 @@ const HandleHeroSection = () => {
           if (formData[key] instanceof File) {
             submitData.append("image", formData[key]);
           }
+        } else if (key === "video") {
+          if (formData[key] instanceof File) {
+            submitData.append("video", formData[key]);
+          }
         } else if (key === "status") {
           submitData.append("status", formData.status ? "1" : "0");
         } else {
@@ -215,12 +324,14 @@ const HandleHeroSection = () => {
       }
     });
 
+    // Add banner_type to form data
+    submitData.append("banner_type", formData.banner_type);
+
     try {
       let response;
 
       if (editingHero) {
-        // Update - use POST with _method PUT for file uploads
-        // submitData.append('_method', 'PUT');
+        // Update
         response = await api.post(
           `/admin/banners/update/${editingHero.id}`,
           submitData,
@@ -248,12 +359,16 @@ const HandleHeroSection = () => {
         setShowModal(false);
         setEditingHero(null);
         setImagePreview(null);
+        setBannerType("image");
         setFormData({
           badge_text: "",
           title: "",
           description: "",
           image: null,
           image_alt: "",
+          video: null,
+          youtube_url: "",
+          banner_type: "image",
           button1_text: "",
           button1_link: "",
           button2_text: "",
@@ -293,6 +408,7 @@ const HandleHeroSection = () => {
   // Handle edit click
   const handleEdit = (hero) => {
     setEditingHero(hero);
+    setBannerType(hero.banner_type || "image");
 
     // Set image preview if exists
     if (hero.image) {
@@ -307,6 +423,9 @@ const HandleHeroSection = () => {
       description: hero.description || "",
       image: hero.image || null,
       image_alt: hero.image_alt || "",
+      video: hero.video || null,
+      youtube_url: hero.youtube_url || "",
+      banner_type: hero.banner_type || "image",
       button1_text: hero.button1_text || "",
       button1_link: hero.button1_link || "",
       button2_text: hero.button2_text || "",
@@ -329,12 +448,16 @@ const HandleHeroSection = () => {
   const handleAdd = () => {
     setEditingHero(null);
     setImagePreview(null);
+    setBannerType("image");
     setFormData({
       badge_text: "",
       title: "",
       description: "",
       image: null,
       image_alt: "",
+      video: null,
+      youtube_url: "",
+      banner_type: "image",
       button1_text: "",
       button1_link: "",
       button2_text: "",
@@ -373,7 +496,7 @@ const HandleHeroSection = () => {
   const handleStatusToggle = async (hero) => {
     try {
       const response = await api.patch(
-        `/admin/hero-sections/${hero.id}/status`,
+        `/admin/banners/${hero.id}/status`,
         {
           status: !(hero.status === 1 || hero.status === true) ? 1 : 0,
         },
@@ -392,7 +515,7 @@ const HandleHeroSection = () => {
   const handleSortOrder = async (id, newOrder) => {
     try {
       const response = await api.patch(
-        `/admin/hero-sections/${id}/sort-order`,
+        `/admin/banners/${id}/sort-order`,
         {
           sort_order: newOrder,
         },
@@ -419,6 +542,25 @@ const HandleHeroSection = () => {
   const truncateText = (text, length = 50) => {
     if (!text) return "-";
     return text.length > length ? text.substring(0, length) + "..." : text;
+  };
+
+  // Render banner type badge
+  const renderBannerTypeBadge = (type) => {
+    const types = {
+      image: { icon: Image, color: "blue", bg: "blue-100", text: "blue-700" },
+      video: { icon: Video, color: "green", bg: "green-100", text: "green-700" },
+      youtube: { icon: Youtube, color: "red", bg: "red-100", text: "red-700" },
+    };
+    
+    const t = types[type] || types.image;
+    const Icon = t.icon;
+    
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1 bg-${t.bg} text-${t.text}`}>
+        <Icon size={12} />
+        {type.charAt(0).toUpperCase() + type.slice(1)}
+      </span>
+    );
   };
 
   if (loading) {
@@ -501,6 +643,7 @@ const HandleHeroSection = () => {
                   setShowModal(false);
                   setEditingHero(null);
                   setImagePreview(null);
+                  setBannerType("image");
                 }}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
@@ -513,6 +656,57 @@ const HandleHeroSection = () => {
               className="space-y-6"
               encType="multipart/form-data"
             >
+              {/* Banner Type Selection */}
+              <div className="mb-6">
+                <label
+                  className="block text-sm font-medium mb-3"
+                  style={{ color: colors.text }}
+                >
+                  Banner Type
+                </label>
+                <div className="grid grid-cols-3 gap-4">
+                  {bannerTypes.map((type) => {
+                    const Icon = type.icon;
+                    const isSelected = bannerType === type.value;
+                    
+                    return (
+                      <button
+                        key={type.value}
+                        type="button"
+                        onClick={() => handleBannerTypeChange(type.value)}
+                        className={`p-4 rounded-lg border-2 transition-all ${
+                          isSelected
+                            ? "border-primary bg-primary/5"
+                            : "border-gray-200 hover:border-gray-300"
+                        }`}
+                        style={{
+                          borderColor: isSelected ? colors.primary : colors.border,
+                          backgroundColor: isSelected ? `${colors.primary}10` : "transparent",
+                        }}
+                      >
+                        <Icon
+                          size={24}
+                          className="mx-auto mb-2"
+                          style={{ color: isSelected ? colors.primary : colors.textLight }}
+                        />
+                        <p
+                          className="text-sm font-medium"
+                          style={{ color: isSelected ? colors.primary : colors.text }}
+                        >
+                          {type.label}
+                        </p>
+                        <p
+                          className="text-xs mt-1"
+                          style={{ color: colors.textLight }}
+                        >
+                          {type.description}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-6">
                 {/* Left Column */}
                 <div className="space-y-4">
@@ -604,124 +798,305 @@ const HandleHeroSection = () => {
                     )}
                   </div>
 
-                  {/* Image Upload */}
-                  <div>
-                    <label
-                      className="block text-sm font-medium mb-2 flex items-center gap-2"
-                      style={{ color: colors.text }}
-                    >
-                      <ImageIcon size={16} style={{ color: colors.primary }} />
-                      Hero Image
-                    </label>
-                    <div className="relative">
-                      <div
-                        className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-opacity-100 transition-all min-h-[150px] flex items-center justify-center"
-                        style={{ borderColor: colors.border }}
-                        onClick={() =>
-                          document.getElementById("hero-image-upload").click()
-                        }
+                  {/* Image Upload - Only show for image type */}
+                  {bannerType === "image" && (
+                    <div>
+                      <label
+                        className="block text-sm font-medium mb-2 flex items-center gap-2"
+                        style={{ color: colors.text }}
                       >
-                        {imagePreview ? (
-                          <img
-                            src={imagePreview}
-                            alt="Hero Preview"
-                            className="max-h-32 mx-auto object-contain"
-                          />
-                        ) : (
-                          <div>
-                            <Upload
-                              size={32}
-                              className="mx-auto mb-2"
-                              style={{ color: colors.muted }}
+                        <ImageIcon size={16} style={{ color: colors.primary }} />
+                        Hero Image <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <div
+                          className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-opacity-100 transition-all min-h-[150px] flex items-center justify-center"
+                          style={{ borderColor: colors.border }}
+                          onClick={() =>
+                            document.getElementById("hero-image-upload").click()
+                          }
+                        >
+                          {imagePreview ? (
+                            <img
+                              src={imagePreview}
+                              alt="Hero Preview"
+                              className="max-h-32 mx-auto object-contain"
                             />
-                            <p
-                              className="text-sm"
-                              style={{ color: colors.textLight }}
-                            >
-                              Click to upload hero image
-                            </p>
-                            <p
-                              className="text-xs mt-1"
-                              style={{ color: colors.muted }}
-                            >
-                              Max size: 2MB
-                            </p>
+                          ) : (
+                            <div>
+                              <Upload
+                                size={32}
+                                className="mx-auto mb-2"
+                                style={{ color: colors.muted }}
+                              />
+                              <p
+                                className="text-sm"
+                                style={{ color: colors.textLight }}
+                              >
+                                Click to upload hero image
+                              </p>
+                              <p
+                                className="text-xs mt-1"
+                                style={{ color: colors.muted }}
+                              >
+                                Max size: 2MB
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        <input
+                          type="file"
+                          id="hero-image-upload"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="hidden"
+                        />
+
+                        {imagePreview && (
+                          <button
+                            type="button"
+                            onClick={handleRemoveImage}
+                            className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                          >
+                            <X size={14} />
+                          </button>
+                        )}
+
+                        {uploadingImage && (
+                          <div className="absolute inset-0 bg-white/80 flex items-center justify-center rounded-lg">
+                            <Loader
+                              size={20}
+                              className="animate-spin"
+                              style={{ color: colors.primary }}
+                            />
                           </div>
                         )}
                       </div>
 
-                      <input
-                        type="file"
-                        id="hero-image-upload"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="hidden"
-                      />
-
-                      {imagePreview && (
-                        <button
-                          type="button"
-                          onClick={handleRemoveImage}
-                          className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                      {/* Current Image Info (for edit mode) */}
+                      {editingHero && editingHero.image && !imagePreview && bannerType === "image" && (
+                        <div
+                          className="mt-2 p-2 border rounded-lg"
+                          style={{ borderColor: colors.border }}
                         >
-                          <X size={14} />
-                        </button>
-                      )}
-
-                      {uploadingImage && (
-                        <div className="absolute inset-0 bg-white/80 flex items-center justify-center rounded-lg">
-                          <Loader
-                            size={20}
-                            className="animate-spin"
-                            style={{ color: colors.primary }}
+                          <p
+                            className="text-xs font-medium mb-1"
+                            style={{ color: colors.textLight }}
+                          >
+                            Current image:
+                          </p>
+                          <img
+                            src={getImageUrl(editingHero.image)}
+                            alt="Current"
+                            className="h-16 object-contain"
                           />
                         </div>
                       )}
-                    </div>
 
-                    {/* Current Image Info (for edit mode) */}
-                    {editingHero && editingHero.image && !imagePreview && (
-                      <div
-                        className="mt-2 p-2 border rounded-lg"
-                        style={{ borderColor: colors.border }}
-                      >
+                      {formErrors.image && (
                         <p
-                          className="text-xs font-medium mb-1"
-                          style={{ color: colors.textLight }}
+                          className="mt-1 text-xs"
+                          style={{ color: colors.danger }}
                         >
-                          Current image:
+                          {formErrors.image}
                         </p>
-                        <img
-                          src={getImageUrl(editingHero.image)}
-                          alt="Current"
-                          className="h-16 object-contain"
-                        />
-                      </div>
-                    )}
-                  </div>
+                      )}
+                    </div>
+                  )}
 
-                  {/* Image Alt Text */}
-                  <div>
-                    <label
-                      className="block text-sm font-medium mb-2"
-                      style={{ color: colors.text }}
-                    >
-                      Image Alt Text
-                    </label>
-                    <input
-                      type="text"
-                      name="image_alt"
-                      value={formData.image_alt}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
-                      style={{
-                        backgroundColor: colors.background,
-                        border: `1px solid ${colors.border}`,
-                        color: colors.text,
-                      }}
-                      placeholder="Enter image alt text for SEO"
-                    />
-                  </div>
+                  {/* Video Upload - Only show for video type */}
+                  {bannerType === "video" && (
+                    <div>
+                      <label
+                        className="block text-sm font-medium mb-2 flex items-center gap-2"
+                        style={{ color: colors.text }}
+                      >
+                        <Video size={16} style={{ color: colors.primary }} />
+                        Video File <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <div
+                          className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-opacity-100 transition-all min-h-[150px] flex items-center justify-center"
+                          style={{ borderColor: colors.border }}
+                          onClick={() =>
+                            document.getElementById("hero-video-upload").click()
+                          }
+                        >
+                          {formData.video ? (
+                            <div className="text-center">
+                              <Video
+                                size={32}
+                                className="mx-auto mb-2"
+                                style={{ color: colors.success }}
+                              />
+                              <p
+                                className="text-sm font-medium"
+                                style={{ color: colors.text }}
+                              >
+                                {formData.video.name}
+                              </p>
+                              <p
+                                className="text-xs mt-1"
+                                style={{ color: colors.muted }}
+                              >
+                                {(formData.video.size / (1024 * 1024)).toFixed(2)} MB
+                              </p>
+                            </div>
+                          ) : (
+                            <div>
+                              <Upload
+                                size={32}
+                                className="mx-auto mb-2"
+                                style={{ color: colors.muted }}
+                              />
+                              <p
+                                className="text-sm"
+                                style={{ color: colors.textLight }}
+                              >
+                                Click to upload video
+                              </p>
+                              <p
+                                className="text-xs mt-1"
+                                style={{ color: colors.muted }}
+                              >
+                                Max size: 50MB
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        <input
+                          type="file"
+                          id="hero-video-upload"
+                          accept="video/*"
+                          onChange={handleVideoChange}
+                          className="hidden"
+                        />
+
+                        {formData.video && (
+                          <button
+                            type="button"
+                            onClick={handleRemoveVideo}
+                            className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                          >
+                            <X size={14} />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Current Video Info (for edit mode) */}
+                      {editingHero && editingHero.video && !formData.video && bannerType === "video" && (
+                        <div
+                          className="mt-2 p-2 border rounded-lg"
+                          style={{ borderColor: colors.border }}
+                        >
+                          <p
+                            className="text-xs font-medium mb-1"
+                            style={{ color: colors.textLight }}
+                          >
+                            Current video:
+                          </p>
+                          <video
+                            src={getVideoUrl(editingHero.video)}
+                            className="w-full h-32 object-cover rounded"
+                            controls
+                          />
+                        </div>
+                      )}
+
+                      {formErrors.video && (
+                        <p
+                          className="mt-1 text-xs"
+                          style={{ color: colors.danger }}
+                        >
+                          {formErrors.video}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* YouTube URL - Only show for youtube type */}
+                  {bannerType === "youtube" && (
+                    <div>
+                      <label
+                        className="block text-sm font-medium mb-2 flex items-center gap-2"
+                        style={{ color: colors.text }}
+                      >
+                        <Youtube size={16} style={{ color: colors.primary }} />
+                        YouTube URL <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="url"
+                        name="youtube_url"
+                        value={formData.youtube_url}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                        style={{
+                          backgroundColor: colors.background,
+                          border: `1px solid ${formErrors.youtube_url ? colors.danger : colors.border}`,
+                          color: colors.text,
+                        }}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                      />
+                      {formErrors.youtube_url && (
+                        <p
+                          className="mt-1 text-xs"
+                          style={{ color: colors.danger }}
+                        >
+                          {formErrors.youtube_url}
+                        </p>
+                      )}
+
+                      {/* YouTube Preview */}
+                      {formData.youtube_url && validateYoutubeUrl(formData.youtube_url) && (
+                        <div className="mt-2">
+                          <p
+                            className="text-xs font-medium mb-1"
+                            style={{ color: colors.textLight }}
+                          >
+                            Preview:
+                          </p>
+                          <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                            <iframe
+                              width="100%"
+                              height="100%"
+                              src={`https://www.youtube.com/embed/${getYoutubeVideoId(formData.youtube_url)}`}
+                              title="YouTube preview"
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            ></iframe>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Image Alt Text - Only for image type */}
+                  {bannerType === "image" && (
+                    <div>
+                      <label
+                        className="block text-sm font-medium mb-2"
+                        style={{ color: colors.text }}
+                      >
+                        Image Alt Text
+                      </label>
+                      <input
+                        type="text"
+                        name="image_alt"
+                        value={formData.image_alt}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                        style={{
+                          backgroundColor: colors.background,
+                          border: `1px solid ${colors.border}`,
+                          color: colors.text,
+                        }}
+                        placeholder="Enter image alt text for SEO"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Right Column */}
@@ -950,6 +1325,7 @@ const HandleHeroSection = () => {
                     setShowModal(false);
                     setEditingHero(null);
                     setImagePreview(null);
+                    setBannerType("image");
                   }}
                   className="px-4 py-2 rounded-lg transition-all"
                   style={{
@@ -1028,7 +1404,7 @@ const HandleHeroSection = () => {
           style={{ borderColor: colors.border }}
         >
           <div className="max-w-[400px] md:max-w-[700px] lg:max-w-[1140px] overflow-x-auto">
-            <table className="w-full min-w-[700px]">
+            <table className="w-full min-w-[800px]">
               <thead style={{ backgroundColor: colors.background }}>
                 <tr style={{ borderBottom: `1px solid ${colors.border}` }}>
                   <th
@@ -1047,7 +1423,13 @@ const HandleHeroSection = () => {
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
                     style={{ color: colors.textLight }}
                   >
-                    Image
+                    Media
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: colors.textLight }}
+                  >
+                    Type
                   </th>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
@@ -1091,7 +1473,7 @@ const HandleHeroSection = () => {
                 {filteredHeroList.length === 0 ? (
                   <tr>
                     <td
-                      colSpan="9"
+                      colSpan="10"
                       className="px-6 py-10 text-center"
                       style={{ color: colors.textLight }}
                     >
@@ -1155,7 +1537,7 @@ const HandleHeroSection = () => {
                         #{hero.id}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {hero.image ? (
+                        {hero.image && (
                           <div className="w-10 h-10 rounded border overflow-hidden">
                             <img
                               src={getImageUrl(hero.image)}
@@ -1167,14 +1549,20 @@ const HandleHeroSection = () => {
                               }}
                             />
                           </div>
-                        ) : (
-                          <div className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center">
-                            <ImageIcon
-                              size={16}
-                              style={{ color: colors.muted }}
-                            />
+                        )}
+                        {hero.video && (
+                          <div className="w-10 h-10 rounded bg-blue-100 flex items-center justify-center">
+                            <Video size={16} className="text-blue-600" />
                           </div>
                         )}
+                        {hero.youtube_url && (
+                          <div className="w-10 h-10 rounded bg-red-100 flex items-center justify-center">
+                            <Youtube size={16} className="text-red-600" />
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {renderBannerTypeBadge(hero.banner_type || "image")}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {hero.badge_text ? (

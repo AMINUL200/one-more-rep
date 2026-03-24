@@ -16,7 +16,6 @@ import {
 import { motion } from "framer-motion";
 
 const Footer = ({ categoryData, contactData }) => {
-  // console.log("Contact Data:", contactData);
   const STORAGE_URL = import.meta.env.VITE_STORAGE_URL
 
   // Generate shop links from categoryData
@@ -62,7 +61,7 @@ const Footer = ({ categoryData, contactData }) => {
       active: !!contactData?.linkedin,
     },
     { icon: Youtube, url: "#", label: "YouTube", active: false },
-  ].filter((social) => social.active); // Only show active social links
+  ].filter((social) => social.active);
 
   // Generate contact info from contactData
   const contactInfo = [
@@ -83,20 +82,6 @@ const Footer = ({ categoryData, contactData }) => {
     },
   ];
 
-  // Format full address
-  const getFullAddress = () => {
-    if (!contactData) return "Mumbai, Maharashtra 400001";
-
-    const parts = [];
-    if (contactData.street_address) parts.push(contactData.street_address);
-    if (contactData.city) parts.push(contactData.city);
-    if (contactData.state) parts.push(contactData.state);
-    if (contactData.zip) parts.push(contactData.zip);
-    if (contactData.country) parts.push(contactData.country);
-
-    return parts.join(", ") || "Mumbai, Maharashtra 400001";
-  };
-
   const trustBadges = [
     { icon: Shield, text: "Secure Payment" },
     { icon: CreditCard, text: "SSL Certified" },
@@ -106,17 +91,17 @@ const Footer = ({ categoryData, contactData }) => {
   return (
     <>
       {/* Red Horizontal Line before Footer */}
-      <div className="w-full h-px bg-gradient-to-r from-transparent via-[#E10600] to-transparent opacity-80" />
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-brand to-transparent opacity-80" />
 
       <motion.footer
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="bg-[#0B0B0B] text-white relative"
+        className="bg-main text-primary relative"
       >
         {/* Top Border for Visual Separation */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#E10600] to-transparent opacity-30" />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-brand to-transparent opacity-30" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-16">
           {/* Main Footer Content - 2 column layout */}
@@ -134,7 +119,6 @@ const Footer = ({ categoryData, contactData }) => {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
                   <div className="w-16 h-16 sm:w-14 sm:h-14 rounded-lg overflow-hidden flex-shrink-0">
                     <img
-                      // src="/image/gym_logo.png"
                       src={`${STORAGE_URL}/${contactData?.site_web_logo}`}
                       alt={contactData?.site_logo_alt || "ONE REP MORE Logo"}
                       className="w-full h-full object-cover"
@@ -147,10 +131,10 @@ const Footer = ({ categoryData, contactData }) => {
                   </div>
                   <div>
                     <h2 className="text-2xl sm:text-3xl font-bold">
-                      <span className="text-white">
+                      <span className="text-primary">
                         {contactData?.site_name?.split(" ")[0] || "ONE"}
                       </span>
-                      <span className="text-[#E10600]">
+                      <span className="text-brand">
                         {" "}
                         {contactData?.site_name
                           ?.split(" ")
@@ -158,15 +142,8 @@ const Footer = ({ categoryData, contactData }) => {
                           .join(" ") || "REP MORE"}
                       </span>
                     </h2>
-                    {/* <p className="text-[#B3B3B3] text-xs sm:text-sm mt-1">
-                      Premium Fitness Equipment
-                    </p> */}
                   </div>
                 </div>
-                {/* <p className="text-[#B3B3B3] text-sm max-w-md">
-                  India's premier destination for premium gym equipment and
-                  fitness gear. Quality equipment for serious athletes.
-                </p> */}
               </motion.div>
 
               {/* Contact Information */}
@@ -179,10 +156,10 @@ const Footer = ({ categoryData, contactData }) => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.08 }}
-                    className="flex items-start sm:items-center gap-3 text-[#B3B3B3] hover:text-white transition-colors duration-200 group"
+                    className="flex items-start sm:items-center gap-3 text-muted hover:text-brand-hover transition-colors  duration-200 group"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-[#141414] border border-[#262626] flex items-center justify-center group-hover:bg-[#E10600]/10 group-hover:border-[#E10600]/30 transition-colors flex-shrink-0">
-                      <info.icon size={16} />
+                    <div className="w-8 h-8 rounded-lg bg-card border border-theme flex items-center justify-center group-hover:text-brand transition-colors flex-shrink-0">
+                      <info.icon size={16} className="text-muted group-hover:text-brand transition-colors" />
                     </div>
                     <span className="text-sm sm:text-base break-all">
                       {info.text}
@@ -198,10 +175,10 @@ const Footer = ({ categoryData, contactData }) => {
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: 0.24 }}
-                    className="flex items-start sm:items-center gap-3 text-[#B3B3B3] hover:text-white transition-colors duration-200 group"
+                    className="flex items-start sm:items-center gap-3 text-muted hover:text-primary transition-colors duration-200 group"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-[#141414] border border-[#262626] flex items-center justify-center group-hover:bg-[#E10600]/10 group-hover:border-[#E10600]/30 transition-colors flex-shrink-0">
-                      <Phone size={16} />
+                    <div className="w-8 h-8 rounded-lg bg-card border border-theme flex items-center justify-center group-hover:bg-primary-light group-hover:border-primary/30 transition-colors flex-shrink-0">
+                      <Phone size={16} className="text-muted group-hover:text-brand transition-colors" />
                     </div>
                     <span className="text-sm sm:text-base break-all">
                       Landline: {contactData.landline}
@@ -213,7 +190,7 @@ const Footer = ({ categoryData, contactData }) => {
               {/* Social Links */}
               {socialLinks.length > 0 && (
                 <div className="mb-8">
-                  <h4 className="text-sm font-semibold mb-4 text-white">
+                  <h4 className="text-sm font-semibold mb-4 text-primary">
                     Follow Us
                   </h4>
                   <div className="flex gap-3">
@@ -227,9 +204,9 @@ const Footer = ({ categoryData, contactData }) => {
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={social.label}
-                        className="w-10 h-10 rounded-lg bg-[#141414] border border-[#262626] flex items-center justify-center hover:bg-[#E10600] hover:border-[#E10600] transition-all duration-200 hover:scale-105"
+                        className="w-10 h-10 rounded-lg bg-card border border-theme flex items-center justify-center hover:bg-brand hover:border-brand transition-all duration-200 hover:scale-105 group"
                       >
-                        <social.icon size={18} />
+                        <social.icon size={18} className="text-muted group-hover:text-brandy transition-colors " />
                       </motion.a>
                     ))}
                   </div>
@@ -245,14 +222,14 @@ const Footer = ({ categoryData, contactData }) => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.12 }}
-                    className="p-3 rounded-lg bg-[#141414] border border-[#262626] text-center"
+                    className="p-3 rounded-lg bg-card border border-theme text-center hover-lift hover-glow transition-all"
                   >
                     <div className="flex justify-center mb-2">
-                      <div className="w-8 h-8 rounded-lg bg-[#E10600]/10 border border-[#E10600]/30 flex items-center justify-center">
-                        <badge.icon size={16} className="text-[#E10600]" />
+                      <div className="w-8 h-8 rounded-lg bg-primary-light border border-primary/30 flex items-center justify-center">
+                        <badge.icon size={16} className="text-brand" />
                       </div>
                     </div>
-                    <span className="text-xs text-[#B3B3B3]">{badge.text}</span>
+                    <span className="text-xs text-muted">{badge.text}</span>
                   </motion.div>
                 ))}
               </div>
@@ -262,9 +239,9 @@ const Footer = ({ categoryData, contactData }) => {
             <div>
               {/* Shop Links */}
               <div className="mb-10">
-                <h3 className="text-xl font-semibold mb-6 text-white relative inline-block">
+                <h3 className="text-xl font-semibold mb-6 text-primary relative inline-block">
                   Shop Categories
-                  <span className="absolute -bottom-2 left-0 w-12 h-0.5 bg-[#E10600] rounded-full" />
+                  <span className="absolute -bottom-2 left-0 w-12 h-0.5 bg-brand rounded-full" />
                 </h3>
 
                 <div className="grid grid-cols-2 gap-x-8 gap-y-3">
@@ -276,9 +253,9 @@ const Footer = ({ categoryData, contactData }) => {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.05 }}
-                      className="text-[#B3B3B3] hover:text-white transition-colors duration-200 flex items-center group"
+                      className="text-muted hover:text-primary transition-colors duration-200 flex items-center group"
                     >
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#262626] mr-3 group-hover:bg-[#E10600] transition-colors" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-border mr-3 group-hover:bg-brand transition-colors" />
                       {link.name}
                     </motion.a>
                   ))}
@@ -286,11 +263,11 @@ const Footer = ({ categoryData, contactData }) => {
               </div>
 
               {/* Newsletter Subscription */}
-              <div className="p-6 rounded-xl bg-gradient-to-r from-[#141414] to-[#0B0B0B] border border-[#262626]">
-                <h4 className="text-lg font-semibold mb-2 text-white">
+              <div className="p-6 rounded-xl bg-gradient-to-r from-card to-main border border-theme shadow-card">
+                <h4 className="text-lg font-semibold mb-2 text-primary">
                   Get Fitness Tips & Offers
                 </h4>
-                <p className="text-sm text-[#B3B3B3] mb-4">
+                <p className="text-sm text-muted mb-4">
                   Subscribe to our newsletter for exclusive deals and fitness
                   advice
                 </p>
@@ -298,11 +275,11 @@ const Footer = ({ categoryData, contactData }) => {
                   <input
                     type="email"
                     placeholder="Enter your email"
-                    className="flex-1 px-4 py-3 rounded-lg bg-[#0B0B0B] border border-[#262626] text-white placeholder-[#666] text-sm focus:outline-none focus:border-[#E10600] transition-colors"
+                    className="flex-1 px-4 py-3 rounded-lg bg-main border border-theme text-primary placeholder-muted text-sm focus:outline-none focus:border-brand transition-colors"
                   />
                   <button
                     type="submit"
-                    className="px-6 py-3 rounded-lg font-semibold text-white text-sm bg-gradient-to-r from-[#E10600] to-[#B30000] hover:from-[#FF0000] hover:to-[#E10600] transition-all duration-200 hover:shadow-lg hover:shadow-[#E10600]/20"
+                    className="px-6 py-3 rounded-lg font-semibold text-sm btn-primary transition-all duration-200"
                   >
                     Subscribe
                   </button>
@@ -317,54 +294,33 @@ const Footer = ({ categoryData, contactData }) => {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
-            className="mt-12 pt-8 border-t border-[#262626]"
+            className="mt-12 pt-8 border-t border-theme"
           >
-            {/* Payment Methods */}
-            {/* <div className="mb-6">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <span className="text-sm text-[#B3B3B3] text-center sm:text-left">
-                  We Accept:
-                </span>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {["VISA", "MASTERCARD", "RUPAY", "UPI", "NETBANKING"].map(
-                    (method, index) => (
-                      <div
-                        key={index}
-                        className="px-3 py-1.5 rounded bg-[#141414] border border-[#262626] text-xs font-medium text-[#B3B3B3]"
-                      >
-                        {method}
-                      </div>
-                    ),
-                  )}
-                </div>
-              </div>
-            </div> */}
-
             {/* Copyright & Links */}
             <div className="flex flex-col items-center gap-4 text-sm">
               <div className="flex flex-wrap justify-center gap-6">
                 <a
                   href="/privacy"
-                  className="text-[#B3B3B3] hover:text-white transition-colors text-xs sm:text-sm"
+                  className="text-muted hover:text-primary transition-colors text-xs sm:text-sm link-underline"
                 >
                   Privacy Policy
                 </a>
                 <a
                   href="/terms"
-                  className="text-[#B3B3B3] hover:text-white transition-colors text-xs sm:text-sm"
+                  className="text-muted hover:text-primary transition-colors text-xs sm:text-sm link-underline"
                 >
                   Terms of Service
                 </a>
                 <a
                   href="/sitemap"
-                  className="text-[#B3B3B3] hover:text-white transition-colors text-xs sm:text-sm"
+                  className="text-muted hover:text-primary transition-colors text-xs sm:text-sm link-underline"
                 >
                   Sitemap
                 </a>
               </div>
-              <p className="text-[#B3B3B3] text-xs sm:text-sm text-center">
+              <p className="text-muted text-xs sm:text-sm text-center">
                 © {new Date().getFullYear()}{" "}
-                <span className="text-white font-semibold">
+                <span className="text-primary font-semibold">
                   {contactData?.site_name || "ONE REP MORE"}
                 </span>
                 . All rights reserved.
@@ -373,7 +329,7 @@ const Footer = ({ categoryData, contactData }) => {
 
             {/* India Badge */}
             <div className="mt-6 flex justify-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#141414] border border-[#262626]">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-theme hover-lift hover-glow transition-all">
                 <div className="w-5 h-5 rounded-full bg-gradient-to-r from-[#FF9933] via-white to-[#138808] flex items-center justify-center flex-shrink-0">
                   <div className="w-2.5 h-2.5 rounded-full bg-blue-600" />
                 </div>
@@ -382,7 +338,7 @@ const Footer = ({ categoryData, contactData }) => {
                   href="https://skilledworkerscloud.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-[#B3B3B3] hover:text-white transition-colors whitespace-nowrap"
+                  className="text-sm text-muted hover:text-primary transition-colors whitespace-nowrap"
                 >
                   Developed by Skilled Workers Cloud
                 </a>

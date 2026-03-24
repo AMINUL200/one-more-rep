@@ -21,6 +21,7 @@ const LandingPage = () => {
     goalData,
     categoryData,
     productData,
+    premiumProduct,
   } = useApp();
 
   useEffect(() => {
@@ -38,9 +39,10 @@ const LandingPage = () => {
 
         <ProductCategory categoryData={categoryData} />
 
-        <ProductSection productData={productData} />
+        <ProductSection productData={premiumProduct} title="Premium Gym Products" />
         {/* ================= FEATURED PRODUCTS ================= */}
-        <FeatureProduct featureProduct={productData} />
+        {/* <FeatureProduct featureProduct={productData} /> */}
+        <ProductSection productData={productData} title="Featured Products"/>
 
         <HowItWorks workData={workData} />
 

@@ -17,19 +17,6 @@ import { premiumFadeUp, premiumItem } from "../../animations/motionVariants";
 
 const ShopByGoal = ({ goalData }) => {
   
-  // Color Schema
-  const colors = {
-    primary: "#E10600",
-    background: "#0B0B0B",
-    cardBg: "#141414",
-    border: "#262626",
-    text: "#FFFFFF",
-    muted: "#B3B3B3",
-    success: "#22C55E",
-    warning: "#FACC15",
-    accent: "#3B82F6",
-  };
-
   // Map of icon names to Lucide components based on title keywords
   const getIconForGoal = (title) => {
     const titleLower = title.toLowerCase();
@@ -49,12 +36,12 @@ const ShopByGoal = ({ goalData }) => {
   // Get color based on goal title or index
   const getColorForGoal = (title, index) => {
     const colors = [
-      "#E10600", // Red
-      "#22C55E", // Green
-      "#3B82F6", // Blue
-      "#FACC15", // Yellow
-      "#8B5CF6", // Purple
-      "#F97316", // Orange
+      "var(--color-primary)",  // Red
+      "var(--color-success)",   // Green
+      "#3B82F6",                // Blue
+      "var(--color-warning)",   // Yellow
+      "#8B5CF6",                // Purple
+      "#F97316",                // Orange
     ];
     
     const titleLower = title.toLowerCase();
@@ -72,14 +59,14 @@ const ShopByGoal = ({ goalData }) => {
   // Get gradient based on color
   const getGradient = (color) => {
     const gradients = {
-      "#E10600": "from-[#E10600] to-[#B30000]",
-      "#22C55E": "from-[#22C55E] to-[#16A34A]",
+      "var(--color-primary)": "from-brand to-[#B30000]",
+      "var(--color-success)": "from-success to-[#16A34A]",
       "#3B82F6": "from-[#3B82F6] to-[#2563EB]",
-      "#FACC15": "from-[#FACC15] to-[#EAB308]",
+      "var(--color-warning)": "from-warning to-[#EAB308]",
       "#8B5CF6": "from-[#8B5CF6] to-[#7C3AED]",
       "#F97316": "from-[#F97316] to-[#EA580C]",
     };
-    return gradients[color] || "from-[#E10600] to-[#B30000]";
+    return gradients[color] || "from-brand to-[#B30000]";
   };
 
   // Get image URL
@@ -108,19 +95,16 @@ const ShopByGoal = ({ goalData }) => {
 
   if (!goalData || !goalData.goals || goalData.goals.length === 0) {
     return (
-      <section className="py-16 px-4 md:px-8" style={{ backgroundColor: colors.background }}>
+      <section className="py-16 px-4 md:px-8 bg-main">
         <div className="max-w-7xl mx-auto text-center">
-          <p style={{ color: colors.muted }}>No goals data available</p>
+          <p className="text-muted">No goals data available</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section
-      className="py-16 px-4 md:px-8"
-      style={{ backgroundColor: colors.background }}
-    >
+    <section className="py-16 px-4 md:px-8 bg-main">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -134,9 +118,10 @@ const ShopByGoal = ({ goalData }) => {
             <span
               className="text-sm font-semibold uppercase tracking-wider px-4 py-2 rounded-full"
               style={{
-                backgroundColor: `${colors.primary}20`,
-                color: colors.primary,
-                border: `1px solid ${colors.primary}30`,
+                backgroundColor: 'var(--color-primary-light)',
+                color: 'var(--color-primary)',
+                border: '1px solid var(--color-primary)',
+                opacity: 0.3,
               }}
             >
               {sectionData.badge_text || "Shop By Your Goals"}
@@ -151,8 +136,8 @@ const ShopByGoal = ({ goalData }) => {
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-bold mb-4"
           >
-            <span style={{ color: colors.text }}>{sectionData.title || "Achieve Your "}</span>
-            <span style={{ color: colors.primary }}> Fitness Goals</span>
+            <span className="text-primary">{sectionData.title || "Achieve Your "}</span>
+            <span className="text-brand"> Fitness Goals</span>
           </motion.h2>
 
           <motion.p
@@ -161,8 +146,7 @@ const ShopByGoal = ({ goalData }) => {
             whileInView="visible"
             transition={{ delay: 0.2 }}
             viewport={{ once: true }}
-            className="text-lg max-w-2xl mx-auto"
-            style={{ color: colors.muted }}
+            className="text-lg max-w-2xl mx-auto text-muted"
           >
             {sectionData.description || "People don't always think in products — they think in goals. Find the perfect equipment for your fitness journey."}
           </motion.p>
@@ -183,16 +167,11 @@ const ShopByGoal = ({ goalData }) => {
             ].filter(tag => tag); // Filter out null/empty tags
 
             return (
-              // <Link key={goal.id} to={`/products/${goal.slug}`} className="group block">
               <Link key={goal.id} to={`#`} className="group block">
                 <motion.div
                   whileHover={{ y: -14, scale: 1.03 }}
                   transition={{ type: "spring", stiffness: 160, damping: 18 }}
-                  className="h-full rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl"
-                  style={{
-                    backgroundColor: colors.cardBg,
-                    border: `1px solid ${colors.border}`,
-                  }}
+                  className="h-full rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl card"
                 >
                   {/* Image with Gradient Overlay */}
                   <motion.div
@@ -238,12 +217,11 @@ const ShopByGoal = ({ goalData }) => {
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h3
-                          className="text-xl font-bold mb-2 group-hover:translate-x-1 transition-transform"
-                          style={{ color: colors.text }}
+                          className="text-xl font-bold mb-2 group-hover:translate-x-1 transition-transform text-primary"
                         >
                           {goal.title}
                         </h3>
-                        <p className="text-sm" style={{ color: colors.muted }}>
+                        <p className="text-sm text-muted">
                           {goal.description}
                         </p>
                       </div>
@@ -280,11 +258,7 @@ const ShopByGoal = ({ goalData }) => {
                         ))}
                         {products.length > 3 && (
                           <span
-                            className="px-3 py-1 text-xs rounded-full"
-                            style={{
-                              backgroundColor: colors.border,
-                              color: colors.muted,
-                            }}
+                            className="px-3 py-1 text-xs rounded-full bg-border text-muted"
                           >
                             +{products.length - 3} more
                           </span>
@@ -305,8 +279,6 @@ const ShopByGoal = ({ goalData }) => {
             );
           })}
         </div>
-
-      
       </div>
     </section>
   );

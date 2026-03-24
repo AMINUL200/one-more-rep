@@ -23,7 +23,6 @@ import {
 } from "lucide-react";
 import PageLoader from "../../component/common/PageLoader";
 import PageHelmet from "../../component/common/PageHelmet";
-// import { useCart } from "../../hooks/useCart";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
@@ -49,18 +48,6 @@ const CartPage = () => {
   } = useCart();
 
   console.log("CartItems:: ", cartItems)
-
-  // Color Schema
-  const colors = {
-    primary: "#E10600",
-    background: "#0B0B0B",
-    cardBg: "#141414",
-    border: "#262626",
-    text: "#FFFFFF",
-    muted: "#B3B3B3",
-    success: "#22C55E",
-    warning: "#FACC15",
-  };
 
   // Initialize variant selections when cart items change
   useEffect(() => {
@@ -300,31 +287,19 @@ const CartPage = () => {
   return (
     <>
       <PageHelmet title="Shopping Cart - ONE REP MORE" />
-      <div
-        style={{ backgroundColor: colors.background }}
-        className="min-h-screen py-8 px-4 md:px-8 pt-30 md:pt-40"
-      >
+      <div className="min-h-screen py-8 px-4 md:px-8 pt-30 md:pt-40 bg-main">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
-              <div
-                className="w-12 h-12 rounded-lg flex items-center justify-center"
-                style={{
-                  backgroundColor: `${colors.primary}20`,
-                  border: `1px solid ${colors.primary}30`,
-                }}
-              >
-                <ShoppingCart size={24} style={{ color: colors.primary }} />
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary-light border border-primary/30">
+                <ShoppingCart size={24} className="text-brand" />
               </div>
               <div>
-                <h1
-                  className="text-3xl md:text-4xl font-bold"
-                  style={{ color: colors.text }}
-                >
+                <h1 className="text-3xl md:text-4xl font-bold text-primary">
                   Your Shopping Cart
                 </h1>
-                <p className="text-lg" style={{ color: colors.muted }}>
+                <p className="text-lg text-muted">
                   {getTotalItems()} {getTotalItems() === 1 ? "item" : "items"}{" "}
                   in your cart
                 </p>
@@ -341,21 +316,21 @@ const CartPage = () => {
                         <div
                           className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
                             index === 0
-                              ? "bg-[#E10600] text-white"
-                              : "bg-[#262626] text-[#B3B3B3]"
+                              ? "bg-brand text-primary"
+                              : "bg-border text-muted"
                           }`}
                         >
                           {index + 1}
                         </div>
                         <span
                           className={`text-sm font-medium ${
-                            index === 0 ? "text-white" : "text-[#B3B3B3]"
+                            index === 0 ? "text-primary" : "text-muted"
                           }`}
                         >
                           {step}
                         </span>
                       </div>
-                      {index < 3 && <div className="w-12 h-px bg-[#262626]" />}
+                      {index < 3 && <div className="w-12 h-px bg-border" />}
                     </div>
                   ),
                 )}
@@ -385,11 +360,7 @@ const CartPage = () => {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -20 }}
-                          className="rounded-2xl overflow-hidden group"
-                          style={{
-                            backgroundColor: colors.cardBg,
-                            border: `1px solid ${colors.border}`,
-                          }}
+                          className="rounded-2xl overflow-hidden group bg-card border border-theme"
                         >
                           <div className="p-6">
                             <div className="flex flex-col md:flex-row gap-6">
@@ -409,10 +380,7 @@ const CartPage = () => {
                                 {originalPrice > currentPrice && (
                                   <div className="absolute -top-2 -left-2">
                                     <span
-                                      className="px-2 py-1 rounded text-xs font-bold text-white"
-                                      style={{
-                                        backgroundColor: colors.primary,
-                                      }}
+                                      className="px-2 py-1 rounded text-xs font-bold text-primary bg-brand"
                                     >
                                       SAVE{" "}
                                       {formatIndianRupees(
@@ -425,10 +393,7 @@ const CartPage = () => {
                                 {hasVariants && (
                                   <div className="absolute -bottom-2 -right-2">
                                     <span
-                                      className="px-2 py-1 rounded text-xs font-bold text-white flex items-center gap-1"
-                                      style={{
-                                        backgroundColor: colors.warning,
-                                      }}
+                                      className="px-2 py-1 rounded text-xs font-bold text-primary flex items-center gap-1 bg-warning"
                                     >
                                       <Package size={12} />
                                       Variants Available
@@ -443,41 +408,26 @@ const CartPage = () => {
                                   <div>
                                     <div className="flex items-center gap-2 mb-1">
                                       <span
-                                        className="text-xs font-semibold uppercase px-2 py-1 rounded"
-                                        style={{
-                                          backgroundColor: `${colors.primary}20`,
-                                          color: colors.primary,
-                                        }}
+                                        className="text-xs font-semibold uppercase px-2 py-1 rounded bg-primary-light text-brand"
                                       >
                                         {item.category || "Equipment"}
                                       </span>
                                       {currentStock > 0 ? (
                                         <span
-                                          className="text-xs font-semibold px-2 py-1 rounded flex items-center gap-1"
-                                          style={{
-                                            backgroundColor: `${colors.success}20`,
-                                            color: colors.success,
-                                          }}
+                                          className="text-xs font-semibold px-2 py-1 rounded flex items-center gap-1 text-success bg-current/20"
                                         >
                                           <div className="w-1.5 h-1.5 rounded-full bg-current" />
                                           In Stock
                                         </span>
                                       ) : (
                                         <span
-                                          className="text-xs font-semibold px-2 py-1 rounded flex items-center gap-1"
-                                          style={{
-                                            backgroundColor: `${colors.primary}20`,
-                                            color: colors.primary,
-                                          }}
+                                          className="text-xs font-semibold px-2 py-1 rounded flex items-center gap-1 bg-primary-light text-brand"
                                         >
                                           Out of Stock
                                         </span>
                                       )}
                                     </div>
-                                    <h3
-                                      className="text-xl font-bold mb-1"
-                                      style={{ color: colors.text }}
-                                    >
+                                    <h3 className="text-xl font-bold mb-1 text-primary">
                                       {item.name}
                                     </h3>
 
@@ -486,19 +436,18 @@ const CartPage = () => {
                                       <div className="mt-3 mb-2">
                                         <button
                                           onClick={() => toggleVariantDropdown(item.id)}
-                                          className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors hover:bg-white/5"
+                                          className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors hover:bg-white/5 border border-theme"
                                           style={{
-                                            border: `1px solid ${colors.border}`,
-                                            backgroundColor: expandedVariants[item.id] ? `${colors.primary}10` : 'transparent',
+                                            backgroundColor: expandedVariants[item.id] ? 'var(--color-primary-light)' : 'transparent',
                                           }}
                                         >
-                                          <span className="text-sm font-medium" style={{ color: colors.text }}>
+                                          <span className="text-sm font-medium text-primary">
                                             {selectedVariant ? `Selected: ${selectedVariant.variant_name}` : 'Select Variant'}
                                           </span>
                                           {expandedVariants[item.id] ? (
-                                            <ChevronUp size={16} style={{ color: colors.muted }} />
+                                            <ChevronUp size={16} className="text-muted" />
                                           ) : (
-                                            <ChevronDown size={16} style={{ color: colors.muted }} />
+                                            <ChevronDown size={16} className="text-muted" />
                                           )}
                                         </button>
 
@@ -520,8 +469,8 @@ const CartPage = () => {
                                                     key={variant.id}
                                                     className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${
                                                       isSelected
-                                                        ? 'border-2 border-[#E10600] bg-[#E10600]/10'
-                                                        : 'border border-[#262626] hover:border-[#404040]'
+                                                        ? 'border-2 border-brand bg-primary-light'
+                                                        : 'border border-theme hover:border-border'
                                                     }`}
                                                   >
                                                     <input
@@ -531,25 +480,25 @@ const CartPage = () => {
                                                       checked={isSelected}
                                                       onChange={() => handleVariantSelect(item.id, variant.id)}
                                                       className="w-4 h-4"
-                                                      style={{ accentColor: colors.primary }}
+                                                      style={{ accentColor: 'var(--color-primary)' }}
                                                     />
                                                     <div className="flex-1">
                                                       <div className="flex justify-between items-center">
-                                                        <span className="font-medium text-white">
+                                                        <span className="font-medium text-primary">
                                                           {variant.variant_name}
                                                         </span>
                                                         <div className="flex items-center gap-2">
-                                                          <span className="text-white font-bold">
+                                                          <span className="text-primary font-bold">
                                                             ₹{variantPrice.toLocaleString('en-IN')}
                                                           </span>
                                                           {variantOriginal > variantPrice && (
-                                                            <span className="text-sm line-through text-[#B3B3B3]">
+                                                            <span className="text-sm line-through text-muted">
                                                               ₹{variantOriginal.toLocaleString('en-IN')}
                                                             </span>
                                                           )}
                                                         </div>
                                                       </div>
-                                                      <div className="flex items-center gap-3 mt-1 text-xs text-[#B3B3B3]">
+                                                      <div className="flex items-center gap-3 mt-1 text-xs text-muted">
                                                         <span>Color: {variant.color}</span>
                                                         <span>Size: {variant.size}</span>
                                                         <span>Stock: {variant.stock}</span>
@@ -566,10 +515,7 @@ const CartPage = () => {
 
                                     {/* Stock Status */}
                                     {currentStock < 5 && currentStock > 0 && (
-                                      <p
-                                        className="text-xs mt-2"
-                                        style={{ color: colors.warning }}
-                                      >
+                                      <p className="text-xs mt-2 text-warning">
                                         Only {currentStock} left in stock
                                       </p>
                                     )}
@@ -578,8 +524,7 @@ const CartPage = () => {
                                   {/* Remove Button */}
                                   <button
                                     onClick={() => removeFromCart(item.id)}
-                                    className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg hover:bg-white/5"
-                                    style={{ color: colors.muted }}
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity p-2 rounded-lg hover:bg-white/5 text-muted"
                                   >
                                     <Trash2 size={18} />
                                   </button>
@@ -597,18 +542,11 @@ const CartPage = () => {
                                             (item.quantity || 1) - 1,
                                           )
                                         }
-                                        className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:bg-white/5"
-                                        style={{
-                                          border: `1px solid ${colors.border}`,
-                                          color: colors.text,
-                                        }}
+                                        className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:bg-white/5 border border-theme text-primary"
                                       >
                                         <Minus size={16} />
                                       </button>
-                                      <span
-                                        className="w-12 text-center font-semibold"
-                                        style={{ color: colors.text }}
-                                      >
+                                      <span className="w-12 text-center font-semibold text-primary">
                                         {item.quantity || 1}
                                       </span>
                                       <button
@@ -618,11 +556,7 @@ const CartPage = () => {
                                             (item.quantity || 1) + 1,
                                           )
                                         }
-                                        className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:bg-white/5"
-                                        style={{
-                                          border: `1px solid ${colors.border}`,
-                                          color: colors.text,
-                                        }}
+                                        className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors hover:bg-white/5 border border-theme text-primary"
                                       >
                                         <Plus size={16} />
                                       </button>
@@ -632,14 +566,8 @@ const CartPage = () => {
                                     <div>
                                       <div className="flex items-center gap-2">
                                         <div className="flex items-center">
-                                          <IndianRupee
-                                            size={18}
-                                            style={{ color: colors.text }}
-                                          />
-                                          <span
-                                            className="text-2xl font-bold ml-1"
-                                            style={{ color: colors.text }}
-                                          >
+                                          <IndianRupee size={18} className="text-primary" />
+                                          <span className="text-2xl font-bold ml-1 text-primary">
                                             {(
                                               currentPrice *
                                               (item.quantity || 1)
@@ -648,14 +576,8 @@ const CartPage = () => {
                                         </div>
                                         {originalPrice > currentPrice && (
                                           <div className="flex items-center">
-                                            <IndianRupee
-                                              size={14}
-                                              style={{ color: colors.muted }}
-                                            />
-                                            <span
-                                              className="text-sm line-through ml-1"
-                                              style={{ color: colors.muted }}
-                                            >
+                                            <IndianRupee size={14} className="text-muted" />
+                                            <span className="text-sm line-through ml-1 text-muted">
                                               {(
                                                 originalPrice *
                                                 (item.quantity || 1)
@@ -664,20 +586,14 @@ const CartPage = () => {
                                           </div>
                                         )}
                                       </div>
-                                      <p
-                                        className="text-xs mt-1"
-                                        style={{ color: colors.muted }}
-                                      >
+                                      <p className="text-xs mt-1 text-muted">
                                         ₹{currentPrice.toLocaleString("en-IN")} each
                                       </p>
                                     </div>
                                   </div>
 
                                   {/* Delivery Info */}
-                                  <div
-                                    className="flex items-center gap-2 text-sm"
-                                    style={{ color: colors.success }}
-                                  >
+                                  <div className="flex items-center gap-2 text-sm text-success">
                                     <Truck size={16} />
                                     Free Shipping
                                   </div>
@@ -692,37 +608,19 @@ const CartPage = () => {
                 </AnimatePresence>
               ) : (
                 /* Empty Cart State */
-                <div
-                  className="rounded-2xl p-12 text-center"
-                  style={{
-                    backgroundColor: colors.cardBg,
-                    border: `1px solid ${colors.border}`,
-                  }}
-                >
-                  <div
-                    className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
-                    style={{
-                      backgroundColor: `${colors.primary}20`,
-                      border: `1px solid ${colors.primary}30`,
-                    }}
-                  >
-                    <ShoppingCart size={32} style={{ color: colors.primary }} />
+                <div className="rounded-2xl p-12 text-center bg-card border border-theme">
+                  <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center bg-primary-light border border-primary/30">
+                    <ShoppingCart size={32} className="text-brand" />
                   </div>
-                  <h3
-                    className="text-2xl font-bold mb-3"
-                    style={{ color: colors.text }}
-                  >
+                  <h3 className="text-2xl font-bold mb-3 text-primary">
                     Your cart is empty
                   </h3>
-                  <p className="mb-8" style={{ color: colors.muted }}>
+                  <p className="mb-8 text-muted">
                     Add some premium gym equipment to get started!
                   </p>
                   <button
                     onClick={() => navigate("/products")}
-                    className="inline-flex items-center gap-3 px-8 py-4 rounded-lg font-semibold text-white transition-all hover:shadow-xl"
-                    style={{
-                      background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-                    }}
+                    className="inline-flex items-center gap-3 px-8 py-4 rounded-lg font-semibold text-primary transition-all hover:shadow-primary-hover bg-gradient-primary"
                   >
                     Browse Equipment
                     <ArrowRight size={20} />
@@ -738,49 +636,44 @@ const CartPage = () => {
                       icon: Truck,
                       title: "Free Shipping",
                       description: "On all orders over ₹5,000",
-                      color: colors.success,
+                      color: "success",
                     },
                     {
                       icon: Shield,
                       title: "2-Year Warranty",
                       description: "On all equipment",
-                      color: colors.warning,
+                      color: "warning",
                     },
                     {
                       icon: RotateCcw,
                       title: "30-Day Returns",
                       description: "Free returns & exchanges",
-                      color: colors.primary,
+                      color: "brand",
                     },
                   ].map((benefit, index) => (
                     <div
                       key={index}
-                      className="p-4 rounded-xl flex items-start gap-3"
-                      style={{
-                        backgroundColor: colors.cardBg,
-                        border: `1px solid ${colors.border}`,
-                      }}
+                      className="p-4 rounded-xl flex items-start gap-3 bg-card border border-theme"
                     >
                       <div
                         className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                         style={{
-                          backgroundColor: `${benefit.color}20`,
-                          border: `1px solid ${benefit.color}30`,
+                          backgroundColor: `var(--color-${benefit.color}-light)`,
+                          border: `1px solid var(--color-${benefit.color})`,
+                          opacity: 0.3,
                         }}
                       >
                         <benefit.icon
                           size={18}
-                          style={{ color: benefit.color }}
+                          className={`text-${benefit.color}`}
+                          style={{ color: `var(--color-${benefit.color})` }}
                         />
                       </div>
                       <div>
-                        <h4
-                          className="font-semibold mb-1"
-                          style={{ color: colors.text }}
-                        >
+                        <h4 className="font-semibold mb-1 text-primary">
                           {benefit.title}
                         </h4>
-                        <p className="text-xs" style={{ color: colors.muted }}>
+                        <p className="text-xs text-muted">
                           {benefit.description}
                         </p>
                       </div>
@@ -793,28 +686,18 @@ const CartPage = () => {
             {/* Right Column - Order Summary */}
             {cartItems.length > 0 && (
               <div className="lg:col-span-1">
-                <div
-                  className="rounded-2xl overflow-hidden sticky top-8"
-                  style={{
-                    backgroundColor: colors.cardBg,
-                    border: `1px solid ${colors.border}`,
-                  }}
-                >
+                <div className="rounded-2xl overflow-hidden sticky top-8 bg-card border border-theme">
                   {/* Order Summary Header */}
                   <div
-                    className="p-6 border-b"
+                    className="p-6 border-b border-theme"
                     style={{
-                      borderColor: colors.border,
-                      background: `linear-gradient(135deg, ${colors.primary}20, transparent)`,
+                      background: `linear-gradient(135deg, var(--color-primary-light), transparent)`,
                     }}
                   >
-                    <h3
-                      className="text-xl font-bold"
-                      style={{ color: colors.text }}
-                    >
+                    <h3 className="text-xl font-bold text-primary">
                       Order Summary
                     </h3>
-                    <p className="text-xs mt-1" style={{ color: colors.muted }}>
+                    <p className="text-xs mt-1 text-muted">
                       {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'} • 
                       {cartItems.filter(item => item.variants?.length > 0).length} with variants
                     </p>
@@ -825,11 +708,8 @@ const CartPage = () => {
                     {/* Price Breakdown */}
                     <div className="space-y-4 mb-6">
                       <div className="flex justify-between">
-                        <span style={{ color: colors.muted }}>Subtotal</span>
-                        <span
-                          className="font-semibold flex items-center"
-                          style={{ color: colors.text }}
-                        >
+                        <span className="text-muted">Subtotal</span>
+                        <span className="font-semibold flex items-center text-primary">
                           <IndianRupee size={14} />
                           {total.toLocaleString("en-IN")}
                         </span>
@@ -837,11 +717,8 @@ const CartPage = () => {
 
                       {calculateSavings() > 0 && (
                         <div className="flex justify-between">
-                          <span style={{ color: colors.success }}>Savings</span>
-                          <span
-                            className="font-semibold flex items-center"
-                            style={{ color: colors.success }}
-                          >
+                          <span className="text-success">Savings</span>
+                          <span className="font-semibold flex items-center text-success">
                             -<IndianRupee size={14} />
                             {calculateSavings().toLocaleString("en-IN")}
                           </span>
@@ -850,14 +727,8 @@ const CartPage = () => {
 
                       {/* Variant Validation Warning */}
                       {cartItems.some(item => item.variants?.length > 0 && !variantSelections[item.id]) && (
-                        <div
-                          className="p-3 rounded-lg"
-                          style={{
-                            backgroundColor: `${colors.warning}10`,
-                            border: `1px solid ${colors.warning}30`,
-                          }}
-                        >
-                          <p className="text-xs" style={{ color: colors.warning }}>
+                        <div className="p-3 rounded-lg bg-warning/10 border border-warning/30">
+                          <p className="text-xs text-warning">
                             Please select variants for all products before checkout
                           </p>
                         </div>
@@ -865,29 +736,16 @@ const CartPage = () => {
 
                       {/* Coupon Code */}
                       {couponApplied ? (
-                        <div
-                          className="flex justify-between items-center py-2 px-3 rounded-lg"
-                          style={{
-                            backgroundColor: `${colors.success}20`,
-                            border: `1px solid ${colors.success}30`,
-                          }}
-                        >
+                        <div className="flex justify-between items-center py-2 px-3 rounded-lg bg-success/20 border border-success/30">
                           <div className="flex items-center gap-2">
-                            <CheckCircle
-                              size={16}
-                              style={{ color: colors.success }}
-                            />
-                            <span
-                              className="text-sm font-medium"
-                              style={{ color: colors.success }}
-                            >
+                            <CheckCircle size={16} className="text-success" />
+                            <span className="text-sm font-medium text-success">
                               Coupon APPLIED
                             </span>
                           </div>
                           <button
                             onClick={() => setCouponApplied(false)}
-                            className="text-sm font-semibold hover:text-white transition-colors"
-                            style={{ color: colors.success }}
+                            className="text-sm font-semibold hover:text-primary transition-colors text-success"
                           >
                             Remove
                           </button>
@@ -900,20 +758,14 @@ const CartPage = () => {
                               value={couponCode}
                               onChange={(e) => setCouponCode(e.target.value)}
                               placeholder="Enter coupon code"
-                              className="flex-1 px-3 py-2 rounded-lg text-sm focus:outline-none"
+                              className="flex-1 px-3 py-2 rounded-lg text-sm focus:outline-none bg-main border-theme text-primary"
                               style={{
-                                backgroundColor: colors.background,
-                                border: `1px solid ${colors.border}`,
-                                color: colors.text,
+                                border: `1px solid var(--bg-border)`,
                               }}
                             />
                             <button
                               type="submit"
-                              className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors hover:bg-white/5"
-                              style={{
-                                color: colors.text,
-                                border: `1px solid ${colors.border}`,
-                              }}
+                              className="px-4 py-2 rounded-lg text-sm font-semibold transition-colors hover:bg-white/5 text-primary border border-theme"
                             >
                               Apply
                             </button>
@@ -921,8 +773,7 @@ const CartPage = () => {
                           <button
                             type="button"
                             onClick={() => setShowCouponForm(false)}
-                            className="text-sm hover:text-white transition-colors"
-                            style={{ color: colors.muted }}
+                            className="text-sm hover:text-primary transition-colors text-muted"
                           >
                             Cancel
                           </button>
@@ -930,8 +781,7 @@ const CartPage = () => {
                       ) : (
                         <button
                           onClick={() => setShowCouponForm(true)}
-                          className="text-sm font-semibold transition-colors hover:text-white"
-                          style={{ color: colors.primary }}
+                          className="text-sm font-semibold transition-colors hover:text-primary text-brand"
                         >
                           + Add coupon code
                         </button>
@@ -939,29 +789,17 @@ const CartPage = () => {
                     </div>
 
                     {/* Total */}
-                    <div
-                      className="py-4 border-y mb-6"
-                      style={{ borderColor: colors.border }}
-                    >
+                    <div className="py-4 border-y mb-6 border-theme">
                       <div className="flex justify-between items-center">
-                        <span
-                          className="text-lg font-bold"
-                          style={{ color: colors.text }}
-                        >
+                        <span className="text-lg font-bold text-primary">
                           Total
                         </span>
                         <div className="text-right">
-                          <div
-                            className="text-2xl font-bold mb-1 flex items-center"
-                            style={{ color: colors.text }}
-                          >
+                          <div className="text-2xl font-bold mb-1 flex items-center text-primary">
                             <IndianRupee size={20} />
                             {total.toLocaleString("en-IN")}
                           </div>
-                          <div
-                            className="text-xs"
-                            style={{ color: colors.muted }}
-                          >
+                          <div className="text-xs text-muted">
                             {couponApplied ? "Includes 10% discount" : "Total Amount"}
                           </div>
                         </div>
@@ -972,14 +810,11 @@ const CartPage = () => {
                     <button
                       onClick={handleCheckout}
                       disabled={checkoutLoading || cartItems.some(item => item.variants?.length > 0 && !variantSelections[item.id])}
-                      className="block w-full py-4 rounded-lg font-semibold text-white text-center transition-all hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{
-                        background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-                      }}
+                      className="block w-full py-4 rounded-lg font-semibold text-primary text-center transition-all hover:shadow-primary-hover hover:scale-[1.02] active:scale-[0.98] mb-4 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-primary"
                     >
                       {checkoutLoading ? (
                         <div className="flex items-center justify-center gap-2">
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                           Processing...
                         </div>
                       ) : (
@@ -989,10 +824,7 @@ const CartPage = () => {
 
                     {/* Security & Payment Info */}
                     <div className="space-y-4">
-                      <div
-                        className="flex items-center justify-center gap-2 text-sm"
-                        style={{ color: colors.muted }}
-                      >
+                      <div className="flex items-center justify-center gap-2 text-sm text-muted">
                         <Lock size={14} />
                         <span>Secure checkout</span>
                       </div>
@@ -1002,17 +834,10 @@ const CartPage = () => {
                           (icon, index) => (
                             <div
                               key={index}
-                              className="w-10 h-6 rounded flex items-center justify-center"
-                              style={{
-                                backgroundColor: colors.background,
-                                border: `1px solid ${colors.border}`,
-                              }}
+                              className="w-10 h-6 rounded flex items-center justify-center bg-main border border-theme"
                             >
                               {typeof icon === "string" ? (
-                                <span
-                                  className="text-xs font-bold"
-                                  style={{ color: colors.text }}
-                                >
+                                <span className="text-xs font-bold text-primary">
                                   {icon === "visa"
                                     ? "VISA"
                                     : icon === "mastercard"
@@ -1020,23 +845,14 @@ const CartPage = () => {
                                       : "AMEX"}
                                 </span>
                               ) : (
-                                <icon
-                                  size={16}
-                                  style={{ color: colors.muted }}
-                                />
+                                <icon size={16} className="text-muted" />
                               )}
                             </div>
                           ),
                         )}
                       </div>
 
-                      <p
-                        className="text-xs text-center pt-4 border-t"
-                        style={{
-                          borderColor: colors.border,
-                          color: colors.muted,
-                        }}
-                      >
+                      <p className="text-xs text-center pt-4 border-t border-theme text-muted">
                         By completing your purchase you agree to our Terms of
                         Service
                       </p>

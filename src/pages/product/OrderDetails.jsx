@@ -36,68 +36,22 @@ const OrderDetails = () => {
   const [orderData, setOrderData] = useState(null);
   const [copied, setCopied] = useState(false);
 
-  // Color Schema
-  const colors = {
-    primary: "#E10600",
-    background: "#0B0B0B",
-    cardBg: "#141414",
-    border: "#262626",
-    text: "#FFFFFF",
-    muted: "#B3B3B3",
-    success: "#22C55E",
-    warning: "#FACC15",
-    danger: "#DC2626",
-    info: "#3B82F6",
-  };
-
-  // Fetch order details
-  useEffect(() => {
-    const fetchOrderDetails = async () => {
-      if (!isAuthenticated) {
-        navigate("/login");
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const response = await api.get(`/user/my-compleate-orders/details/${id}`);
-        
-        if (response.data?.status) {
-          setOrderData(response.data.data);
-        } else {
-          toast.error("Failed to load order details");
-          navigate("/my-orders");
-        }
-      } catch (error) {
-        console.error("Error fetching order details:", error);
-        toast.error("Failed to load order details");
-        navigate("/my-orders");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchOrderDetails();
-    }
-  }, [id, isAuthenticated, navigate]);
-
-  // Get status color
+  // Get status color using CSS variables
   const getStatusColor = (status) => {
     switch(status?.toLowerCase()) {
       case 'delivered':
-        return colors.success;
+        return 'var(--color-success)';
       case 'shipped':
-        return colors.primary;
+        return 'var(--color-primary)';
       case 'pending':
       case 'processing':
-        return colors.warning;
+        return 'var(--color-warning)';
       case 'cancelled':
-        return colors.danger;
+        return '#DC2626';
       case 'paid':
-        return colors.success;
+        return 'var(--color-success)';
       default:
-        return colors.muted;
+        return 'var(--text-muted)';
     }
   };
 
@@ -142,6 +96,38 @@ const OrderDetails = () => {
     }).format(amount);
   };
 
+  // Fetch order details
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      if (!isAuthenticated) {
+        navigate("/login");
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const response = await api.get(`/user/my-compleate-orders/details/${id}`);
+        
+        if (response.data?.status) {
+          setOrderData(response.data.data);
+        } else {
+          toast.error("Failed to load order details");
+          navigate("/my-orders");
+        }
+      } catch (error) {
+        console.error("Error fetching order details:", error);
+        toast.error("Failed to load order details");
+        navigate("/my-orders");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchOrderDetails();
+    }
+  }, [id, isAuthenticated, navigate]);
+
   // Copy order number
   const copyOrderNumber = () => {
     navigator.clipboard.writeText(orderData.order_number);
@@ -163,13 +149,12 @@ const OrderDetails = () => {
     <>
       <PageHelmet title={`Order ${orderData.order_number} - ONE REP MORE`} />
       
-      <div style={{ backgroundColor: colors.background }} className="min-h-screen py-8 px-4 md:px-8 pt-30 md:pt-40">
+      <div className="min-h-screen py-8 px-4 md:px-8 pt-30 md:pt-40 bg-main">
         <div className="max-w-7xl mx-auto">
           {/* Back Button */}
           <button
             onClick={() => navigate("/my-orders")}
-            className="flex items-center gap-2 mb-6 transition-colors hover:text-white"
-            style={{ color: colors.muted }}
+            className="flex items-center gap-2 mb-6 transition-colors hover:text-primary text-muted"
           >
             <ArrowLeft size={18} />
             <span>Back to My Orders</span>
@@ -178,18 +163,12 @@ const OrderDetails = () => {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div className="flex items-center gap-3">
-              <div
-                className="w-12 h-12 rounded-lg flex items-center justify-center"
-                style={{
-                  backgroundColor: `${colors.primary}20`,
-                  border: `1px solid ${colors.primary}30`,
-                }}
-              >
-                <Package size={24} style={{ color: colors.primary }} />
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary-light border border-primary/30">
+                <Package size={24} className="text-brand" />
               </div>
               <div>
                 <div className="flex items-center gap-3">
-                  <h1 className="text-3xl md:text-4xl font-bold" style={{ color: colors.text }}>
+                  <h1 className="text-3xl md:text-4xl font-bold text-primary">
                     Order {orderData.order_number}
                   </h1>
                   <button
@@ -197,10 +176,10 @@ const OrderDetails = () => {
                     className="p-2 rounded-lg hover:bg-white/5 transition-colors"
                     title="Copy order number"
                   >
-                    <Copy size={16} style={{ color: colors.muted }} />
+                    <Copy size={16} className="text-muted" />
                   </button>
                 </div>
-                <p className="text-lg" style={{ color: colors.muted }}>
+                <p className="text-lg text-muted">
                   Placed on {formatDate(orderData.created_at)}
                 </p>
               </div>
@@ -234,24 +213,15 @@ const OrderDetails = () => {
             {/* Left Column - Order Items */}
             <div className="lg:col-span-2 space-y-6">
               {/* Order Items Card */}
-              <div
-                className="rounded-2xl overflow-hidden"
-                style={{
-                  backgroundColor: colors.cardBg,
-                  border: `1px solid ${colors.border}`,
-                }}
-              >
-                <div
-                  className="p-6 border-b"
-                  style={{ borderColor: colors.border }}
-                >
-                  <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: colors.text }}>
-                    <ShoppingBag size={20} style={{ color: colors.primary }} />
+              <div className="rounded-2xl overflow-hidden bg-card border border-theme">
+                <div className="p-6 border-b border-theme">
+                  <h2 className="text-xl font-bold flex items-center gap-2 text-primary">
+                    <ShoppingBag size={20} className="text-brand" />
                     Order Items
                   </h2>
                 </div>
 
-                <div className="divide-y" style={{ borderColor: colors.border }}>
+                <div className="divide-y divide-theme">
                   {orderData.items?.map((item) => (
                     <div key={item.id} className="p-6">
                       <div className="flex flex-col md:flex-row gap-6">
@@ -277,27 +247,26 @@ const OrderDetails = () => {
                         <div className="flex-1">
                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                             <div>
-                              <h3 className="text-lg font-bold mb-2" style={{ color: colors.text }}>
+                              <h3 className="text-lg font-bold mb-2 text-primary">
                                 {item.product?.name}
                               </h3>
                               <div className="flex items-center gap-4 text-sm">
-                                <span style={{ color: colors.muted }}>
+                                <span className="text-muted">
                                   Quantity: {item.qty}
                                 </span>
-                                <span style={{ color: colors.muted }}>
+                                <span className="text-muted">
                                   Price per unit: {formatCurrency(item.price)}
                                 </span>
                               </div>
                             </div>
                             <div className="text-right">
-                              <p className="text-xl font-bold flex items-center justify-end" style={{ color: colors.primary }}>
+                              <p className="text-xl font-bold flex items-center justify-end text-brand">
                                 <IndianRupee size={16} />
                                 {(item.qty * item.price).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                               </p>
                               <Link
                                 to={`/product-details/${item.product?.slug}`}
-                                className="text-sm mt-2 inline-flex items-center gap-1 hover:gap-2 transition-all"
-                                style={{ color: colors.primary }}
+                                className="text-sm mt-2 inline-flex items-center gap-1 hover:gap-2 transition-all text-brand"
                               >
                                 View Product
                                 <ChevronRight size={14} />
@@ -311,15 +280,12 @@ const OrderDetails = () => {
                 </div>
 
                 {/* Order Summary */}
-                <div
-                  className="p-6 border-t"
-                  style={{ borderColor: colors.border }}
-                >
+                <div className="p-6 border-t border-theme">
                   <div className="flex justify-between items-center">
-                    <span className="text-lg" style={{ color: colors.muted }}>
+                    <span className="text-lg text-muted">
                       Total Amount
                     </span>
-                    <span className="text-2xl font-bold flex items-center" style={{ color: colors.text }}>
+                    <span className="text-2xl font-bold flex items-center text-primary">
                       <IndianRupee size={20} />
                       {parseFloat(orderData.total_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                     </span>
@@ -329,19 +295,10 @@ const OrderDetails = () => {
 
               {/* Payment Details Card */}
               {orderData.payment && (
-                <div
-                  className="rounded-2xl overflow-hidden"
-                  style={{
-                    backgroundColor: colors.cardBg,
-                    border: `1px solid ${colors.border}`,
-                  }}
-                >
-                  <div
-                    className="p-6 border-b"
-                    style={{ borderColor: colors.border }}
-                  >
-                    <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: colors.text }}>
-                      <CreditCard size={20} style={{ color: colors.primary }} />
+                <div className="rounded-2xl overflow-hidden bg-card border border-theme">
+                  <div className="p-6 border-b border-theme">
+                    <h2 className="text-xl font-bold flex items-center gap-2 text-primary">
+                      <CreditCard size={20} className="text-brand" />
                       Payment Details
                     </h2>
                   </div>
@@ -349,31 +306,31 @@ const OrderDetails = () => {
                   <div className="p-6">
                     <div className="grid md:grid-cols-2 gap-6">
                       <div>
-                        <p className="text-sm mb-1" style={{ color: colors.muted }}>
+                        <p className="text-sm mb-1 text-muted">
                           Payment Gateway
                         </p>
-                        <p className="font-medium" style={{ color: colors.text }}>
+                        <p className="font-medium text-primary">
                           {orderData.payment.payment_gateway}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm mb-1" style={{ color: colors.muted }}>
+                        <p className="text-sm mb-1 text-muted">
                           Transaction ID
                         </p>
-                        <p className="font-mono text-sm" style={{ color: colors.text }}>
+                        <p className="font-mono text-sm text-primary">
                           {orderData.payment.transaction_id}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm mb-1" style={{ color: colors.muted }}>
+                        <p className="text-sm mb-1 text-muted">
                           Payment ID
                         </p>
-                        <p className="font-mono text-sm" style={{ color: colors.text }}>
+                        <p className="font-mono text-sm text-primary">
                           {orderData.payment.payment_id}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm mb-1" style={{ color: colors.muted }}>
+                        <p className="text-sm mb-1 text-muted">
                           Payment Status
                         </p>
                         <span
@@ -396,31 +353,22 @@ const OrderDetails = () => {
             {/* Right Column - Customer & Order Info */}
             <div className="space-y-6">
               {/* Customer Details Card */}
-              <div
-                className="rounded-2xl overflow-hidden"
-                style={{
-                  backgroundColor: colors.cardBg,
-                  border: `1px solid ${colors.border}`,
-                }}
-              >
-                <div
-                  className="p-6 border-b"
-                  style={{ borderColor: colors.border }}
-                >
-                  <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: colors.text }}>
-                    <User size={20} style={{ color: colors.primary }} />
+              <div className="rounded-2xl overflow-hidden bg-card border border-theme">
+                <div className="p-6 border-b border-theme">
+                  <h2 className="text-xl font-bold flex items-center gap-2 text-primary">
+                    <User size={20} className="text-brand" />
                     Customer Details
                   </h2>
                 </div>
 
                 <div className="p-6 space-y-4">
                   <div className="flex items-start gap-3">
-                    <User size={18} style={{ color: colors.muted }} className="mt-0.5" />
+                    <User size={18} className="text-muted mt-0.5" />
                     <div>
-                      <p className="text-sm mb-1" style={{ color: colors.muted }}>
+                      <p className="text-sm mb-1 text-muted">
                         Receiver Name
                       </p>
-                      <p className="font-medium" style={{ color: colors.text }}>
+                      <p className="font-medium text-primary">
                         {orderData.receiver_name || orderData.customer_name}
                       </p>
                     </div>
@@ -428,12 +376,12 @@ const OrderDetails = () => {
 
                   {orderData.receiver_phone && (
                     <div className="flex items-start gap-3">
-                      <Phone size={18} style={{ color: colors.muted }} className="mt-0.5" />
+                      <Phone size={18} className="text-muted mt-0.5" />
                       <div>
-                        <p className="text-sm mb-1" style={{ color: colors.muted }}>
+                        <p className="text-sm mb-1 text-muted">
                           Phone Number
                         </p>
-                        <p className="font-medium" style={{ color: colors.text }}>
+                        <p className="font-medium text-primary">
                           {orderData.receiver_phone}
                         </p>
                       </div>
@@ -441,15 +389,15 @@ const OrderDetails = () => {
                   )}
 
                   <div className="flex items-start gap-3">
-                    <MapPin size={18} style={{ color: colors.muted }} className="mt-0.5" />
+                    <MapPin size={18} className="text-muted mt-0.5" />
                     <div>
-                      <p className="text-sm mb-1" style={{ color: colors.muted }}>
+                      <p className="text-sm mb-1 text-muted">
                         Shipping Address
                       </p>
-                      <p className="font-medium" style={{ color: colors.text }}>
+                      <p className="font-medium text-primary">
                         {orderData.address}, {orderData.city}
                       </p>
-                      <p className="font-medium" style={{ color: colors.text }}>
+                      <p className="font-medium text-primary">
                         {orderData.state} - {orderData.pincode}
                       </p>
                     </div>
@@ -458,58 +406,49 @@ const OrderDetails = () => {
               </div>
 
               {/* Order Summary Card */}
-              <div
-                className="rounded-2xl overflow-hidden"
-                style={{
-                  backgroundColor: colors.cardBg,
-                  border: `1px solid ${colors.border}`,
-                }}
-              >
-                <div
-                  className="p-6 border-b"
-                  style={{ borderColor: colors.border }}
-                >
-                  <h2 className="text-xl font-bold flex items-center gap-2" style={{ color: colors.text }}>
-                    <Package size={20} style={{ color: colors.primary }} />
+              <div className="rounded-2xl overflow-hidden bg-card border border-theme">
+                <div className="p-6 border-b border-theme">
+                  <h2 className="text-xl font-bold flex items-center gap-2 text-primary">
+                    <Package size={20} className="text-brand" />
                     Order Summary
                   </h2>
                 </div>
 
                 <div className="p-6 space-y-4">
                   <div className="flex justify-between">
-                    <span style={{ color: colors.muted }}>Order Number</span>
-                    <span className="font-mono text-sm" style={{ color: colors.text }}>
+                    <span className="text-muted">Order Number</span>
+                    <span className="font-mono text-sm text-primary">
                       {orderData.order_number}
                     </span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span style={{ color: colors.muted }}>Order Date</span>
-                    <span style={{ color: colors.text }}>
+                    <span className="text-muted">Order Date</span>
+                    <span className="text-primary">
                       {new Date(orderData.created_at).toLocaleDateString('en-IN')}
                     </span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span style={{ color: colors.muted }}>Total Items</span>
-                    <span style={{ color: colors.text }}>
+                    <span className="text-muted">Total Items</span>
+                    <span className="text-primary">
                       {orderData.items?.length || 0}
                     </span>
                   </div>
 
                   <div className="flex justify-between">
-                    <span style={{ color: colors.muted }}>Payment Method</span>
-                    <span className="capitalize" style={{ color: colors.text }}>
+                    <span className="text-muted">Payment Method</span>
+                    <span className="capitalize text-primary">
                       {orderData.payment_method}
                     </span>
                   </div>
 
-                  <div className="pt-4 border-t" style={{ borderColor: colors.border }}>
+                  <div className="pt-4 border-t border-theme">
                     <div className="flex justify-between items-center">
-                      <span className="text-lg font-bold" style={{ color: colors.text }}>
+                      <span className="text-lg font-bold text-primary">
                         Total Amount
                       </span>
-                      <span className="text-2xl font-bold flex items-center" style={{ color: colors.primary }}>
+                      <span className="text-2xl font-bold flex items-center text-brand">
                         <IndianRupee size={18} />
                         {parseFloat(orderData.total_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                       </span>
@@ -522,38 +461,17 @@ const OrderDetails = () => {
               <div className="flex flex-col gap-3">
                 <button
                   onClick={() => navigate("/contact")}
-                  className="w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all hover:shadow-lg"
-                  style={{
-                    background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-                    color: colors.text,
-                  }}
+                  className="w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all hover:shadow-primary-hover bg-gradient-primary text-primary"
                 >
                   <MessageSquare size={18} />
                   Need Help? Contact Support
                 </button>
-
-                {/* <button
-                  className="w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all hover:bg-white/5"
-                  style={{
-                    color: colors.text,
-                    border: `1px solid ${colors.border}`,
-                  }}
-                >
-                  <Download size={18} />
-                  Download Invoice
-                </button> */}
               </div>
 
               {/* Order Status Timeline */}
-              <div
-                className="rounded-2xl p-6"
-                style={{
-                  backgroundColor: colors.cardBg,
-                  border: `1px solid ${colors.border}`,
-                }}
-              >
-                <h3 className="font-semibold mb-4 flex items-center gap-2" style={{ color: colors.text }}>
-                  <Clock size={18} style={{ color: colors.primary }} />
+              <div className="rounded-2xl p-6 bg-card border border-theme">
+                <h3 className="font-semibold mb-4 flex items-center gap-2 text-primary">
+                  <Clock size={18} className="text-brand" />
                   Order Timeline
                 </h3>
                 <div className="space-y-3">
@@ -561,17 +479,17 @@ const OrderDetails = () => {
                     <div
                       className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{
-                        backgroundColor: `${colors.success}20`,
-                        color: colors.success,
+                        backgroundColor: 'var(--color-success)20',
+                        color: 'var(--color-success)',
                       }}
                     >
                       <CheckCircle size={14} />
                     </div>
                     <div>
-                      <p className="text-sm font-medium" style={{ color: colors.text }}>
+                      <p className="text-sm font-medium text-primary">
                         Order Placed
                       </p>
-                      <p className="text-xs" style={{ color: colors.muted }}>
+                      <p className="text-xs text-muted">
                         {formatDate(orderData.created_at)}
                       </p>
                     </div>
@@ -582,25 +500,25 @@ const OrderDetails = () => {
                       className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{
                         backgroundColor: orderData.order_status === 'shipped' || orderData.order_status === 'delivered'
-                          ? `${colors.success}20`
-                          : `${colors.warning}20`,
+                          ? 'var(--color-success)20'
+                          : 'var(--color-warning)20',
                         color: orderData.order_status === 'shipped' || orderData.order_status === 'delivered'
-                          ? colors.success
-                          : colors.warning,
+                          ? 'var(--color-success)'
+                          : 'var(--color-warning)',
                       }}
                     >
                       <Truck size={14} />
                     </div>
                     <div>
-                      <p className="text-sm font-medium" style={{ color: colors.text }}>
+                      <p className="text-sm font-medium text-primary">
                         Order Shipped
                       </p>
                       {orderData.order_status === 'shipped' || orderData.order_status === 'delivered' ? (
-                        <p className="text-xs" style={{ color: colors.muted }}>
+                        <p className="text-xs text-muted">
                           {formatDate(orderData.updated_at)}
                         </p>
                       ) : (
-                        <p className="text-xs" style={{ color: colors.muted }}>
+                        <p className="text-xs text-muted">
                           Pending
                         </p>
                       )}
@@ -612,25 +530,25 @@ const OrderDetails = () => {
                       className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{
                         backgroundColor: orderData.order_status === 'delivered'
-                          ? `${colors.success}20`
-                          : `${colors.muted}20`,
+                          ? 'var(--color-success)20'
+                          : 'var(--text-muted)20',
                         color: orderData.order_status === 'delivered'
-                          ? colors.success
-                          : colors.muted,
+                          ? 'var(--color-success)'
+                          : 'var(--text-muted)',
                       }}
                     >
                       <CheckCircle size={14} />
                     </div>
                     <div>
-                      <p className="text-sm font-medium" style={{ color: colors.text }}>
+                      <p className="text-sm font-medium text-primary">
                         Delivered
                       </p>
                       {orderData.order_status === 'delivered' ? (
-                        <p className="text-xs" style={{ color: colors.muted }}>
+                        <p className="text-xs text-muted">
                           {formatDate(orderData.updated_at)}
                         </p>
                       ) : (
-                        <p className="text-xs" style={{ color: colors.muted }}>
+                        <p className="text-xs text-muted">
                           Pending
                         </p>
                       )}

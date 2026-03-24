@@ -18,7 +18,6 @@ import {
   Globe,
   Building2,
   PhoneCall,
-  // Fax,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import PageLoader from "../../component/common/PageLoader";
@@ -66,19 +65,6 @@ const ContactUs = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   
   const [openFaq, setOpenFaq] = useState(null);
-  
-  // Color Schema
-  const colors = {
-    primary: "#E10600",
-    background: "#0B0B0B",
-    cardBg: "#141414",
-    border: "#262626",
-    text: "#FFFFFF",
-    muted: "#B3B3B3",
-    success: "#22C55E",
-    warning: "#FACC15",
-    danger: "#EF4444",
-  };
   
   // Generate contact info from API data
   const getContactInfo = () => {
@@ -264,42 +250,34 @@ const ContactUs = () => {
   return (
     <>
       <PageHelmet title={`Contact Us - ${contactData?.site_name || "ONE REP MORE"}`} />
-      <div
-        style={{ backgroundColor: colors.background }}
-        className="min-h-screen pt-30"
-      >
+      <div className="min-h-screen pt-30 bg-main">
         {/* Hero Section */}
         <div
           className="relative py-20 px-4 md:px-8 overflow-hidden"
           style={{
-            background: `linear-gradient(135deg, ${colors.background} 0%, #1a1a1a 100%)`,
-            borderBottom: `1px solid ${colors.border}`,
+            background: `linear-gradient(135deg, var(--bg-main) 0%, #1a1a1a 100%)`,
+            borderBottom: '1px solid var(--bg-border)',
           }}
         >
           <div className="max-w-7xl mx-auto relative z-10">
             <div className="text-center mb-12">
               <div
-                className="inline-block mb-4 px-4 py-2 rounded-full"
-                style={{
-                  backgroundColor: `${colors.primary}20`,
-                  border: `1px solid ${colors.primary}30`,
-                }}
+                className="inline-block mb-4 px-4 py-2 rounded-full text-brand bg-[currentColor]/20 "
+                // style={{
+                //   backgroundColor: 'var(--color-primary-light)',
+                //   border: '1px solid var(--color-primary)',
+                //   opacity: 0.3,
+                // }}
               >
-                <span
-                  className="text-sm font-semibold uppercase tracking-wider"
-                  style={{ color: colors.primary }}
-                >
+                <span className="text-sm font-semibold uppercase tracking-wider ">
                   Get in Touch
                 </span>
               </div>
               <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                <span style={{ color: colors.text }}>Contact </span>
-                <span style={{ color: colors.primary }}>Our Team</span>
+                <span className="text-primary">Contact </span>
+                <span className="text-brand">Our Team</span>
               </h1>
-              <p
-                className="text-lg md:text-xl max-w-2xl mx-auto"
-                style={{ color: colors.muted }}
-              >
+              <p className="text-lg md:text-xl max-w-2xl mx-auto text-muted">
                 Have questions about our premium gym equipment? Our fitness
                 experts are here to help you build your perfect workout space.
               </p>
@@ -325,34 +303,25 @@ const ContactUs = () => {
               {contactInfo.map((item, index) => (
                 <div
                   key={index}
-                  className="group p-6 rounded-2xl transition-all duration-300 hover:transform hover:-translate-y-2"
-                  style={{
-                    backgroundColor: colors.cardBg,
-                    border: `1px solid ${colors.border}`,
-                  }}
+                  className="group p-6 rounded-2xl transition-all duration-300 hover:transform hover:-translate-y-2 card"
                 >
                   <div
                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-300 group-hover:scale-110"
                     style={{
-                      backgroundColor: `${colors.primary}20`,
-                      border: `1px solid ${colors.primary}30`,
+                      backgroundColor: 'var(--color-primary-light)',
+                      border: '1px solid var(--color-primary)',
+                      opacity: 0.3,
                     }}
                   >
-                    <item.icon size={24} style={{ color: colors.primary }} />
+                    <item.icon size={24} className="text-brand" />
                   </div>
-                  <h3
-                    className="text-lg font-semibold mb-2"
-                    style={{ color: colors.text }}
-                  >
+                  <h3 className="text-lg font-semibold mb-2 text-primary">
                     {item.title}
                   </h3>
-                  <p
-                    className="text-lg font-bold mb-1"
-                    style={{ color: colors.primary }}
-                  >
+                  <p className="text-lg font-bold mb-1 text-brand">
                     {item.details}
                   </p>
-                  <p className="text-sm" style={{ color: colors.muted }}>
+                  <p className="text-sm text-muted">
                     {item.description}
                   </p>
                 </div>
@@ -366,18 +335,15 @@ const ContactUs = () => {
                 <div className="flex items-center gap-3 mb-8">
                   <div
                     className="p-2 rounded-lg"
-                    style={{ backgroundColor: `${colors.primary}20` }}
+                    style={{ backgroundColor: 'var(--color-primary-light)' }}
                   >
-                    <MessageSquare size={24} style={{ color: colors.primary }} />
+                    <MessageSquare size={24} className="text-brand" />
                   </div>
                   <div>
-                    <h2
-                      className="text-2xl font-bold"
-                      style={{ color: colors.text }}
-                    >
+                    <h2 className="text-2xl font-bold text-primary">
                       Send us a Message
                     </h2>
-                    <p style={{ color: colors.muted }}>
+                    <p className="text-muted">
                       We'll get back to you within 24 hours
                     </p>
                   </div>
@@ -385,14 +351,10 @@ const ContactUs = () => {
 
                 {submitSuccess && (
                   <div
-                    className="mb-6 p-4 rounded-lg flex items-center gap-3"
-                    style={{
-                      backgroundColor: `${colors.success}20`,
-                      border: `1px solid ${colors.success}30`,
-                    }}
+                    className="mb-6 p-4 rounded-lg flex items-center gap-3 bg-success/10 border border-success/30"
                   >
-                    <CheckCircle size={20} style={{ color: colors.success }} />
-                    <p className="font-medium" style={{ color: colors.success }}>
+                    <CheckCircle size={20} className="text-success" />
+                    <p className="font-medium text-success">
                       Message sent successfully! Our team will contact you soon.
                     </p>
                   </div>
@@ -401,10 +363,7 @@ const ContactUs = () => {
                 <form onSubmit={handleSubmit}>
                   <div className="grid md:grid-cols-2 gap-6 mb-6">
                     <div>
-                      <label
-                        className="block text-sm font-medium mb-2"
-                        style={{ color: colors.text }}
-                      >
+                      <label className="block text-sm font-medium mb-2 text-primary">
                         Full Name *
                       </label>
                       <input
@@ -413,22 +372,18 @@ const ContactUs = () => {
                         value={formData.full_name}
                         onChange={handleChange}
                         className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                          errors.full_name ? "border-red-500" : ""
+                          errors.full_name ? "border-primary" : "border-theme"
                         }`}
                         style={{
-                          backgroundColor: colors.cardBg,
-                          border: `1px solid ${
-                            errors.full_name ? colors.primary : colors.border
-                          }`,
-                          color: colors.text,
+                          backgroundColor: 'var(--bg-card)',
+                          border: '1px solid',
+                          borderColor: errors.full_name ? 'var(--color-primary)' : 'var(--bg-border)',
+                          color: 'var(--text-primary)',
                         }}
                         placeholder="John Doe"
                       />
                       {errors.full_name && (
-                        <p
-                          className="mt-1 text-sm flex items-center gap-1"
-                          style={{ color: colors.danger }}
-                        >
+                        <p className="mt-1 text-sm flex items-center gap-1 text-error">
                           <AlertCircle size={12} />
                           {errors.full_name}
                         </p>
@@ -436,10 +391,7 @@ const ContactUs = () => {
                     </div>
 
                     <div>
-                      <label
-                        className="block text-sm font-medium mb-2"
-                        style={{ color: colors.text }}
-                      >
+                      <label className="block text-sm font-medium mb-2 text-primary">
                         Email Address *
                       </label>
                       <input
@@ -448,22 +400,18 @@ const ContactUs = () => {
                         value={formData.email}
                         onChange={handleChange}
                         className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                          errors.email ? "border-red-500" : ""
+                          errors.email ? "border-primary" : "border-theme"
                         }`}
                         style={{
-                          backgroundColor: colors.cardBg,
-                          border: `1px solid ${
-                            errors.email ? colors.primary : colors.border
-                          }`,
-                          color: colors.text,
+                          backgroundColor: 'var(--bg-card)',
+                          border: '1px solid',
+                          borderColor: errors.email ? 'var(--color-primary)' : 'var(--bg-border)',
+                          color: 'var(--text-primary)',
                         }}
                         placeholder={contactData?.email || "john@example.com"}
                       />
                       {errors.email && (
-                        <p
-                          className="mt-1 text-sm flex items-center gap-1"
-                          style={{ color: colors.danger }}
-                        >
+                        <p className="mt-1 text-sm flex items-center gap-1 text-error">
                           <AlertCircle size={12} />
                           {errors.email}
                         </p>
@@ -472,10 +420,7 @@ const ContactUs = () => {
                   </div>
 
                   <div className="mb-6">
-                    <label
-                      className="block text-sm font-medium mb-2"
-                      style={{ color: colors.text }}
-                    >
+                    <label className="block text-sm font-medium mb-2 text-primary">
                       Phone Number (Optional)
                     </label>
                     <input
@@ -484,22 +429,18 @@ const ContactUs = () => {
                       value={formData.phone_number}
                       onChange={handleChange}
                       className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                        errors.phone_number ? "border-red-500" : ""
+                        errors.phone_number ? "border-primary" : "border-theme"
                       }`}
                       style={{
-                        backgroundColor: colors.cardBg,
-                        border: `1px solid ${
-                          errors.phone_number ? colors.primary : colors.border
-                        }`,
-                        color: colors.text,
+                        backgroundColor: 'var(--bg-card)',
+                        border: '1px solid',
+                        borderColor: errors.phone_number ? 'var(--color-primary)' : 'var(--bg-border)',
+                        color: 'var(--text-primary)',
                       }}
                       placeholder={contactData?.phone || "+1 (555) 123-4567"}
                     />
                     {errors.phone_number && (
-                      <p
-                        className="mt-1 text-sm flex items-center gap-1"
-                        style={{ color: colors.danger }}
-                      >
+                      <p className="mt-1 text-sm flex items-center gap-1 text-error">
                         <AlertCircle size={12} />
                         {errors.phone_number}
                       </p>
@@ -507,10 +448,7 @@ const ContactUs = () => {
                   </div>
 
                   <div className="mb-6">
-                    <label
-                      className="block text-sm font-medium mb-2"
-                      style={{ color: colors.text }}
-                    >
+                    <label className="block text-sm font-medium mb-2 text-primary">
                       Subject *
                     </label>
                     <input
@@ -519,22 +457,18 @@ const ContactUs = () => {
                       value={formData.subject}
                       onChange={handleChange}
                       className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                        errors.subject ? "border-red-500" : ""
+                        errors.subject ? "border-primary" : "border-theme"
                       }`}
                       style={{
-                        backgroundColor: colors.cardBg,
-                        border: `1px solid ${
-                          errors.subject ? colors.primary : colors.border
-                        }`,
-                        color: colors.text,
+                        backgroundColor: 'var(--bg-card)',
+                        border: '1px solid',
+                        borderColor: errors.subject ? 'var(--color-primary)' : 'var(--bg-border)',
+                        color: 'var(--text-primary)',
                       }}
                       placeholder="How can we help?"
                     />
                     {errors.subject && (
-                      <p
-                        className="mt-1 text-sm flex items-center gap-1"
-                        style={{ color: colors.danger }}
-                      >
+                      <p className="mt-1 text-sm flex items-center gap-1 text-error">
                         <AlertCircle size={12} />
                         {errors.subject}
                       </p>
@@ -542,10 +476,7 @@ const ContactUs = () => {
                   </div>
 
                   <div className="mb-8">
-                    <label
-                      className="block text-sm font-medium mb-2"
-                      style={{ color: colors.text }}
-                    >
+                    <label className="block text-sm font-medium mb-2 text-primary">
                       Message *
                     </label>
                     <textarea
@@ -554,22 +485,18 @@ const ContactUs = () => {
                       onChange={handleChange}
                       rows="6"
                       className={`w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 transition-all resize-none ${
-                        errors.message ? "border-red-500" : ""
+                        errors.message ? "border-primary" : "border-theme"
                       }`}
                       style={{
-                        backgroundColor: colors.cardBg,
-                        border: `1px solid ${
-                          errors.message ? colors.primary : colors.border
-                        }`,
-                        color: colors.text,
+                        backgroundColor: 'var(--bg-card)',
+                        border: '1px solid',
+                        borderColor: errors.message ? 'var(--color-primary)' : 'var(--bg-border)',
+                        color: 'var(--text-primary)',
                       }}
                       placeholder="Tell us about your gym equipment needs..."
                     />
                     {errors.message && (
-                      <p
-                        className="mt-1 text-sm flex items-center gap-1"
-                        style={{ color: colors.danger }}
-                      >
+                      <p className="mt-1 text-sm flex items-center gap-1 text-error">
                         <AlertCircle size={12} />
                         {errors.message}
                       </p>
@@ -579,14 +506,11 @@ const ContactUs = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="group inline-flex items-center gap-3 px-8 py-4 rounded-lg font-semibold text-white transition-all duration-300 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      background: `linear-gradient(135deg, ${colors.primary}, #B30000)`,
-                    }}
+                    className="group inline-flex items-center gap-3 px-8 py-4 rounded-lg font-semibold text-primary transition-all duration-300 hover:shadow-primary-hover disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-primary"
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
                         Sending...
                       </>
                     ) : (
@@ -606,10 +530,9 @@ const ContactUs = () => {
               <div>
                 {/* Map Container */}
                 <div
-                  className="rounded-2xl overflow-hidden mb-8 border"
+                  className="rounded-2xl overflow-hidden mb-8 border border-theme"
                   style={{
-                    backgroundColor: colors.cardBg,
-                    borderColor: colors.border,
+                    backgroundColor: 'var(--bg-card)',
                   }}
                 >
                   <div className="h-64 md:h-80 bg-gray-800 relative">
@@ -618,50 +541,39 @@ const ContactUs = () => {
                       <div className="text-center">
                         <div
                           className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-                          style={{ backgroundColor: `${colors.primary}20` }}
+                          style={{ backgroundColor: 'var(--color-primary-light)' }}
                         >
-                          <MapPin size={32} style={{ color: colors.primary }} />
+                          <MapPin size={32} className="text-brand" />
                         </div>
-                        <h3
-                          className="text-xl font-bold mb-2"
-                          style={{ color: colors.text }}
-                        >
+                        <h3 className="text-xl font-bold mb-2 text-primary">
                           Our Location
                         </h3>
-                        <p style={{ color: colors.muted }}>
+                        <p className="text-muted">
                           {contactData?.street_address || "123 Fitness Street"}, {contactData?.city || "Miami"}, {contactData?.state || "FL"} {contactData?.zip || "33101"}
                         </p>
-                        <p style={{ color: colors.muted }}>
+                        <p className="text-muted">
                           {contactData?.country || "USA"}
                         </p>
                       </div>
                     </div>
                   </div>
                   <div className="p-6">
-                    <h3
-                      className="text-lg font-semibold mb-4"
-                      style={{ color: colors.text }}
-                    >
+                    <h3 className="text-lg font-semibold mb-4 text-primary">
                       Visit Our Showroom
                     </h3>
-                    <p className="text-sm mb-4" style={{ color: colors.muted }}>
+                    <p className="text-sm mb-4 text-muted">
                       Experience our premium gym equipment firsthand at our Miami
                       showroom. Our experts are available to guide you through our
                       complete range of fitness solutions.
                     </p>
                     <div className="flex gap-3">
                       <button
-                        className="px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-white/5"
-                        style={{
-                          color: colors.text,
-                          border: `1px solid ${colors.border}`,
-                        }}
+                        className="px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-white/5 text-primary border border-theme"
                       >
                         Get Directions
                       </button>
                       <button
-                        className="px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
-                        style={{ backgroundColor: colors.primary }}
+                        className="px-4 py-2 rounded-lg text-sm font-medium text-primary transition-colors bg-primary hover:bg-primary-hover"
                       >
                         Schedule Visit
                       </button>
@@ -672,19 +584,12 @@ const ContactUs = () => {
                 {/* Social Media */}
                 {socialLinks.length > 0 && (
                   <div
-                    className="rounded-2xl p-6"
-                    style={{
-                      backgroundColor: colors.cardBg,
-                      border: `1px solid ${colors.border}`,
-                    }}
+                    className="rounded-2xl p-6 card"
                   >
-                    <h3
-                      className="text-lg font-semibold mb-4"
-                      style={{ color: colors.text }}
-                    >
+                    <h3 className="text-lg font-semibold mb-4 text-primary">
                       Connect With Us
                     </h3>
-                    <p className="text-sm mb-6" style={{ color: colors.muted }}>
+                    <p className="text-sm mb-6 text-muted">
                       Follow us on social media for the latest equipment releases,
                       fitness tips, and exclusive offers.
                     </p>
@@ -697,15 +602,14 @@ const ContactUs = () => {
                           rel="noopener noreferrer"
                           className="group w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-300 hover:transform hover:-translate-y-1"
                           style={{
-                            backgroundColor: `${colors.primary}10`,
-                            border: `1px solid ${colors.border}`,
+                            backgroundColor: 'var(--color-primary-light)',
+                            border: '1px solid var(--bg-border)',
                           }}
                           aria-label={social.label}
                         >
                           <social.icon
                             size={20}
-                            className="transition-colors group-hover:text-white"
-                            style={{ color: colors.primary }}
+                            className="transition-colors group-hover:text-primary text-brand"
                           />
                         </a>
                       ))}
@@ -722,27 +626,19 @@ const ContactUs = () => {
                   <div
                     className="inline-block mb-4 px-4 py-2 rounded-full"
                     style={{
-                      backgroundColor: `${colors.primary}20`,
-                      border: `1px solid ${colors.primary}30`,
+                      backgroundColor: 'var(--color-primary-light)',
+                      border: '1px solid var(--color-primary)',
+                      opacity: 0.3,
                     }}
                   >
-                    <span
-                      className="text-sm font-semibold uppercase tracking-wider"
-                      style={{ color: colors.primary }}
-                    >
+                    <span className="text-sm font-semibold uppercase tracking-wider text-brand">
                       Common Questions
                     </span>
                   </div>
-                  <h2
-                    className="text-3xl md:text-4xl font-bold mb-4"
-                    style={{ color: colors.text }}
-                  >
+                  <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary">
                     Frequently Asked Questions
                   </h2>
-                  <p
-                    className="text-lg max-w-2xl mx-auto"
-                    style={{ color: colors.muted }}
-                  >
+                  <p className="text-lg max-w-2xl mx-auto text-muted">
                     Find answers to the most common questions about our gym
                     equipment and services.
                   </p>
@@ -752,30 +648,25 @@ const ContactUs = () => {
                   {faqs.map((item, index) => (
                     <div
                       key={item.id}
-                      className={`mb-4 rounded-xl transition-all duration-300 ${
-                        openFaq === index ? "border-[#E10600]" : ""
+                      className={`mb-4 rounded-xl transition-all duration-300 card ${
+                        openFaq === index ? "border-primary" : "border-theme"
                       }`}
                       style={{
-                        backgroundColor: colors.cardBg,
-                        border: `1px solid ${
-                          openFaq === index ? colors.primary : colors.border
-                        }`,
+                        border: '1px solid',
+                        borderColor: openFaq === index ? 'var(--color-primary)' : 'var(--bg-border)',
                       }}
                     >
                       <button
                         onClick={() => toggleFaq(index)}
                         className="w-full px-6 py-5 flex items-center justify-between text-left"
                       >
-                        <span
-                          className="text-lg font-semibold pr-8"
-                          style={{ color: colors.text }}
-                        >
+                        <span className="text-lg font-semibold pr-8 text-primary">
                           {item.faq_question}
                         </span>
                         {openFaq === index ? (
-                          <ChevronUp size={20} style={{ color: colors.primary }} />
+                          <ChevronUp size={20} className="text-brand" />
                         ) : (
-                          <ChevronDown size={20} style={{ color: colors.muted }} />
+                          <ChevronDown size={20} className="text-muted" />
                         )}
                       </button>
 
@@ -787,11 +678,7 @@ const ContactUs = () => {
                         }`}
                       >
                         <div
-                          className="pt-4 border-t"
-                          style={{
-                            borderColor: colors.border,
-                            color: colors.muted,
-                          }}
+                          className="pt-4 border-t border-theme text-muted"
                         >
                           <div dangerouslySetInnerHTML={{ __html: item.faq_answer }} />
                         </div>

@@ -154,6 +154,12 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       icon: <User2 className="w-5 h-5" />,
       path: "/admin/order-track",
     },
+    {
+      id: "mange-blogs",
+      label: "Mange Blogs",
+      icon: <User2 className="w-5 h-5" />,
+      path: "/admin/mange-blogs",
+    },
   ];
 
   const toggleDropdown = (id) => {
