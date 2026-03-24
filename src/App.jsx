@@ -118,6 +118,7 @@ const PublicRoute = ({ children }) => {
 
 const App = () => {
   const { loading } = useAuth();
+  
 
   if (loading) {
     return (

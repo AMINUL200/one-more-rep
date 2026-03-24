@@ -6,29 +6,24 @@
   :root {
     /* 🎯 Brand Colors */
     --color-primary: #E10600;
-    /* red */
-    --color-primary-hover: #FF2A2A;
+    --color-primary-hover: #FF0800;
     --color-primary-light: rgba(225, 6, 0, 0.1);
     --color-primary-glow: rgba(225, 6, 0, 0.4);
 
-    /* 🎯 Backgrounds (UPDATED → GRAY THEME) */
-    --bg-main: #353535;
-    /* main gray */
-    --bg-card: #2A2A2A;
-    /* card gray */
-    --bg-card-hover: #404040;
-    /* hover gray */
-    --bg-border: #4A4A4A;
+    /* 🎯 Backgrounds */
+    --bg-main: #0B0B0B;
+    --bg-card: #141414;
+    --bg-card-hover: #1A1A1A;
+    --bg-border: #262626;
 
     /* 🎯 Text */
-    --text-primary: #FFFFFF;
-    --text-muted: #CFCFCF;
+    --text-primary: #ffffff;
+    --text-muted: #B3B3B3;
     --text-red: #E10600;
 
     /* 🎯 Status */
     --color-success: #22C55E;
     --color-warning: #FACC15;
-    /* yellow */
 
     /* 🎯 Shadows */
     --shadow-primary: 0 0 20px var(--color-primary-glow);
@@ -36,10 +31,9 @@
     /* 🎯 Transitions */
     --transition-base: 0.3s ease;
 
-    /* 🎯 Gradient */
     --gradient-primary: linear-gradient(135deg,
         var(--color-primary) 0%,
-        var(--color-warning) 100%);
+        var(--color-primary-hover) 100%);
   }
 
   .dark {
@@ -65,7 +59,7 @@
     background: var(--color-primary);
   }
 
-  .bg-success {
+  .bg-success{
     background: var(--color-success);
   }
 
@@ -90,8 +84,7 @@
   .text-warning {
     color: var(--color-warning);
   }
-
-  .text-success {
+  .text-success{
     color: var(--color-success);
   }
 
@@ -105,14 +98,15 @@
   }
 
   /* ------- border success -------- */
-  .border-success {
-    border-color: var(--color-success);
-  }
+.border-success {
+  border-color: var(--color-success);
+}
 
   /* -------- BUTTONS -------- */
   .btn-primary {
-    background: var(--gradient-primary);
+    background: var(--color-primary);
     color: white;
+    transition: var(--transition-base);
   }
 
   .btn-primary:hover {
@@ -137,8 +131,8 @@
   }
 
   .card:hover {
-    border-color: var(--color-warning);
-    box-shadow: 0 0 15px rgba(250, 204, 21, 0.2);
+    border-color: var(--color-primary);
+    transform: translateY(-4px);
   }
 
   /* ------- badge variants -------- */

@@ -60,7 +60,7 @@ const WhyChooseUs = ({ choseData }) => {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-b from-main to-card relative overflow-hidden">
+    <section className="py-20 bg-main relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
         <div

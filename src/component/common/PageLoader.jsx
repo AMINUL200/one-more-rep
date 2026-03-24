@@ -6,24 +6,11 @@ const PageLoader = () => {
   const [currentQuote, setCurrentQuote] = useState(0);
   const [progress, setProgress] = useState(0);
 
-  // Color Schema
-  const colors = {
-    primary: "#E10600",
-    background: "#0B0B0B",
-    cardBg: "#141414",
-    border: "#262626",
-    text: "#FFFFFF",
-    muted: "#B3B3B3",
-    success: "#22C55E",
-    warning: "#FACC15",
-    accent: "#8B5CF6", // Added accent color for floating dots
-  };
-
   // Gym instruments to rotate
   const gymInstruments = [
-    { icon: Dumbbell, label: "Dumbbell", color: "#E10600" },
-    { icon: Weight, label: "Weight Plate", color: "#FACC15" },
-    { icon: Target, label: "Target", color: "#22C55E" },
+    { icon: Dumbbell, label: "Dumbbell", color: "var(--color-primary)" },
+    { icon: Weight, label: "Weight Plate", color: "var(--color-warning)" },
+    { icon: Target, label: "Target", color: "var(--color-success)" },
     { icon: Trophy, label: "Trophy", color: "#8B5CF6" },
     { icon: Zap, label: "Energy", color: "#F97316" },
   ];
@@ -76,10 +63,8 @@ const PageLoader = () => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden bg-main"
       style={{ 
-        backgroundColor: colors.background,
-        // Ensure no scrollbars appear
         overscrollBehavior: 'none',
         WebkitOverflowScrolling: 'touch',
       }}
@@ -90,14 +75,13 @@ const PageLoader = () => {
         <div className="text-center animate-fadeIn flex-shrink-0">
           <div className="relative w-20 h-20 mx-auto mb-6">
             {/* Logo Container */}
-            <div className="absolute inset-0 rounded-full overflow-hidden border-2 p-1"
+            <div className="absolute inset-0 rounded-full overflow-hidden border-2 p-1 bg-card"
               style={{ 
-                borderColor: colors.primary,
-                backgroundColor: colors.cardBg,
+                borderColor: 'var(--color-primary)',
               }}
             >
               <img
-                src="/image/gym_logo.png"
+                src="/image/gym_log2.png"
                 alt="One Rep More"
                 className="w-full h-full object-cover rounded-full"
               />
@@ -105,18 +89,14 @@ const PageLoader = () => {
             
             {/* Animated Ring */}
             <div className="absolute -inset-2 rounded-full animate-ping-slow opacity-30"
-              style={{ border: `2px solid ${colors.primary}` }}
+              style={{ border: '2px solid var(--color-primary)' }}
             />
           </div>
           
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2"
-            style={{ color: colors.text }}
-          >
-            ONE <span style={{ color: colors.primary }}>REP</span> MORE
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2 text-primary">
+            ONE <span className="text-brand">REP</span> MORE
           </h1>
-          <p className="text-sm uppercase tracking-widest"
-            style={{ color: colors.muted }}
-          >
+          <p className="text-sm uppercase tracking-widest text-muted">
             Premium Fitness Equipment
           </p>
         </div>
@@ -157,19 +137,17 @@ const PageLoader = () => {
               />
             </div>
             
-            <h3 className="text-xl font-bold uppercase tracking-wider"
-              style={{ color: colors.text }}
-            >
+            <h3 className="text-xl font-bold uppercase tracking-wider text-primary">
               {gymInstruments[currentInstrument].label}
             </h3>
           </div>
           
           {/* Floating Dots - Fixed positioning to be relative to container */}
           <div className="absolute -top-4 -right-4 w-8 h-8 rounded-full animate-float"
-            style={{ backgroundColor: colors.primary }}
+            style={{ backgroundColor: 'var(--color-primary)' }}
           />
           <div className="absolute -bottom-4 -left-4 w-8 h-8 rounded-full animate-float-delayed"
-            style={{ backgroundColor: colors.accent }}
+            style={{ backgroundColor: '#8B5CF6' }}
           />
         </div>
 
@@ -177,17 +155,14 @@ const PageLoader = () => {
         <div className="max-w-md text-center mb-4 flex-shrink-0">
           <div className="relative">
             {/* Quote Marks */}
-            <div className="absolute -left-6 -top-4 text-3xl"
-              style={{ color: colors.primary }}
-            >
+            <div className="absolute -left-6 -top-4 text-3xl text-brand">
               "
             </div>
-            <p className="text-lg md:text-xl px-8 py-4 rounded-xl transition-all duration-500 animate-fadeInUp"
+            <p className="text-lg md:text-xl px-8 py-4 rounded-xl transition-all duration-500 animate-fadeInUp text-primary"
               style={{
-                color: colors.text,
-                backgroundColor: `${colors.cardBg}80`,
+                backgroundColor: 'var(--bg-card)',
                 backdropFilter: 'blur(10px)',
-                border: `1px solid ${colors.border}`,
+                border: '1px solid var(--bg-border)',
                 minHeight: '80px',
                 display: 'flex',
                 alignItems: 'center',
@@ -196,9 +171,7 @@ const PageLoader = () => {
             >
               {motivationalQuotes[currentQuote]}
             </p>
-            <div className="absolute -right-6 -bottom-4 text-3xl"
-              style={{ color: colors.primary }}
-            >
+            <div className="absolute -right-6 -bottom-4 text-3xl text-brand">
               "
             </div>
           </div>
@@ -212,10 +185,10 @@ const PageLoader = () => {
                 key={index}
                 className="w-3 h-3 rounded-full transition-all duration-300"
                 style={{
-                  backgroundColor: index * 20 <= progress ? colors.primary : colors.border,
+                  backgroundColor: index * 20 <= progress ? 'var(--color-primary)' : 'var(--bg-border)',
                   animation: `pulse 1.5s ease-in-out ${index * 0.2}s infinite`,
                   transform: index * 20 <= progress ? 'scale(1.2)' : 'scale(1)',
-                  boxShadow: index * 20 <= progress ? `0 0 20px ${colors.primary}` : 'none'
+                  boxShadow: index * 20 <= progress ? `0 0 20px var(--color-primary)` : 'none'
                 }}
               />
             ))}
