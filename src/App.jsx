@@ -44,6 +44,7 @@ import HandleBlog from "./pages/admin/blog/HandleBlog";
 import BlogPage from "./pages/blog/BlogPage";
 import BlogsDetails from "./pages/blog/BlogsDetails";
 import AboutPage from "./pages/about/AboutPage";
+import CMSTemplate from "./pages/cms/CMSTemplate";
 
 // Protected Route Component for authenticated users only
 const ProtectedRoute = ({ children }) => {
@@ -188,6 +189,7 @@ const App = () => {
           <Route path="/product-details/:PSlug" element={<ProductDetails />} />
           <Route path="/about" element={<AboutPage/>}/>
           <Route path="/contact" element={<ContactUs />} />
+          <Route path="/cms/:slug" element={<CMSTemplate/>}/>
           <Route path="blogs" element={<BlogPage />} />
           <Route path="blogs/:slug" element={<BlogsDetails />} />
           <Route path="/cart" element={<CartPage />} />
