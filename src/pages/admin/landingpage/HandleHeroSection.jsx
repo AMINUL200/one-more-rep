@@ -76,9 +76,24 @@ const HandleHeroSection = () => {
 
   // Banner type options
   const bannerTypes = [
-    { value: "image", label: "Image", icon: Image, description: "Upload an image banner" },
-    { value: "video", label: "Video", icon: Video, description: "Upload a video file" },
-    { value: "youtube", label: "YouTube", icon: Youtube, description: "Embed a YouTube video" },
+    {
+      value: "image",
+      label: "Image",
+      icon: Image,
+      description: "Upload an image banner",
+    },
+    {
+      value: "video",
+      label: "Video",
+      icon: Video,
+      description: "Upload a video file",
+    },
+    {
+      value: "youtube",
+      label: "YouTube",
+      icon: Youtube,
+      description: "Embed a YouTube video",
+    },
   ];
 
   // API Base URL for images
@@ -134,7 +149,7 @@ const HandleHeroSection = () => {
       video: type === "video" ? prev.video : null,
       youtube_url: type === "youtube" ? prev.youtube_url : "",
     }));
-    
+
     // Clear preview if switching away from image
     if (type !== "image") {
       setImagePreview(null);
@@ -221,9 +236,10 @@ const HandleHeroSection = () => {
 
   // Get YouTube video ID from URL
   const getYoutubeVideoId = (url) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const regExp =
+      /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
+    return match && match[2].length === 11 ? match[2] : null;
   };
 
   // Validate YouTube URL
@@ -331,23 +347,19 @@ const HandleHeroSection = () => {
       let response;
 
       if (editingHero) {
+        console.log("----- FormData Debug -----");
+        for (let pair of submitData.entries()) {
+          console.log(pair[0], pair[1]);
+        }
+        console.log("----- End -----");
         // Update
         response = await api.post(
           `/admin/banners/update/${editingHero.id}`,
           submitData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          },
         );
       } else {
         // Create
-        response = await api.post("/admin/banners", submitData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        response = await api.post("/admin/banners", submitData);
       }
 
       if (response.data?.status) {
@@ -495,12 +507,9 @@ const HandleHeroSection = () => {
   // Handle status toggle
   const handleStatusToggle = async (hero) => {
     try {
-      const response = await api.patch(
-        `/admin/banners/${hero.id}/status`,
-        {
-          status: !(hero.status === 1 || hero.status === true) ? 1 : 0,
-        },
-      );
+      const response = await api.patch(`/admin/banners/${hero.id}/status`, {
+        status: !(hero.status === 1 || hero.status === true) ? 1 : 0,
+      });
       if (response.data?.status) {
         toast.success("Status updated successfully");
         fetchHeroList();
@@ -514,12 +523,9 @@ const HandleHeroSection = () => {
   // Handle sort order change
   const handleSortOrder = async (id, newOrder) => {
     try {
-      const response = await api.patch(
-        `/admin/banners/${id}/sort-order`,
-        {
-          sort_order: newOrder,
-        },
-      );
+      const response = await api.patch(`/admin/banners/${id}/sort-order`, {
+        sort_order: newOrder,
+      });
       if (response.data?.status) {
         toast.success("Sort order updated");
         fetchHeroList();
@@ -548,19 +554,57 @@ const HandleHeroSection = () => {
   const renderBannerTypeBadge = (type) => {
     const types = {
       image: { icon: Image, color: "blue", bg: "blue-100", text: "blue-700" },
-      video: { icon: Video, color: "green", bg: "green-100", text: "green-700" },
+      video: {
+        icon: Video,
+        color: "green",
+        bg: "green-100",
+        text: "green-700",
+      },
       youtube: { icon: Youtube, color: "red", bg: "red-100", text: "red-700" },
     };
-    
+
     const t = types[type] || types.image;
     const Icon = t.icon;
-    
+
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1 bg-${t.bg} text-${t.text}`}>
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1 bg-${t.bg} text-${t.text}`}
+      >
         <Icon size={12} />
         {type.charAt(0).toUpperCase() + type.slice(1)}
       </span>
     );
+  };
+
+  const MediaNote = ({ type }) => {
+    if (type === "image") {
+      return (
+        <div className="mt-3 p-3 rounded-lg bg-blue-50 border border-blue-200 text-xs text-blue-700 flex gap-2">
+          <HelpCircle size={14} />
+          <div>
+            <p className="font-medium">Recommended Image Size</p>
+            <p>1920 × 1080 px (16:9 ratio)</p>
+            <p>Max size: 2MB | Format: JPG/PNG/WebP</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (type === "video") {
+      return (
+        <div className="mt-3 p-3 rounded-lg bg-green-50 border border-green-200 text-xs text-green-700 flex gap-2">
+          <HelpCircle size={14} />
+          <div>
+            <p className="font-medium">Recommended Video Size</p>
+            <p>1920 × 1080 px (16:9 ratio)</p>
+            <p>Max size: 10MB (optimize recommended)</p>
+            <p>Format: MP4 (H.264)</p>
+          </div>
+        </div>
+      );
+    }
+
+    return null;
   };
 
   if (loading) {
@@ -668,7 +712,7 @@ const HandleHeroSection = () => {
                   {bannerTypes.map((type) => {
                     const Icon = type.icon;
                     const isSelected = bannerType === type.value;
-                    
+
                     return (
                       <button
                         key={type.value}
@@ -680,18 +724,28 @@ const HandleHeroSection = () => {
                             : "border-gray-200 hover:border-gray-300"
                         }`}
                         style={{
-                          borderColor: isSelected ? colors.primary : colors.border,
-                          backgroundColor: isSelected ? `${colors.primary}10` : "transparent",
+                          borderColor: isSelected
+                            ? colors.primary
+                            : colors.border,
+                          backgroundColor: isSelected
+                            ? `${colors.primary}10`
+                            : "transparent",
                         }}
                       >
                         <Icon
                           size={24}
                           className="mx-auto mb-2"
-                          style={{ color: isSelected ? colors.primary : colors.textLight }}
+                          style={{
+                            color: isSelected
+                              ? colors.primary
+                              : colors.textLight,
+                          }}
                         />
                         <p
                           className="text-sm font-medium"
-                          style={{ color: isSelected ? colors.primary : colors.text }}
+                          style={{
+                            color: isSelected ? colors.primary : colors.text,
+                          }}
                         >
                           {type.label}
                         </p>
@@ -805,7 +859,10 @@ const HandleHeroSection = () => {
                         className="block text-sm font-medium mb-2 flex items-center gap-2"
                         style={{ color: colors.text }}
                       >
-                        <ImageIcon size={16} style={{ color: colors.primary }} />
+                        <ImageIcon
+                          size={16}
+                          style={{ color: colors.primary }}
+                        />
                         Hero Image <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
@@ -842,8 +899,10 @@ const HandleHeroSection = () => {
                                 Max size: 2MB
                               </p>
                             </div>
+                            
                           )}
                         </div>
+                        <MediaNote type="image" />
 
                         <input
                           type="file"
@@ -875,24 +934,27 @@ const HandleHeroSection = () => {
                       </div>
 
                       {/* Current Image Info (for edit mode) */}
-                      {editingHero && editingHero.image && !imagePreview && bannerType === "image" && (
-                        <div
-                          className="mt-2 p-2 border rounded-lg"
-                          style={{ borderColor: colors.border }}
-                        >
-                          <p
-                            className="text-xs font-medium mb-1"
-                            style={{ color: colors.textLight }}
+                      {editingHero &&
+                        editingHero.image &&
+                        !imagePreview &&
+                        bannerType === "image" && (
+                          <div
+                            className="mt-2 p-2 border rounded-lg"
+                            style={{ borderColor: colors.border }}
                           >
-                            Current image:
-                          </p>
-                          <img
-                            src={getImageUrl(editingHero.image)}
-                            alt="Current"
-                            className="h-16 object-contain"
-                          />
-                        </div>
-                      )}
+                            <p
+                              className="text-xs font-medium mb-1"
+                              style={{ color: colors.textLight }}
+                            >
+                              Current image:
+                            </p>
+                            <img
+                              src={getImageUrl(editingHero.image)}
+                              alt="Current"
+                              className="h-16 object-contain"
+                            />
+                          </div>
+                        )}
 
                       {formErrors.image && (
                         <p
@@ -940,7 +1002,10 @@ const HandleHeroSection = () => {
                                 className="text-xs mt-1"
                                 style={{ color: colors.muted }}
                               >
-                                {(formData.video.size / (1024 * 1024)).toFixed(2)} MB
+                                {(formData.video.size / (1024 * 1024)).toFixed(
+                                  2,
+                                )}{" "}
+                                MB
                               </p>
                             </div>
                           ) : (
@@ -965,6 +1030,7 @@ const HandleHeroSection = () => {
                             </div>
                           )}
                         </div>
+                        <MediaNote type="video" />
 
                         <input
                           type="file"
@@ -986,24 +1052,27 @@ const HandleHeroSection = () => {
                       </div>
 
                       {/* Current Video Info (for edit mode) */}
-                      {editingHero && editingHero.video && !formData.video && bannerType === "video" && (
-                        <div
-                          className="mt-2 p-2 border rounded-lg"
-                          style={{ borderColor: colors.border }}
-                        >
-                          <p
-                            className="text-xs font-medium mb-1"
-                            style={{ color: colors.textLight }}
+                      {editingHero &&
+                        editingHero.video &&
+                        !formData.video &&
+                        bannerType === "video" && (
+                          <div
+                            className="mt-2 p-2 border rounded-lg"
+                            style={{ borderColor: colors.border }}
                           >
-                            Current video:
-                          </p>
-                          <video
-                            src={getVideoUrl(editingHero.video)}
-                            className="w-full h-32 object-cover rounded"
-                            controls
-                          />
-                        </div>
-                      )}
+                            <p
+                              className="text-xs font-medium mb-1"
+                              style={{ color: colors.textLight }}
+                            >
+                              Current video:
+                            </p>
+                            <video
+                              src={getVideoUrl(editingHero.video)}
+                              className="w-full h-32 object-cover rounded"
+                              controls
+                            />
+                          </div>
+                        )}
 
                       {formErrors.video && (
                         <p
@@ -1049,27 +1118,28 @@ const HandleHeroSection = () => {
                       )}
 
                       {/* YouTube Preview */}
-                      {formData.youtube_url && validateYoutubeUrl(formData.youtube_url) && (
-                        <div className="mt-2">
-                          <p
-                            className="text-xs font-medium mb-1"
-                            style={{ color: colors.textLight }}
-                          >
-                            Preview:
-                          </p>
-                          <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
-                            <iframe
-                              width="100%"
-                              height="100%"
-                              src={`https://www.youtube.com/embed/${getYoutubeVideoId(formData.youtube_url)}`}
-                              title="YouTube preview"
-                              frameBorder="0"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                            ></iframe>
+                      {formData.youtube_url &&
+                        validateYoutubeUrl(formData.youtube_url) && (
+                          <div className="mt-2">
+                            <p
+                              className="text-xs font-medium mb-1"
+                              style={{ color: colors.textLight }}
+                            >
+                              Preview:
+                            </p>
+                            <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                              <iframe
+                                width="100%"
+                                height="100%"
+                                src={`https://www.youtube.com/embed/${getYoutubeVideoId(formData.youtube_url)}`}
+                                title="YouTube preview"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                              ></iframe>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
                     </div>
                   )}
 

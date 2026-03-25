@@ -19,6 +19,7 @@ import {
   Map,
   Building,
   FileText,
+  MessageCircle,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { api } from "../../../utils/app";
@@ -32,6 +33,7 @@ const SiteSettings = () => {
     // General
     site_name: "",
     site_logo_alt: "",
+    punch_line: "",
     is_active: true,
 
     // Contact
@@ -39,6 +41,7 @@ const SiteSettings = () => {
     landline: "",
     email: "",
     fax: "",
+    whats_app: "", // Added whatsapp field
 
     // Address
     street_address: "",
@@ -106,11 +109,13 @@ const SiteSettings = () => {
       const response = await api.get("/admin/website-settings");
       if (response.data?.status && response.data?.data) {
         const data = response.data.data;
+        console.log("Data ::", data);
         setSettings(data);
         setFormData({
           // General
           site_name: data.site_name || "",
           site_logo_alt: data.site_logo_alt || "",
+          punch_line: data.punch_line || "",
           is_active: data.is_active || true,
 
           // Contact
@@ -118,6 +123,7 @@ const SiteSettings = () => {
           landline: data.landline || "",
           email: data.email || "",
           fax: data.fax || "",
+          whats_app: data.whats_app || "", // Added whatsapp field
 
           // Address
           street_address: data.street_address || "",
@@ -255,10 +261,12 @@ const SiteSettings = () => {
       }
     });
 
-    // If updating existing settings
-    // if (settings?.id) {
-    //   submitData.append('_method', 'PUT');
-    // }
+    // 👇 DEBUG HERE
+    console.log("----- FormData Debug -----");
+    for (let pair of submitData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+    console.log("----- End -----");
 
     try {
       const url = settings?.id
@@ -288,6 +296,17 @@ const SiteSettings = () => {
     if (!path) return null;
     if (path.startsWith("data:") || path.startsWith("http")) return path;
     return `${import.meta.env.VITE_STORAGE_URL}/${path}`;
+  };
+
+  // Format phone number helper
+  const formatPhoneNumber = (value) => {
+    // Remove all non-digit characters
+    const cleaned = value.replace(/\D/g, "");
+    // Format as needed (e.g., +91 XXXXX XXXXX)
+    if (cleaned.length === 10) {
+      return cleaned.replace(/(\d{5})(\d{5})/, "$1 $2");
+    }
+    return cleaned;
   };
 
   if (loading) {
@@ -636,6 +655,44 @@ const SiteSettings = () => {
                   />
                 </div>
 
+                {/* Punch Line Field */}
+                <div>
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: colors.text }}
+                  >
+                    Punch Line / Tagline
+                  </label>
+                  <div className="relative">
+                    <span
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                      style={{ color: colors.muted }}
+                    >
+                      🏷️
+                    </span>
+                    <input
+                      type="text"
+                      name="punch_line"
+                      value={formData.punch_line}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                      style={{
+                        backgroundColor: colors.background,
+                        border: `1px solid ${colors.border}`,
+                        color: colors.text,
+                      }}
+                      placeholder="e.g., Your Ultimate Fitness Destination"
+                    />
+                  </div>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: colors.textLight }}
+                  >
+                    A short catchy phrase that describes your brand (displayed
+                    below your logo)
+                  </p>
+                </div>
+
                 <div>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -763,6 +820,43 @@ const SiteSettings = () => {
                     }}
                     placeholder="033-87654321"
                   />
+                </div>
+
+                {/* WhatsApp Number Field */}
+                <div>
+                  <label
+                    className="block text-sm font-medium mb-2 flex items-center gap-2"
+                    style={{ color: colors.text }}
+                  >
+                    <MessageCircle size={16} style={{ color: "#25D366" }} />
+                    WhatsApp Number
+                  </label>
+                  <div className="relative">
+                    <MessageCircle
+                      size={16}
+                      className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                      style={{ color: "#25D366" }}
+                    />
+                    <input
+                      type="tel"
+                      name="whats_app"
+                      value={formData.whats_app}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:ring-2 transition-all"
+                      style={{
+                        backgroundColor: colors.background,
+                        border: `1px solid ${colors.border}`,
+                        color: colors.text,
+                      }}
+                      placeholder="+91 98765 43210"
+                    />
+                  </div>
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: colors.textLight }}
+                  >
+                    Enter WhatsApp number with country code for direct chat
+                  </p>
                 </div>
               </div>
             )}
