@@ -252,21 +252,21 @@ const MangeAbout = () => {
   const validateForm = () => {
     const errors = {};
 
-    if (!formData.page_name.trim()) {
-      errors.page_name = "Page name is required";
-    }
-    if (!formData.page_desc.trim()) {
-      errors.page_desc = "Page description is required";
-    }
-    if (!formData.heading.trim()) {
-      errors.heading = "Heading is required";
-    }
-    if (!formData.badge_text.trim()) {
-      errors.badge_text = "Badge text is required";
-    }
-    if (!formData.description) {
-      errors.description = "Description is required";
-    }
+    // if (!formData.page_name.trim()) {
+    //   errors.page_name = "Page name is required";
+    // }
+    // if (!formData.page_desc.trim()) {
+    //   errors.page_desc = "Page description is required";
+    // }
+    // if (!formData.heading.trim()) {
+    //   errors.heading = "Heading is required";
+    // }
+    // if (!formData.badge_text.trim()) {
+    //   errors.badge_text = "Badge text is required";
+    // }
+    // if (!formData.description) {
+    //   errors.description = "Description is required";
+    // }
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;

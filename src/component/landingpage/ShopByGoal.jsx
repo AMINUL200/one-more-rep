@@ -104,7 +104,7 @@ const ShopByGoal = ({ goalData }) => {
   }
 
   return (
-    <section className="py-16 px-4 md:px-8 bg-main">
+    <section className="py-4 px-4 md:px-8 bg-main">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -116,13 +116,13 @@ const ShopByGoal = ({ goalData }) => {
             className="inline-block mb-3"
           >
             <span
-              className="text-sm font-semibold uppercase tracking-wider px-4 py-2 rounded-full"
-              style={{
-                backgroundColor: 'var(--color-primary-light)',
-                color: 'var(--color-primary)',
-                border: '1px solid var(--color-primary)',
-                opacity: 0.3,
-              }}
+              className="bg-primary-light text-brand px-4 py-2 rounded-full text-sm font-bold border border-primary/20"
+              // style={{
+              //   backgroundColor: 'var(--color-primary-light)',
+              //   color: 'var(--color-primary)',
+              //   border: '1px solid var(--color-primary)',
+              //   opacity: 0.3,
+              // }}
             >
               {sectionData.badge_text || "Shop By Your Goals"}
             </span>

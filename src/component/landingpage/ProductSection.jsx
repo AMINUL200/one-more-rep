@@ -344,11 +344,9 @@ const ProductSection = ({ productData, title }) => {
     return productData.map((product) => ({
       id: product.id,
       name: product.name,
-      category:
-        product.category?.slug ||
-        `cat-${product.category?.id}` ||
-        "uncategorized",
+      category: product.category?.slug || `cat-${product.category?.id}` || "uncategorized",
       categoryName: product.category?.name || "Uncategorized",
+      categorySlug: product.category?.slug || "",
       price: product.sale_price
         ? parseFloat(product.sale_price)
         : parseFloat(product.price),
@@ -382,6 +380,7 @@ const ProductSection = ({ productData, title }) => {
         categoryMap.set(product.category.id, {
           id: product.category.slug || `cat-${product.category.id}`,
           name: product.category.name,
+          slug: product.category.slug,
           icon: getCategoryIcon(product.category.name),
           color: getCategoryColor(product.category.name),
         });
@@ -393,6 +392,7 @@ const ProductSection = ({ productData, title }) => {
       {
         id: "all",
         name: "All Products",
+        slug: null,
         icon: <ShoppingBag className="w-5 h-5" />,
         color: "from-brand to-[#FF4D4D]",
       },
@@ -416,6 +416,27 @@ const ProductSection = ({ productData, title }) => {
     setFilteredProducts(filtered);
   }, [activeCategory, showAll, allProducts]);
 
+  // Handle product card click
+  const handleProductClick = (product) => {
+    navigate(`/product-details/${product.slug || product.id}`);
+  };
+
+  // Handle view all button click
+  const handleViewAll = () => {
+    if (activeCategory === "all") {
+      // If "All Products" is selected, navigate to products page
+      navigate("/products");
+    } else {
+      // If a specific category is selected, navigate to category page
+      const category = categories.find(c => c.id === activeCategory);
+      if (category && category.slug) {
+        navigate(`/products/${category.slug}`);
+      } else {
+        navigate("/products");
+      }
+    }
+  };
+
   // Benefits data - static, no need to memoize
   const benefits = [
     { icon: <Truck className="w-6 h-6" />, text: "Free Shipping Over ₹999" },
@@ -426,7 +447,7 @@ const ProductSection = ({ productData, title }) => {
   // Don't render if no products
   if (!productData || productData.length === 0) {
     return (
-      <div className="bg-main py-16 md:py-16">
+      <div className="bg-main py-8 md:py-18">
         <div className="container mx-auto px-4 text-center">
           <p className="text-muted">No products available</p>
         </div>
@@ -437,7 +458,7 @@ const ProductSection = ({ productData, title }) => {
   // Show loading state while cart is being loaded
   if (!isLoaded) {
     return (
-      <div className="bg-main py-16 md:py-16">
+      <div className="bg-main py-8 md:py-8">
         <div className="container mx-auto px-4 text-center">
           <div className="loading-pulse">
             <div className="h-8 bg-border rounded w-64 mx-auto mb-4"></div>
@@ -449,7 +470,7 @@ const ProductSection = ({ productData, title }) => {
   }
 
   return (
-    <div className="bg-main py-16 md:py-16">
+    <div className="bg-main py-6 md:py-6">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12 relative">
@@ -532,7 +553,8 @@ const ProductSection = ({ productData, title }) => {
                       y: -10,
                       scale: 1.03,
                     }}
-                    className="group card rounded-2xl overflow-hidden hover:border-primary hover:transform hover:scale-[1.02] transition-all duration-300"
+                    className="group card rounded-2xl overflow-hidden hover:border-primary hover:transform hover:scale-[1.02] transition-all duration-300 cursor-pointer"
+                    onClick={() => handleProductClick(product)}
                   >
                     {/* Product Image */}
                     <motion.div
@@ -576,7 +598,10 @@ const ProductSection = ({ productData, title }) => {
 
                       {/* Wishlist Button */}
                       <button
-                        onClick={() => toggleWishlist(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleWishlist(product);
+                        }}
                         className="absolute bottom-4 right-4 p-2 bg-overlay backdrop-blur-sm rounded-full hover:bg-primary transition group"
                       >
                         <Heart
@@ -674,44 +699,24 @@ const ProductSection = ({ productData, title }) => {
                                 </div>
                               )}
                           </div>
-                         
                         </div>
                       </div>
 
-                      {/* Action Buttons */}
+                      {/* Add to Cart Button Only */}
                       <div className="flex gap-3 mt-4">
-                        {/* VIEW BUTTON */}
-                        <motion.button
-                          whileHover={{ scale: 1.06 }}
-                          whileTap={{ scale: 0.94 }}
-                          onClick={() =>
-                            navigate(
-                              `/product-details/${product.slug || product.id}`,
-                            )
-                          }
-                          className="
-                            flex-1 flex items-center justify-center gap-2
-                            px-5 py-3 btn-secondary
-                            rounded-lg
-                          "
-                        >
-                          <Eye className="w-4 h-4" />
-                          View
-                        </motion.button>
-
-                        {/* ADD TO CART BUTTON */}
                         <motion.button
                           whileHover={{ scale: 1.06 }}
                           whileTap={{ scale: 0.94 }}
                           className={`
-                            flex-1 flex items-center justify-center gap-2
+                            w-full flex items-center justify-center gap-2
                             px-5 py-3 btn-primary
                             rounded-lg
                             ${product.stock === 0 ? "opacity-50 cursor-not-allowed" : ""}
                           `}
-                          onClick={() =>
-                            product.stock > 0 && addToCart(product)
-                          }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (product.stock > 0) addToCart(product);
+                          }}
                           disabled={product.stock === 0}
                         >
                           {getCartQuantity(product.id) > 0 ? (
@@ -748,13 +753,13 @@ const ProductSection = ({ productData, title }) => {
           )}
         </div>
 
-        {/* View All Button */}
-        {filteredProducts.length > 0 && !showAll && (
+        {/* View All Button - Only show when a category is selected (not "All Products") */}
+        {filteredProducts.length > 0 && !showAll && activeCategory !== "all" && (
           <div className="text-center mb-16">
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setShowAll(true)}
+              onClick={handleViewAll}
               className="
                 group inline-flex items-center gap-3
                 px-8 py-4 btn-secondary
@@ -775,7 +780,7 @@ const ProductSection = ({ productData, title }) => {
       </div>
 
       {/* Benefits Bar */}
-      <div className="border-t border-theme bg-main py-6 mt-8">
+      <div className="border-t border-theme bg-main py-2 ">
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-center gap-8 md:gap-16">
             {benefits.map((benefit, index) => (

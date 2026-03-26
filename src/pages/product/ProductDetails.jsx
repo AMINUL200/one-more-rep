@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 import {
   Star,
   Heart,
@@ -58,11 +64,11 @@ const ProductDetails = () => {
       setLoading(true);
       try {
         const response = await api.get(`/products/${PSlug}`);
-        
+
         if (response.data?.status) {
           const product = response.data.data;
           setProductData(product);
-          
+
           // Set available variants from product data
           if (product.variants && product.variants.length > 0) {
             setAvailableVariants(product.variants);
@@ -88,25 +94,27 @@ const ProductDetails = () => {
   // Get image URL
   const getImageUrl = useCallback((imagePath) => {
     if (!imagePath) return "";
-    
-    if (imagePath.startsWith('http') || imagePath.startsWith('https')) {
+
+    if (imagePath.startsWith("http") || imagePath.startsWith("https")) {
       return imagePath;
     }
-    
-    const storageUrl = import.meta.env.VITE_STORAGE_URL || '';
+
+    const storageUrl = import.meta.env.VITE_STORAGE_URL || "";
     return `${storageUrl}/${imagePath}`;
   }, []);
 
   // Prepare media array from product images
   const media = useMemo(() => {
     if (!productData) return [];
-    
+
     const mediaArray = [];
-    
+
     if (productData.images && productData.images.length > 0) {
-      const sortedImages = [...productData.images].sort((a, b) => a.sort_order - b.sort_order);
-      
-      sortedImages.forEach(img => {
+      const sortedImages = [...productData.images].sort(
+        (a, b) => a.sort_order - b.sort_order,
+      );
+
+      sortedImages.forEach((img) => {
         mediaArray.push({
           type: "image",
           src: getImageUrl(img.image),
@@ -118,17 +126,18 @@ const ProductDetails = () => {
       mediaArray.push({
         type: "image",
         src: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80",
-        thumbnail: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=200&h=150&fit=crop",
+        thumbnail:
+          "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=200&h=150&fit=crop",
         alt: productData.name,
       });
     }
-    
+
     return mediaArray;
   }, [productData, getImageUrl]);
 
   // Format price in rupees
   const formatPrice = useCallback((price) => {
-    return parseFloat(price).toLocaleString('en-IN');
+    return parseFloat(price).toLocaleString("en-IN");
   }, []);
 
   // Get current price based on selected variant or product
@@ -190,14 +199,14 @@ const ProductDetails = () => {
   // Prepare specifications from product.specifications
   const productSpecs = useMemo(() => {
     if (!productData) return [];
-    
+
     if (productData.specifications && productData.specifications.length > 0) {
-      return productData.specifications.map(spec => ({
+      return productData.specifications.map((spec) => ({
         label: spec.spec_key,
         value: spec.spec_value,
       }));
     }
-    
+
     return [
       { label: "Weight Range", value: "5-50 kg" },
       { label: "Material", value: "Steel + Rubber" },
@@ -211,11 +220,11 @@ const ProductDetails = () => {
   // Prepare features from product.features
   const features = useMemo(() => {
     if (!productData) return [];
-    
+
     if (productData.features && productData.features.length > 0) {
-      return productData.features.map(f => f.feature);
+      return productData.features.map((f) => f.feature);
     }
-    
+
     return [
       "Quick-adjust weight system (5-50 kg)",
       "Premium anti-slip rubber grips",
@@ -231,30 +240,35 @@ const ProductDetails = () => {
   // Prepare reviews from product.reviews
   const reviews = useMemo(() => {
     if (!productData) return [];
-    
+
     if (productData.reviews && productData.reviews.length > 0) {
-      return productData.reviews.map(review => ({
+      return productData.reviews.map((review) => ({
         id: review.id,
         name: review.customer_name,
         rating: review.rating,
-        date: new Date(review.created_at).toLocaleDateString('en-IN', {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric'
+        date: new Date(review.created_at).toLocaleDateString("en-IN", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
         }),
         comment: review.review,
       }));
     }
-    
+
     return [];
   }, [productData]);
 
   // Technical specifications from product data
   const technicalSpecs = useMemo(() => {
     if (!productData) return [];
-    
+
     return [
-      { label: "Material", value: productData.specifications?.find(s => s.spec_key === "Material")?.spec_value || "High-grade Steel + Rubber" },
+      {
+        label: "Material",
+        value:
+          productData.specifications?.find((s) => s.spec_key === "Material")
+            ?.spec_value || "High-grade Steel + Rubber",
+      },
       { label: "Weight", value: `${productData.stock || 20} kg total` },
       { label: "Maximum Load", value: `${productData.stock * 2 || 50} kg` },
       { label: "Warranty", value: "2 Years Limited" },
@@ -269,17 +283,22 @@ const ProductDetails = () => {
       {
         icon: Truck,
         title: "Free Shipping",
-        description: productData?.shipping_policy ? "Free shipping across India" : "On orders above ₹2,000. Delivered in 3-7 business days.",
+        description: productData?.shipping_policy
+          ? "Free shipping across India"
+          : "On orders above ₹2,000. Delivered in 3-7 business days.",
       },
       {
         icon: Package,
         title: "Easy Installation",
-        description: "Comes with detailed manual. Professional installation available.",
+        description:
+          "Comes with detailed manual. Professional installation available.",
       },
       {
         icon: RotateCcw,
         title: productData?.return_policy ? "Return Policy" : "30-Day Returns",
-        description: productData?.return_policy ? "7 day return policy for unused products." : "Not satisfied? Return within 30 days for full refund.",
+        description: productData?.return_policy
+          ? "7 day return policy for unused products."
+          : "Not satisfied? Return within 30 days for full refund.",
       },
       {
         icon: ShieldCheck,
@@ -306,7 +325,9 @@ const ProductDetails = () => {
       product_id: productData.id,
       qty: qty,
       variant_id: selectedVariant?.id,
-      name: selectedVariant ? `${productData.name} - ${selectedVariant.variant_name}` : productData.name,
+      name: selectedVariant
+        ? `${productData.name} - ${selectedVariant.variant_name}`
+        : productData.name,
       price: currentPrice,
       original_price: originalPrice,
     };
@@ -343,9 +364,9 @@ const ProductDetails = () => {
           {
             product_id: productData.id,
             qty: qty,
-            ...(selectedVariant && { variant_id: selectedVariant.id })
-          }
-        ]
+            ...(selectedVariant && { variant_id: selectedVariant.id }),
+          },
+        ],
       };
 
       console.log("Buy Now Order Data:", orderData);
@@ -360,18 +381,21 @@ const ProductDetails = () => {
       }
     } catch (error) {
       console.error("Buy Now error:", error);
-      
+
       if (error.response?.status === 422) {
         const errors = error.response.data?.errors;
         if (errors) {
-          Object.values(errors).forEach(msg => {
+          Object.values(errors).forEach((msg) => {
             toast.error(msg[0]);
           });
         } else {
           toast.error("Please check your order details");
         }
       } else {
-        toast.error(error.response?.data?.message || "Failed to place order. Please try again.");
+        toast.error(
+          error.response?.data?.message ||
+            "Failed to place order. Please try again.",
+        );
       }
     } finally {
       setBuyNowLoading(false);
@@ -379,7 +403,7 @@ const ProductDetails = () => {
   };
 
   if (loading) return <PageLoader />;
-  
+
   if (!productData) {
     return (
       <div className="bg-main text-primary min-h-screen pt-40 px-4">
@@ -391,8 +415,10 @@ const ProductDetails = () => {
   }
 
   // Calculate average rating from review_summary
-  const averageRating = productData.review_summary?.average_rating || productData.rating || 4.5;
-  const totalReviews = productData.review_summary?.total_reviews || productData.review_count || 0;
+  const averageRating =
+    productData.review_summary?.average_rating || productData.rating || 4.5;
+  const totalReviews =
+    productData.review_summary?.total_reviews || productData.review_count || 0;
 
   return (
     <>
@@ -402,17 +428,27 @@ const ProductDetails = () => {
         <div className="max-w-7xl mx-auto">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-muted mb-8">
-            <span className="hover:text-primary cursor-pointer" onClick={() => navigate("/")}>Home</span>
+            <span
+              className="hover:text-primary cursor-pointer"
+              onClick={() => navigate("/")}
+            >
+              Home
+            </span>
             <ChevronRight size={14} />
-            <span className="hover:text-primary cursor-pointer" onClick={() => navigate("/products")}>
+            <span
+              className="hover:text-primary cursor-pointer"
+              onClick={() => navigate("/products")}
+            >
               Products
             </span>
             <ChevronRight size={14} />
             {productData.category && (
               <>
-                <span 
+                <span
                   className="hover:text-primary cursor-pointer"
-                  onClick={() => navigate(`/products/${productData.category.slug}`)}
+                  onClick={() =>
+                    navigate(`/products/${productData.category.slug}`)
+                  }
                 >
                   {productData.category.name}
                 </span>
@@ -427,22 +463,6 @@ const ProductDetails = () => {
             <div>
               {/* Main Media Display */}
               <div className="bg-card border border-theme rounded-2xl overflow-hidden relative">
-                {/* Badge Section - Premium and Tag Line */}
-                <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-                  {productData.premium_product === 1 && (
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-primary text-primary shadow-primary">
-                      <Crown size={16} />
-                      <span className="text-xs font-bold uppercase">Premium</span>
-                    </div>
-                  )}
-                  {productData.tag_line && (
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-success/20 border border-success/30 text-success">
-                      <Award size={14} />
-                      <span className="text-xs font-semibold">{productData.tag_line}</span>
-                    </div>
-                  )}
-                </div>
-
                 {media[selectedMedia]?.type === "image" ? (
                   <img
                     src={media[selectedMedia].src}
@@ -463,9 +483,7 @@ const ProductDetails = () => {
                       <h3 className="text-lg font-bold">
                         {media[selectedMedia].title || "Product Demonstration"}
                       </h3>
-                      <p className="text-sm text-muted">
-                        How to use
-                      </p>
+                      <p className="text-sm text-muted">How to use</p>
                     </div>
                     <button
                       onClick={handleVideoPlay}
@@ -531,6 +549,24 @@ const ProductDetails = () => {
               <p className="text-brand text-sm font-semibold mb-2 uppercase tracking-wider">
                 {productData.category?.name || "Premium Equipment"}
               </p>
+
+              {/* Badge Section - Premium and Tag Line - Now above title */}
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                {productData.premium_product === 1 && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-primary text-primary shadow-primary">
+                    <Crown size={14} />
+                    <span className="text-xs font-bold uppercase">Premium</span>
+                  </div>
+                )}
+                {productData.tag_line && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-success/20 border border-success/30 text-success">
+                    <Award size={12} />
+                    <span className="text-xs font-semibold">
+                      {productData.tag_line}
+                    </span>
+                  </div>
+                )}
+              </div>
 
               <h1 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight text-primary">
                 {productData.name}
@@ -599,7 +635,9 @@ const ProductDetails = () => {
               {/* Variant Selection */}
               {availableVariants.length > 0 && (
                 <div className="mb-8">
-                  <span className="font-semibold block mb-3 text-primary">Select Variant</span>
+                  <span className="font-semibold block mb-3 text-primary">
+                    Select Variant
+                  </span>
                   <div className="grid grid-cols-2 gap-3">
                     {availableVariants.map((variant) => (
                       <button
@@ -611,11 +649,14 @@ const ProductDetails = () => {
                             : "border-theme hover:border-border bg-card"
                         }`}
                       >
-                        <p className="font-semibold text-primary mb-1">{variant.variant_name}</p>
+                        <p className="font-semibold text-primary mb-1">
+                          {variant.variant_name}
+                        </p>
                         <div className="flex items-center justify-between">
                           <div>
                             <span className="text-brand font-bold">
-                              ₹{formatPrice(variant.sale_price || variant.price)}
+                              ₹
+                              {formatPrice(variant.sale_price || variant.price)}
                             </span>
                             {variant.sale_price && (
                               <span className="text-xs text-muted line-through ml-2">
@@ -623,12 +664,16 @@ const ProductDetails = () => {
                               </span>
                             )}
                           </div>
-                          <span className={`text-xs px-2 py-1 rounded ${
-                            variant.stock > 0 
-                              ? "bg-success/10 text-success" 
-                              : "bg-error/10 text-error"
-                          }`}>
-                            {variant.stock > 0 ? `${variant.stock} left` : "Out"}
+                          <span
+                            className={`text-xs px-2 py-1 rounded ${
+                              variant.stock > 0
+                                ? "bg-success/10 text-success"
+                                : "bg-error/10 text-error"
+                            }`}
+                          >
+                            {variant.stock > 0
+                              ? `${variant.stock} left`
+                              : "Out"}
                           </span>
                         </div>
                       </button>
@@ -645,14 +690,18 @@ const ProductDetails = () => {
                     className="flex items-center justify-between p-3 rounded-lg bg-card border border-theme"
                   >
                     <span className="text-sm text-muted">{spec.label}</span>
-                    <span className="font-semibold text-primary">{spec.value}</span>
+                    <span className="font-semibold text-primary">
+                      {spec.value}
+                    </span>
                   </div>
                 ))}
               </div>
 
               {/* Quantity */}
               <div className="mb-8">
-                <span className="font-semibold block mb-3 text-primary">Quantity</span>
+                <span className="font-semibold block mb-3 text-primary">
+                  Quantity
+                </span>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center border border-theme rounded-xl overflow-hidden">
                     <button
@@ -757,12 +806,19 @@ const ProductDetails = () => {
                     )}
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold mb-4 text-primary">Technical Specifications</h3>
+                    <h3 className="text-xl font-bold mb-4 text-primary">
+                      Technical Specifications
+                    </h3>
                     <div className="space-y-3">
                       {technicalSpecs.map((spec, idx) => (
-                        <div key={idx} className="flex justify-between py-2 border-b border-theme">
+                        <div
+                          key={idx}
+                          className="flex justify-between py-2 border-b border-theme"
+                        >
                           <span className="text-muted">{spec.label}</span>
-                          <span className="font-medium text-primary">{spec.value}</span>
+                          <span className="font-medium text-primary">
+                            {spec.value}
+                          </span>
                         </div>
                       ))}
                     </div>
@@ -816,7 +872,9 @@ const ProductDetails = () => {
                                 <User size={20} className="text-muted" />
                               </div>
                               <div>
-                                <h4 className="font-bold text-primary">{review.name}</h4>
+                                <h4 className="font-bold text-primary">
+                                  {review.name}
+                                </h4>
                                 <div className="flex items-center gap-2 mt-1">
                                   <div className="flex items-center gap-1">
                                     {[...Array(5)].map((_, i) => (
@@ -843,7 +901,9 @@ const ProductDetails = () => {
                     </div>
                   ) : (
                     <div className="text-center py-12">
-                      <p className="text-muted">No reviews yet. Be the first to review this product!</p>
+                      <p className="text-muted">
+                        No reviews yet. Be the first to review this product!
+                      </p>
                     </div>
                   )}
                 </div>
@@ -862,9 +922,13 @@ const ProductDetails = () => {
                             <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary-light">
                               <Truck size={20} className="text-brand" />
                             </div>
-                            <h4 className="text-xl font-bold text-primary">Delivery</h4>
+                            <h4 className="text-xl font-bold text-primary">
+                              Delivery
+                            </h4>
                           </div>
-                          <p className="text-muted">Free shipping across India within 5-7 days.</p>
+                          <p className="text-muted">
+                            Free shipping across India within 5-7 days.
+                          </p>
                         </div>
                       </div>
                     )}
@@ -879,9 +943,13 @@ const ProductDetails = () => {
                             <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-primary-light">
                               <RotateCcw size={20} className="text-brand" />
                             </div>
-                            <h4 className="text-xl font-bold text-primary">Return Policy</h4>
+                            <h4 className="text-xl font-bold text-primary">
+                              Return Policy
+                            </h4>
                           </div>
-                          <p className="text-muted">7 day return policy for unused products.</p>
+                          <p className="text-muted">
+                            7 day return policy for unused products.
+                          </p>
                         </div>
                       </div>
                     )}

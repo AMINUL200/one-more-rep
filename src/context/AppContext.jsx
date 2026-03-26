@@ -15,6 +15,7 @@ export const AppProvider = ({ children }) => {
   const [premiumProduct, setPremiumProduct] = useState([]);
   const [contactData, setContactData] = useState();
   const [cmsData, setCmsData] = useState([]);
+  const [fellowData, setFellowData] = useState([])
 
   // 🔥 fetch all landing APIs
   const fetchLandingData = async () => {
@@ -29,6 +30,7 @@ export const AppProvider = ({ children }) => {
         contactRes,
         premiumRes,
         cmsRes,
+        fellowRes,
       ] = await Promise.all([
         api.get("/banners"),
         api.get("/how-it-works"),
@@ -39,6 +41,7 @@ export const AppProvider = ({ children }) => {
         api.get("/website-settings"),
         api.get("/premium-product"),
         api.get("/cms-pages"),
+        api.get("/short-videos"),
       ]);
 
       setBannerData(bannerRes.data.data);
@@ -49,7 +52,8 @@ export const AppProvider = ({ children }) => {
       setProductData(productRes.data.data);
       setContactData(contactRes.data.data.settings)
       setPremiumProduct(premiumRes.data.data);
-      setCmsData(cmsRes.data.data)
+      setCmsData(cmsRes.data.data);
+      setFellowData(fellowRes.data.data)
     } catch (error) {
       console.error("Landing API Error:", error.message);
     } finally {
@@ -74,6 +78,7 @@ export const AppProvider = ({ children }) => {
         contactData,
         premiumProduct,
         cmsData,
+        fellowData,
         fetchLandingData,
       }}
     >

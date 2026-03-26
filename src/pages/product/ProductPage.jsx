@@ -340,10 +340,6 @@ const ProductPage = () => {
       badge: getProductBadge(product),
       slug: product.slug,
       stock: product.stock || 10,
-      colors: product.images?.slice(0, 3).map((img) => "#E10600") || [
-        "#E10600",
-      ],
-      sizes: ["S", "M", "L", "XL"],
       variants: product.variants || [],
     })) || [];
 
@@ -508,13 +504,21 @@ const ProductPage = () => {
                   <div className="flex items-center gap-2 p-1 rounded-lg bg-card">
                     <button
                       onClick={() => setViewMode("grid")}
-                      className={`p-2 rounded ${viewMode === "grid" ? "bg-primary text-primary" : "text-muted"}`}
+                      className={`p-2 rounded transition-all ${
+                        viewMode === "grid"
+                          ? "bg-primary text-primary"
+                          : "text-muted hover:text-primary"
+                      }`}
                     >
                       <Grid size={20} />
                     </button>
                     <button
                       onClick={() => setViewMode("list")}
-                      className={`p-2 rounded ${viewMode === "list" ? "bg-primary text-primary" : "text-muted"}`}
+                      className={`p-2 rounded transition-all ${
+                        viewMode === "list"
+                          ? "bg-primary text-primary"
+                          : "text-muted hover:text-primary"
+                      }`}
                     >
                       <List size={20} />
                     </button>
@@ -524,7 +528,7 @@ const ProductPage = () => {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="px-4 py-2 rounded-lg focus:outline-none bg-card border-theme text-primary"
+                    className="px-4 py-2 rounded-lg focus:outline-none bg-card border-theme text-primary cursor-pointer"
                   >
                     {filters.map((filter) => (
                       <option key={filter.id} value={filter.id}>
@@ -537,10 +541,18 @@ const ProductPage = () => {
 
               {/* Products Grid/List */}
               <div
-                className={`${viewMode === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4" : "space-y-4"} gap-6`}
+                className={`${
+                  viewMode === "grid"
+                    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+                    : "space-y-4"
+                } gap-6`}
               >
                 {sortedProducts.map((product) => (
-                  <div key={product.id} className="group block">
+                  <div
+                    key={product.id}
+                    className="group block cursor-pointer"
+                    onClick={() => navigate(`/product-details/${product.slug}`)}
+                  >
                     <div
                       className={`${
                         viewMode === "grid"
@@ -574,10 +586,10 @@ const ProductPage = () => {
                                 product.badge.includes("% OFF")
                                   ? "badge-success"
                                   : product.badge === "BESTSELLER"
-                                    ? "badge-primary"
-                                    : product.badge === "LOW STOCK"
-                                      ? "badge-warning"
-                                      : "badge-primary"
+                                  ? "badge-primary"
+                                  : product.badge === "LOW STOCK"
+                                  ? "badge-warning"
+                                  : "badge-primary"
                               }`}
                             >
                               {product.badge}
@@ -609,7 +621,7 @@ const ProductPage = () => {
                           <button
                             className="w-8 h-8 rounded-full flex items-center justify-center mb-2 bg-card text-primary hover:bg-primary hover:text-primary transition"
                             onClick={(e) => {
-                              e.preventDefault();
+                              e.stopPropagation();
                               navigate(`/product-details/${product.slug}`);
                             }}
                           >
@@ -628,28 +640,23 @@ const ProductPage = () => {
                           </span>
                         </div>
 
-                        <Link to={`/product-details/${product.slug}`}>
-                          <h3 className="font-bold mb-2 group-hover:text-brand transition-colors text-primary">
-                            {product.name}
-                          </h3>
-                        </Link>
+                        <h3 className="font-bold mb-2 group-hover:text-brand transition-colors text-primary">
+                          {product.name}
+                        </h3>
 
                         {/* Rating */}
                         <div className="flex items-center gap-2 mb-3">
                           <div className="flex items-center">
                             {[...Array(5)].map((_, i) => (
-                              <svg
+                              <Star
                                 key={i}
-                                className={`w-4 h-4 ${
+                                size={14}
+                                className={`${
                                   i < Math.floor(product.rating)
-                                    ? "text-warning"
-                                    : "text-border text-primary"
+                                    ? "text-warning fill-warning"
+                                    : "text-border"
                                 }`}
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                              </svg>
+                              />
                             ))}
                           </div>
                           <span className="text-sm text-muted">
@@ -665,15 +672,14 @@ const ProductPage = () => {
                               {formatPrice(product.price)}
                             </span>
                           </div>
-                          {product.originalPrice &&
-                            product.originalPrice !== product.price && (
-                              <div className="flex items-center">
-                                <IndianRupee className="w-4 h-4 text-brand" />
-                                <span className="price-original text-brand line-through ml-1">
-                                  {formatPrice(product.originalPrice)}
-                                </span>
-                              </div>
-                            )}
+                          {product.originalPrice > product.price && (
+                            <div className="flex items-center">
+                              <IndianRupee size={12} className="text-muted" />
+                              <span className="text-sm line-through ml-1 text-muted">
+                                {formatPrice(product.originalPrice)}
+                              </span>
+                            </div>
+                          )}
                         </div>
 
                         {/* Add to Cart Button */}
@@ -681,7 +687,7 @@ const ProductPage = () => {
                           <div className="flex items-center gap-2 mt-4">
                             <button
                               onClick={(e) => {
-                                e.preventDefault();
+                                e.stopPropagation();
                                 updateQuantity(
                                   product.id,
                                   getCartQuantity(product.id) - 1,
@@ -698,7 +704,7 @@ const ProductPage = () => {
 
                             <button
                               onClick={(e) => {
-                                e.preventDefault();
+                                e.stopPropagation();
                                 updateQuantity(
                                   product.id,
                                   getCartQuantity(product.id) + 1,
@@ -713,7 +719,7 @@ const ProductPage = () => {
                           <button
                             className="w-full mt-4 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all hover:shadow-primary-hover btn-primary"
                             onClick={(e) => {
-                              e.preventDefault();
+                              e.stopPropagation();
                               addToCart(product);
                             }}
                           >

@@ -11,6 +11,7 @@ import ShopByGoal from "../../component/landingpage/ShopByGoal";
 import HowItWorks from "../../component/landingpage/HowItWorks";
 import PageHelmet from "../../component/common/PageHelmet";
 import { useApp } from "../../context/AppContext";
+import FellowThinks from "../../component/landingpage/FellowThinks";
 
 const LandingPage = () => {
   const {
@@ -22,6 +23,7 @@ const LandingPage = () => {
     categoryData,
     productData,
     premiumProduct,
+    fellowData
   } = useApp();
 
   useEffect(() => {
@@ -44,7 +46,8 @@ const LandingPage = () => {
         {/* <FeatureProduct featureProduct={productData} /> */}
         <ProductSection productData={productData} title="Featured Products"/>
 
-        <HowItWorks workData={workData} />
+        {/* <HowItWorks workData={workData} /> */}
+        <FellowThinks fellowData={fellowData}/>
 
         <ShopByGoal goalData={goalData} />
 

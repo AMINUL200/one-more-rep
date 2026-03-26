@@ -23,7 +23,7 @@ const Footer = ({ categoryData, contactData, cmsData }) => {
   // Generate shop links from categoryData
   const shopLinks =
     categoryData && categoryData.length > 0
-      ? categoryData.slice(0, 8).map((category) => ({
+      ? categoryData.slice(0, 12).map((category) => ({
           name: category.name,
           url: `/products/${category.slug}`,
         }))
@@ -237,38 +237,17 @@ const Footer = ({ categoryData, contactData, cmsData }) => {
                   </div>
                 </div>
               )}
-
-              {/* Trust Badges */}
-              {/* <div className="grid grid-cols-3 gap-3">
-                {trustBadges.map((badge, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.12 }}
-                    className="p-3 rounded-lg bg-card border border-theme text-center hover-lift hover-glow transition-all"
-                  >
-                    <div className="flex justify-center mb-2">
-                      <div className="w-8 h-8 rounded-lg bg-primary-light border border-primary/30 flex items-center justify-center">
-                        <badge.icon size={16} className="text-brand" />
-                      </div>
-                    </div>
-                    <span className="text-xs font-medium text-muted">{badge.text}</span>
-                  </motion.div>
-                ))}
-              </div> */}
             </div>
 
             {/* Middle Column - Shop Categories (Red Links) */}
             <div>
               <div className="mb-8">
-                <h3 className="text-xl font-bold mb-5 text-brand relative inline-block">
+                <h3 className="text-2xl font-bold mb-5 text-brand relative inline-block">
                   Shop Categories
                   <span className="absolute -bottom-2 left-0 w-12 h-0.5 bg-brand rounded-full" />
                 </h3>
 
-                <div className="grid grid-cols-1 gap-y-2">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-2">
                   {shopLinks.map((link, index) => (
                     <motion.a
                       key={index}
@@ -277,12 +256,11 @@ const Footer = ({ categoryData, contactData, cmsData }) => {
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
                       transition={{ delay: index * 0.05 }}
-                      className="text-lg text-muted hover:text-brand transition-colors duration-200 flex items-center group"
-                      
+                      className="text-lg text-muted hover:text-brand transition-all duration-200 flex items-center gap-2 group"
                     >
-                      <ChevronRight
-                        size={14}
-                        className="mr-2 text-muted group-hover:text-brand group-hover:translate-x-1 transition-all"/>
+                      {/* 🔴 Dot */}
+                      <span className="w-2 h-2 bg-primary rounded-full bg-brand opacity-0 group-hover:opacity-100 transition-all duration-200"></span>
+
                       {link.name}
                     </motion.a>
                   ))}
@@ -294,12 +272,12 @@ const Footer = ({ categoryData, contactData, cmsData }) => {
             <div>
               {cmsLinks.length > 0 && (
                 <div>
-                  <h3 className="text-xl font-bold mb-5 text-brand relative inline-block">
+                  <h3 className="text-2xl font-bold mb-5 text-brand relative inline-block">
                     Quick Links
                     <span className="absolute -bottom-2 left-0 w-12 h-0.5 bg-brand rounded-full" />
                   </h3>
 
-                  <div className="grid grid-cols-1 gap-y-2">
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-2">
                     {cmsLinks.map((link, index) => (
                       <motion.a
                         key={index}
@@ -308,12 +286,11 @@ const Footer = ({ categoryData, contactData, cmsData }) => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: index * 0.05 }}
-                        className="text-lg text-muted hover:text-brand transition-colors duration-200 flex items-center group"
+                        className="text-lg text-muted hover:text-brand transition-all duration-200 flex items-center gap-2 group"
                       >
-                        <ChevronRight
-                          size={14}
-                          className="mr-2 text-muted group-hover:text-brand group-hover:translate-x-1 transition-all"
-                        />
+                        {/* 🔴 Dot */}
+                        <span className="w-2 h-2 bg-primary rounded-full bg-brand opacity-0 group-hover:opacity-100 transition-all duration-200"></span>
+
                         {link.name}
                       </motion.a>
                     ))}
@@ -329,7 +306,7 @@ const Footer = ({ categoryData, contactData, cmsData }) => {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
-            className="mt-12 pt-2 border-t border-theme"
+            className="mt-4 pt-2 border-t border-theme"
           >
             {/* Copyright & Links */}
             <div className="flex flex-col items-center gap-3 text-sm">

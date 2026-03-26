@@ -149,7 +149,7 @@ const ProductCategory = ({ categoryData }) => {
   }
 
   return (
-    <section className="bg-main py-16 overflow-hidden">
+    <section className="bg-main py-8 overflow-hidden">
       <div className="max-w-full mx-auto px-4">
         {/* HEADER */}
         <div className="text-center mb-12">

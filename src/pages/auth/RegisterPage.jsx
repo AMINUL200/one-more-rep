@@ -15,8 +15,11 @@ import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import { api } from "../../utils/app";
 import PageHelmet from "../../component/common/PageHelmet";
+import { useApp } from "../../context/AppContext";
 
 const RegisterPage = () => {
+  const { contactData } = useApp();
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -150,16 +153,18 @@ const RegisterPage = () => {
         console.log("Sending registration data:", registerData);
 
         const res = await api.post("/register", registerData);
-        
+
         console.log("Registration response:", res.data);
-        
+
         if (res.data?.status) {
-          toast.success(res.data.message || "Registration successful! Please login.");
-          
+          toast.success(
+            res.data.message || "Registration successful! Please login.",
+          );
+
           // Auto login after register
           if (res.data.data?.token && res.data.data?.user) {
             await login(res.data.data.user, res.data.data.token);
-            
+
             // Redirect based on role
             if (res.data.data.user.role === "admin") {
               navigate("/admin", { replace: true });
@@ -168,8 +173,8 @@ const RegisterPage = () => {
             }
           } else {
             // If auto-login fails, redirect to login page
-            navigate("/login", { 
-              state: { message: "Registration successful! Please login." } 
+            navigate("/login", {
+              state: { message: "Registration successful! Please login." },
             });
           }
         } else {
@@ -178,20 +183,23 @@ const RegisterPage = () => {
         }
       } catch (error) {
         console.error("Registration error:", error);
-        
+
         // Handle validation errors
         if (error.response?.status === 422) {
           const validationErrors = error.response.data?.errors || {};
           const formattedErrors = {};
-          
-          Object.keys(validationErrors).forEach(key => {
+
+          Object.keys(validationErrors).forEach((key) => {
             formattedErrors[key] = validationErrors[key][0];
           });
-          
+
           setErrors(formattedErrors);
           toast.error("Please check the form for errors");
         } else {
-          toast.error(error.response?.data?.message || "Registration failed. Please try again.");
+          toast.error(
+            error.response?.data?.message ||
+              "Registration failed. Please try again.",
+          );
         }
         setIsLoading(false);
       }
@@ -206,11 +214,11 @@ const RegisterPage = () => {
         <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-5">
           <div
             className="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl"
-            style={{ backgroundColor: 'var(--color-primary)' }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           ></div>
           <div
             className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl"
-            style={{ backgroundColor: 'var(--color-primary)' }}
+            style={{ backgroundColor: "var(--color-primary)" }}
           ></div>
 
           {/* Gym icons pattern */}
@@ -239,8 +247,8 @@ const RegisterPage = () => {
               <div className="flex justify-center mb-4">
                 <div className="p-3 rounded-2xl shadow-lg bg-main border-2 border-theme">
                   <img
-                    src="/image/gym_logo.png"
-                    alt="One Rep More"
+                    src={`${STORAGE_URL}/${contactData.site_web_logo}`}
+                    alt={contactData?.site_name || "One Rep More"}
                     className="h-16 w-16 object-contain rounded-full"
                   />
                 </div>
@@ -265,7 +273,9 @@ const RegisterPage = () => {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Enter your full name"
-                  borderColor={errors.name ? 'var(--color-primary)' : 'var(--bg-border)'}
+                  borderColor={
+                    errors.name ? "var(--color-primary)" : "var(--bg-border)"
+                  }
                   focusColor="var(--color-primary)"
                   icon={User}
                   className="bg-transparent"
@@ -288,7 +298,9 @@ const RegisterPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Enter your email"
-                  borderColor={errors.email ? 'var(--color-primary)' : 'var(--bg-border)'}
+                  borderColor={
+                    errors.email ? "var(--color-primary)" : "var(--bg-border)"
+                  }
                   focusColor="var(--color-primary)"
                   icon={Mail}
                   className="bg-transparent"
@@ -311,7 +323,9 @@ const RegisterPage = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="Enter 10-digit phone number"
-                  borderColor={errors.phone ? 'var(--color-primary)' : 'var(--bg-border)'}
+                  borderColor={
+                    errors.phone ? "var(--color-primary)" : "var(--bg-border)"
+                  }
                   focusColor="var(--color-primary)"
                   icon={Phone}
                   className="bg-transparent"
@@ -334,7 +348,11 @@ const RegisterPage = () => {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Create a strong password"
-                  borderColor={errors.password ? 'var(--color-primary)' : 'var(--bg-border)'}
+                  borderColor={
+                    errors.password
+                      ? "var(--color-primary)"
+                      : "var(--bg-border)"
+                  }
                   focusColor="var(--color-primary)"
                   icon={Lock}
                   className="bg-transparent"
@@ -346,7 +364,9 @@ const RegisterPage = () => {
                     <div className="flex items-center justify-between">
                       <div
                         className="flex-1 h-2 rounded-full overflow-hidden"
-                        style={{ backgroundColor: 'var(--color-primary-light)' }}
+                        style={{
+                          backgroundColor: "var(--color-primary-light)",
+                        }}
                       >
                         <div
                           className="h-full rounded-full transition-all duration-300"
@@ -380,7 +400,9 @@ const RegisterPage = () => {
                           <span
                             className="text-xs"
                             style={{
-                              color: req.met ? 'var(--color-success)' : 'var(--text-muted)',
+                              color: req.met
+                                ? "var(--color-success)"
+                                : "var(--text-muted)",
                             }}
                           >
                             {req.label}
@@ -409,7 +431,11 @@ const RegisterPage = () => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Re-enter your password"
-                  borderColor={errors.confirmPassword ? 'var(--color-primary)' : 'var(--bg-border)'}
+                  borderColor={
+                    errors.confirmPassword
+                      ? "var(--color-primary)"
+                      : "var(--bg-border)"
+                  }
                   focusColor="var(--color-primary)"
                   icon={Lock}
                   className="bg-transparent"
@@ -433,10 +459,10 @@ const RegisterPage = () => {
                     className="w-4 h-4 mt-1 rounded cursor-pointer focus:ring-2 focus:ring-offset-0"
                     style={{
                       backgroundColor: agreedToTerms
-                        ? 'var(--color-primary)'
-                        : 'var(--bg-card)',
-                      border: '1px solid var(--bg-border)',
-                      color: 'var(--color-primary)',
+                        ? "var(--color-primary)"
+                        : "var(--bg-card)",
+                      border: "1px solid var(--bg-border)",
+                      color: "var(--color-primary)",
                     }}
                   />
                   <label
@@ -486,8 +512,6 @@ const RegisterPage = () => {
                 )}
               </button>
             </form>
-
-           
 
             {/* Divider */}
             <div className="mt-6">
