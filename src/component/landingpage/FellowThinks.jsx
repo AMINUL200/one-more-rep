@@ -1,12 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Autoplay } from 'swiper/modules';
-import { Play, Pause, Volume2, VolumeX, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useRef, useEffect } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Autoplay } from "swiper/modules";
+import {
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  ExternalLink,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 // Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/navigation';
-import { Link } from 'react-router-dom';
+import "swiper/css";
+import "swiper/css/navigation";
+import { Link } from "react-router-dom";
 
 const FellowThinks = ({ fellowData }) => {
   const [playingVideo, setPlayingVideo] = useState(null);
@@ -17,8 +25,8 @@ const FellowThinks = ({ fellowData }) => {
   // Get video URL
   const getVideoUrl = (videoPath) => {
     if (!videoPath) return null;
-    if (videoPath.startsWith('http')) return videoPath;
-    const storageUrl = import.meta.env.VITE_STORAGE_URL || '';
+    if (videoPath.startsWith("http")) return videoPath;
+    const storageUrl = import.meta.env.VITE_STORAGE_URL || "";
     return `${storageUrl}/${videoPath}`;
   };
 
@@ -28,13 +36,13 @@ const FellowThinks = ({ fellowData }) => {
     const videoElement = videoRefs.current[videoId];
     if (videoElement && playingVideo !== videoId) {
       // Pause all other videos
-      Object.keys(videoRefs.current).forEach(key => {
+      Object.keys(videoRefs.current).forEach((key) => {
         if (videoRefs.current[key] && key !== videoId) {
           videoRefs.current[key].pause();
         }
       });
       videoElement.currentTime = 0;
-      videoElement.play().catch(err => {
+      videoElement.play().catch((err) => {
         console.log("Video play failed:", err);
       });
       setPlayingVideo(videoId);
@@ -61,6 +69,14 @@ const FellowThinks = ({ fellowData }) => {
     }
   };
 
+  const getYouTubeId = (url) => {
+    if (!url) return null;
+    const match = url.match(
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
+    );
+    return match ? match[1] : null;
+  };
+
   if (!fellowData || fellowData.length === 0) {
     return null;
   }
@@ -69,10 +85,13 @@ const FellowThinks = ({ fellowData }) => {
     <section className="py-8 bg-main relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle, var(--color-primary) 1px, transparent 1px)`,
-          backgroundSize: '50px 50px'
-        }}></div>
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `radial-gradient(circle, var(--color-primary) 1px, transparent 1px)`,
+            backgroundSize: "50px 50px",
+          }}
+        ></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 relative z-10">
@@ -88,7 +107,8 @@ const FellowThinks = ({ fellowData }) => {
             <span className="text-brand">Fellows Think</span>
           </h2>
           <p className="text-muted text-lg max-w-2xl mx-auto">
-            Real stories from our community members who transformed their fitness journey with us
+            Real stories from our community members who transformed their
+            fitness journey with us
           </p>
         </div>
 
@@ -99,8 +119,8 @@ const FellowThinks = ({ fellowData }) => {
             spaceBetween={30}
             slidesPerView={1}
             navigation={{
-              nextEl: '.swiper-button-next-fellow',
-              prevEl: '.swiper-button-prev-fellow',
+              nextEl: ".swiper-button-next-fellow",
+              prevEl: ".swiper-button-prev-fellow",
             }}
             autoplay={{
               delay: 5000,
@@ -135,19 +155,95 @@ const FellowThinks = ({ fellowData }) => {
                   <div className="bg-card rounded-2xl overflow-hidden border-2 border-theme transition-all duration-300 group-hover:border-primary group-hover:shadow-primary">
                     {/* Video Container */}
                     <div className="relative bg-black aspect-[9/16] overflow-hidden cursor-pointer">
-                      <video
-                        ref={el => videoRefs.current[fellow.id] = el}
-                        src={getVideoUrl(fellow.video)}
-                        className="w-full h-full object-cover"
-                        loop
-                        muted={muted}
-                        playsInline
-                      />
-                      
+                      <div className="relative bg-black aspect-[9/16] overflow-hidden cursor-pointer">
+                        {/* ✅ If video exists */}
+                        {fellow.video ? (
+                          <video
+                            ref={(el) => (videoRefs.current[fellow.id] = el)}
+                            src={getVideoUrl(fellow.video)}
+                            className="w-full h-full object-cover"
+                            loop
+                            muted={muted}
+                            playsInline
+                          />
+                        ) : fellow.youtube_link ? (
+                          /* ✅ YouTube fallback */
+                          <iframe
+                            src={`https://www.youtube.com/embed/${getYouTubeId(fellow.youtube_link)}?autoplay=${
+                              hoveredVideo === fellow.id ? 1 : 0
+                            }&mute=1&controls=0&loop=1&playlist=${getYouTubeId(fellow.youtube_link)}`}
+                            className="w-full h-full object-cover pointer-events-none"
+                            allow="autoplay; encrypted-media"
+                            allowFullScreen
+                          />
+                        ) : (
+                          /* ❌ No media fallback */
+                          <div className="flex items-center justify-center h-full text-white">
+                            No Video Available
+                          </div>
+                        )}
+
+                        {/* Overlay (only for video, optional hide for youtube) */}
+                        {fellow.video && (
+                          <>
+                            {/* Play/Pause Overlay */}
+                            <div
+                              className={`absolute inset-0 bg-black/60 transition-opacity duration-300 flex items-center justify-center ${
+                                hoveredVideo === fellow.id
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              }`}
+                            >
+                              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-primary">
+                                {playingVideo === fellow.id ? (
+                                  <Pause size={28} className="text-primary" />
+                                ) : (
+                                  <Play
+                                    size={28}
+                                    className="text-primary ml-1"
+                                  />
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Volume Control */}
+                            <div
+                              className={`absolute top-4 right-4 transition-opacity duration-300 ${
+                                hoveredVideo === fellow.id
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              }`}
+                            >
+                              <button
+                                onClick={(e) => toggleMute(fellow.id, e)}
+                                className="w-10 h-10 bg-black/70 rounded-full flex items-center justify-center"
+                              >
+                                {muted ? (
+                                  <VolumeX size={18} />
+                                ) : (
+                                  <Volume2 size={18} />
+                                )}
+                              </button>
+                            </div>
+                          </>
+                        )}
+
+                        {/* Title Badge */}
+                        <div className="absolute top-4 left-4">
+                          <span className="px-3 py-1 bg-black/70 text-primary text-xs font-bold rounded-full max-w-[150px] truncate">
+                            {fellow.video_title || "Fellow Story"}
+                          </span>
+                        </div>
+                      </div>
+
                       {/* Play/Pause Overlay */}
-                      <div className={`absolute inset-0 bg-black/60 transition-opacity duration-300 flex items-center justify-center ${
-                        hoveredVideo === fellow.id ? 'opacity-100' : 'opacity-0'
-                      }`}>
+                      <div
+                        className={`absolute inset-0 bg-black/60 transition-opacity duration-300 flex items-center justify-center ${
+                          hoveredVideo === fellow.id
+                            ? "opacity-100"
+                            : "opacity-0"
+                        }`}
+                      >
                         <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-primary">
                           {playingVideo === fellow.id ? (
                             <Pause size={28} className="text-primary" />
@@ -158,9 +254,13 @@ const FellowThinks = ({ fellowData }) => {
                       </div>
 
                       {/* Volume Control */}
-                      <div className={`absolute top-4 right-4 transition-opacity duration-300 ${
-                        hoveredVideo === fellow.id ? 'opacity-100' : 'opacity-0'
-                      }`}>
+                      <div
+                        className={`absolute top-4 right-4 transition-opacity duration-300 ${
+                          hoveredVideo === fellow.id
+                            ? "opacity-100"
+                            : "opacity-0"
+                        }`}
+                      >
                         <button
                           onClick={(e) => toggleMute(fellow.id, e)}
                           className="w-10 h-10 bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-primary transition-colors"
@@ -182,16 +282,23 @@ const FellowThinks = ({ fellowData }) => {
                     </div>
 
                     {/* Button - Shows on Hover */}
-                    <div className={`p-2 transition-all duration-300 ${
-                      hoveredVideo === fellow.id ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-                    }`}>
+                    <div
+                      className={`p-2 transition-all duration-300 ${
+                        hoveredVideo === fellow.id
+                          ? "opacity-100 translate-y-0"
+                          : "opacity-0 translate-y-4"
+                      }`}
+                    >
                       {fellow.button_name && fellow.button_url && (
                         <Link
                           to={fellow.button_url}
                           className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-primary text-primary font-bold rounded-lg transition-all duration-300 hover:shadow-primary-hover group"
                         >
                           {fellow.button_name}
-                          <ExternalLink size={16} className="group-hover:translate-x-1 transition-transform" />
+                          <ExternalLink
+                            size={16}
+                            className="group-hover:translate-x-1 transition-transform"
+                          />
                         </Link>
                       )}
                     </div>

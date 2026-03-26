@@ -219,25 +219,25 @@ const MangeFellows = () => {
   const validateForm = () => {
     const errors = {};
 
-    if (!formData.video_title.trim()) {
-      errors.video_title = "Video title is required";
-    }
-    if (!formData.video && !editingItem?.video) {
-      errors.video = "Video file is required";
-    }
-    if (!formData.youtube_link.trim()) {
-      errors.youtube_link = "YouTube link is required";
-    } else if (!isValidUrl(formData.youtube_link)) {
-      errors.youtube_link = "Please enter a valid URL";
-    }
-    if (!formData.button_name.trim()) {
-      errors.button_name = "Button name is required";
-    }
-    if (!formData.button_url.trim()) {
-      errors.button_url = "Button URL is required";
-    } else if (!isValidUrl(formData.button_url)) {
-      errors.button_url = "Please enter a valid URL";
-    }
+    // if (!formData.video_title.trim()) {
+    //   errors.video_title = "Video title is required";
+    // }
+    // if (!formData.video && !editingItem?.video) {
+    //   errors.video = "Video file is required";
+    // }
+    // if (!formData.youtube_link.trim()) {
+    //   errors.youtube_link = "YouTube link is required";
+    // } else if (!isValidUrl(formData.youtube_link)) {
+    //   errors.youtube_link = "Please enter a valid URL";
+    // }
+    // if (!formData.button_name.trim()) {
+    //   errors.button_name = "Button name is required";
+    // }
+    // if (!formData.button_url.trim()) {
+    //   errors.button_url = "Button URL is required";
+    // } else if (!isValidUrl(formData.button_url)) {
+    //   errors.button_url = "Please enter a valid URL";
+    // }
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -654,7 +654,7 @@ const MangeFellows = () => {
                 <div className="relative">
                   <Link2 size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: colors.textLight }} />
                   <input
-                    type="url"
+                    type="text"
                     name="button_url"
                     value={formData.button_url}
                     onChange={handleInputChange}
@@ -664,7 +664,7 @@ const MangeFellows = () => {
                       border: `1px solid ${formErrors.button_url ? colors.danger : colors.border}`,
                       color: colors.text,
                     }}
-                    placeholder="https://example.com"
+                    placeholder="/demo"
                   />
                 </div>
                 {formErrors.button_url && (
