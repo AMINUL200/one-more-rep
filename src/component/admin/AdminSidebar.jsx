@@ -33,10 +33,10 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation();
   const [openDropdowns, setOpenDropdowns] = useState({});
   const { user } = useAuth();
-  
+
   // Get user role
-  const userRole = user?.role || 'admin';
-  
+  const userRole = user?.role || "admin";
+
   console.log("User Role:", userRole);
 
   // ==================== COMMON MENU ITEMS (visible to all) ====================
@@ -47,38 +47,6 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       icon: <LayoutDashboard className="w-5 h-5" />,
       path: "/admin",
     },
-    // {
-    //   id: "products",
-    //   label: "Products",
-    //   icon: <Package className="w-5 h-5" />,
-    //   children: [
-    //     {
-    //       id: "products",
-    //       label: "Products List",
-    //       icon: <Database className="w-4 h-4" />,
-    //       path: "/admin/products",
-    //     },
-    //   ],
-    // },
-    // {
-    //   id: "orders",
-    //   label: "Orders",
-    //   icon: <ShoppingCart className="w-5 h-5" />,
-    //   children: [
-    //     {
-    //       id: "order-track",
-    //       label: "Order Tracking",
-    //       icon: <Truck className="w-4 h-4" />,
-    //       path: "/admin/order-track",
-    //     },
-    //     {
-    //       id: "order-history",
-    //       label: "Order History",
-    //       icon: <Clock className="w-4 h-4" />,
-    //       path: "/admin/order-history",
-    //     },
-    //   ],
-    // },
   ];
 
   // ==================== ADMIN ONLY MENU ITEMS ====================
@@ -88,6 +56,12 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       label: "Products",
       icon: <Package className="w-5 h-5" />,
       children: [
+        {
+          id: "products",
+          label: "Products List",
+          icon: <Database className="w-4 h-4" />,
+          path: "/admin/products",
+        },
         {
           id: "products-category",
           label: "Products Category",
@@ -177,6 +151,12 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       ],
     },
     {
+      id: "order-track",
+      label: "Order Tracking",
+      icon: <Truck className="w-4 h-4" />,
+      path: "/admin/order-track",
+    },
+    {
       id: "manage-blogs",
       label: "Manage Blogs",
       icon: <FileText className="w-5 h-5" />,
@@ -202,42 +182,17 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
 
   // ==================== ACCOUNTS ONLY MENU ITEMS ====================
   const accountsOnlyMenuItems = [
+    // {
+    //   id: "financial-dashboard",
+    //   label: "Financial Dashboard",
+    //   icon: <DollarSign className="w-5 h-5" />,
+    //   path: "/admin/financial-dashboard",
+    // },
     {
-      id: "financial-dashboard",
-      label: "Financial Dashboard",
-      icon: <DollarSign className="w-5 h-5" />,
-      path: "/admin/financial-dashboard",
-    },
-    {
-      id: "transactions",
-      label: "Transactions",
-      icon: <Receipt className="w-5 h-5" />,
-      children: [
-        {
-          id: "all-transactions",
-          label: "All Transactions",
-          icon: <Receipt className="w-4 h-4" />,
-          path: "/admin/transactions",
-        },
-        {
-          id: "payment-history",
-          label: "Payment History",
-          icon: <CreditCard className="w-4 h-4" />,
-          path: "/admin/payment-history",
-        },
-      ],
-    },
-    {
-      id: "invoices",
-      label: "Invoices",
-      icon: <FileText className="w-5 h-5" />,
-      path: "/admin/invoices",
-    },
-    {
-      id: "reports",
-      label: "Financial Reports",
-      icon: <BarChart className="w-5 h-5" />,
-      path: "/admin/financial-reports",
+      id: "order-track",
+      label: "Order Tracking",
+      icon: <Truck className="w-4 h-4" />,
+      path: "/admin/account-order-track",
     },
   ];
 
@@ -245,21 +200,21 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
   const getMenuItems = () => {
     // Start with common menu items for all roles
     let items = [...commonMenuItems];
-    
+
     // Add role-specific menu items
-    if (userRole === 'admin') {
+    if (userRole === "admin") {
       items = [...items, ...adminOnlyMenuItems];
-    } else if (userRole === 'sales') {
+    } else if (userRole === "sales") {
       items = [...items, ...salesOnlyMenuItems];
-    } else if (userRole === 'accounts') {
+    } else if (userRole === "accounts") {
       items = [...items, ...accountsOnlyMenuItems];
     }
-    
+
     // Merge children for products and orders
     const mergedItems = [];
     const itemsMap = new Map();
-    
-    items.forEach(item => {
+
+    items.forEach((item) => {
       if (itemsMap.has(item.id)) {
         // If item already exists, merge children
         const existingItem = itemsMap.get(item.id);
@@ -272,7 +227,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
         itemsMap.set(item.id, { ...item });
       }
     });
-    
+
     return Array.from(itemsMap.values());
   };
 
@@ -298,15 +253,35 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
 
   // Get role display name and badge color
   const getRoleInfo = () => {
-    switch(userRole) {
-      case 'admin':
-        return { name: 'Administrator', color: 'from-purple-500 to-indigo-600', badge: 'bg-purple-500/20 text-purple-400', icon: <Shield className="w-5 h-5 text-white" /> };
-      case 'sales':
-        return { name: 'Sales Manager', color: 'from-green-500 to-emerald-600', badge: 'bg-green-500/20 text-green-400', icon: <TrendingUp className="w-5 h-5 text-white" /> };
-      case 'accounts':
-        return { name: 'Accounts Manager', color: 'from-blue-500 to-cyan-600', badge: 'bg-blue-500/20 text-blue-400', icon: <DollarSign className="w-5 h-5 text-white" /> };
+    switch (userRole) {
+      case "admin":
+        return {
+          name: "Administrator",
+          color: "from-purple-500 to-indigo-600",
+          badge: "bg-purple-500/20 text-purple-400",
+          icon: <Shield className="w-5 h-5 text-white" />,
+        };
+      case "sales":
+        return {
+          name: "Sales Manager",
+          color: "from-green-500 to-emerald-600",
+          badge: "bg-green-500/20 text-green-400",
+          icon: <TrendingUp className="w-5 h-5 text-white" />,
+        };
+      case "accounts":
+        return {
+          name: "Accounts Manager",
+          color: "from-blue-500 to-cyan-600",
+          badge: "bg-blue-500/20 text-blue-400",
+          icon: <DollarSign className="w-5 h-5 text-white" />,
+        };
       default:
-        return { name: 'Administrator', color: 'from-purple-500 to-indigo-600', badge: 'bg-purple-500/20 text-purple-400', icon: <Shield className="w-5 h-5 text-white" /> };
+        return {
+          name: "Administrator",
+          color: "from-purple-500 to-indigo-600",
+          badge: "bg-purple-500/20 text-purple-400",
+          icon: <Shield className="w-5 h-5 text-white" />,
+        };
     }
   };
 
@@ -332,12 +307,16 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
         {/* Header */}
         <div className="sticky top-0 z-50 bg-slate-900 flex items-center justify-between p-6 border-b border-slate-700/50">
           <div className="flex items-center space-x-3">
-            <div className={`w-10 h-10 bg-gradient-to-br ${roleInfo.color} rounded-xl flex items-center justify-center shadow-lg`}>
+            <div
+              className={`w-10 h-10 bg-gradient-to-br ${roleInfo.color} rounded-xl flex items-center justify-center shadow-lg`}
+            >
               {roleInfo.icon}
             </div>
             <div>
               <h2 className="text-lg font-bold text-white">Admin Panel</h2>
-              <p className={`text-xs ${roleInfo.badge} px-2 py-0.5 rounded-full inline-block mt-1`}>
+              <p
+                className={`text-xs ${roleInfo.badge} px-2 py-0.5 rounded-full inline-block mt-1`}
+              >
                 {roleInfo.name}
               </p>
             </div>

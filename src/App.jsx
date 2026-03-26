@@ -48,6 +48,7 @@ import CMSTemplate from "./pages/cms/CMSTemplate";
 import MangeAccount from "./pages/admin/account/MangeAccount";
 import Dashboard from "./pages/admin/dashboard/Dashboard";
 import SalesLead from "./pages/sales/SalesLead";
+import MangeOrders from "./pages/account/MangeOrders";
 
 // Protected Route Component for authenticated users only
 const ProtectedRoute = ({ children }) => {
@@ -395,14 +396,14 @@ const App = () => {
           />
 
           {/* Accounts Routes - To be added later */}
-          {/* <Route
-            path="financial-dashboard"
+          <Route
+            path="account-order-track"
             element={
               <RoleBasedRoute allowedRoles={['accounts', 'admin']}>
-                <FinancialDashboard />
+                <MangeOrders />
               </RoleBasedRoute>
             }
-          /> */}
+          />
         </Route>
 
         {/* 404 Not Found Route */}
