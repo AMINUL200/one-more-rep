@@ -113,8 +113,8 @@ const HeroSection = ({ heroData }) => {
             </div>
 
             {/* Overlay */}
-            <div className="absolute inset-0 bg-black/60 z-10"></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10"></div>
+            {/* <div className="absolute inset-0 bg-black/60 z-10"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10"></div> */}
           </div>
         );
       }
@@ -135,8 +135,8 @@ const HeroSection = ({ heroData }) => {
               playsInline
             />
             {/* Dark Overlay */}
-            <div className="absolute inset-0 bg-black/60"></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
+            {/* <div className="absolute inset-0 bg-black/60"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div> */}
 
             {/* Video Controls - Optional */}
             <button
@@ -161,9 +161,9 @@ const HeroSection = ({ heroData }) => {
         style={{ backgroundImage: `url(${getImageUrl(image)})` }}
       >
         {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-black/60"></div>
+        {/* <div className="absolute inset-0 bg-black/60"></div> */}
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
+        {/* <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div> */}
       </div>
     );
   };
@@ -172,16 +172,16 @@ const HeroSection = ({ heroData }) => {
     <div className="hero-section min-h-screen relative bg-[#0B0B0B] overflow-hidden">
       {/* Hero Slider */}
       <Swiper
-        // modules={[Autoplay, EffectFade, Navigation]}
-        modules={[EffectFade, Navigation]}
+        modules={[Autoplay, EffectFade, Navigation]}
+        // modules={[EffectFade, Navigation]}
         spaceBetween={0}
         slidesPerView={1}
         effect="fade"
         fadeEffect={{ crossFade: true }}
-        // autoplay={{
-        //   delay: 5000,
-        //   disableOnInteraction: false,
-        // }}
+        autoplay={{
+          delay: 5000,
+          disableOnInteraction: false,
+        }}
         speed={1000}
         loop={true}
         navigation={{
@@ -269,7 +269,7 @@ const HeroSection = ({ heroData }) => {
                 </div>
 
                 {/* Banner Type Indicator - Optional */}
-                <div className="absolute bottom-4 left-4 z-20">
+                {/* <div className="absolute bottom-4 left-4 z-20">
                   {slide.banner_type === "youtube" && (
                     <span className="px-2 py-1 bg-red-600/80 text-white text-xs rounded-full flex items-center gap-1">
                       <Play size={12} />
@@ -287,7 +287,7 @@ const HeroSection = ({ heroData }) => {
                       Image
                     </span>
                   )}
-                </div>
+                </div> */}
               </div>
             </SwiperSlide>
           ))

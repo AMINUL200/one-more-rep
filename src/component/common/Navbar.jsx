@@ -200,7 +200,7 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
 
           {/* Brand Text */}
           <div className="flex flex-col leading-tight">
-            <h1 className="text-lg font-black text-primary">
+            <h1 className="text-xl md:text-2xl font-black text-primary">
               {contactData?.site_name?.split(" ").map((word, index) => (
                 <span key={index} className={index === 0 ? "" : "text-brand"}>
                   {word}{" "}
@@ -243,7 +243,7 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
                     <button
                       ref={productButtonRef}
                       onClick={handleProductClick}
-                      className={`nav-link flex items-center gap-1 text-2xl font-semibold tracking-wide transition px-2 py-1 ${
+                      className={`nav-link flex items-center gap-1 text-xl md:text-2xl font-semibold tracking-wide transition px-2 py-1 ${
                         active || productDropdownOpen
                           ? "text-brand active"
                           : "text-primary"
@@ -319,7 +319,7 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
                 <button
                   key={item.id}
                   onClick={() => navigate(item.path)}
-                  className={`nav-link relative  tracking-wide transition text-2xl ${
+                  className={`nav-link relative  tracking-wide transition text-xl md:text-2xl ${
                     active ? "text-brand active" : "text-primary"
                   }`}
                 >
