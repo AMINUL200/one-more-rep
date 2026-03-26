@@ -45,6 +45,9 @@ import BlogPage from "./pages/blog/BlogPage";
 import BlogsDetails from "./pages/blog/BlogsDetails";
 import AboutPage from "./pages/about/AboutPage";
 import CMSTemplate from "./pages/cms/CMSTemplate";
+import MangeAccount from "./pages/admin/account/MangeAccount";
+import Dashboard from "./pages/admin/dashboard/Dashboard";
+import SalesLead from "./pages/sales/SalesLead";
 
 // Protected Route Component for authenticated users only
 const ProtectedRoute = ({ children }) => {
@@ -68,7 +71,7 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// Admin Route Component for admin users only
+// Admin Route Component for admin, sales, and accounts users
 const AdminRoute = ({ children }) => {
   const { isAuthenticated, user, loading } = useAuth();
 
@@ -87,8 +90,37 @@ const AdminRoute = ({ children }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (user?.role !== "admin") {
+  // Allow access for admin, sales, and accounts roles
+  const allowedRoles = ['admin', 'sales', 'accounts'];
+  
+  if (!allowedRoles.includes(user?.role)) {
     return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+// Role-based route wrapper for specific admin routes
+const RoleBasedRoute = ({ children, allowedRoles }) => {
+  const { user, loading, isAuthenticated } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0B0B0B]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#E10600] mx-auto mb-4"></div>
+          <p className="text-[#B3B3B3]">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!allowedRoles.includes(user?.role)) {
+    return <Navigate to="/admin" replace />;
   }
 
   return children;
@@ -118,7 +150,6 @@ const PublicRoute = ({ children }) => {
 
 const App = () => {
   const { loading } = useAuth();
-  
 
   if (loading) {
     return (
@@ -195,65 +226,6 @@ const App = () => {
           <Route path="blogs/:slug" element={<BlogsDetails />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/order-successful" element={<OrderSuccessful />} />
-          <Route
-            path="/test"
-            element={
-              <>
-                    <div
-      style={{
-        position: "relative",
-        height: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        textAlign: "center",
-        overflow: "hidden",
-      }}
-    >
-      {/* YouTube Background */}
-      <iframe
-        src="https://www.youtube.com/embed/MtOdnARc5tE?autoplay=1&mute=1&controls=0&loop=1&playlist=MtOdnARc5tE"
-        title="YouTube video background"
-        frameBorder="0"
-        allow="autoplay; encrypted-media"
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          width: "177.77vh", // 16:9 ratio
-          height: "100vh",
-          transform: "translate(-50%, -50%)",
-          pointerEvents: "none",
-        }}
-      ></iframe>
-
-      {/* Optional Overlay */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "rgba(0,0,0,0.4)",
-        }}
-      ></div>
-
-      {/* Content */}
-      <div
-        style={{
-          position: "relative",
-          zIndex: 10,
-          color: "white",
-        }}
-      >
-        <h1 style={{ fontSize: "48px", fontWeight: "bold" }}>
-          Hero Section
-        </h1>
-        <p>Fullscreen YouTube Background</p>
-      </div>
-    </div>
-
-              </>
-            }
-          />
 
           {/* Protected Routes - Require login */}
           <Route
@@ -290,7 +262,7 @@ const App = () => {
           />
         </Route>
 
-        {/* Admin Routes - Only admin users can access */}
+        {/* Admin Routes - Accessible by admin, sales, accounts */}
         <Route
           path="/admin"
           element={
@@ -299,46 +271,142 @@ const App = () => {
             </AdminRoute>
           }
         >
-          <Route index element={<AdminDashboard />} />
-          <Route path="products-category" element={<HandleProductCategory />} />
+          {/* Common Routes - Accessible by all admin roles */}
+          <Route index element={<Dashboard />} />
+          <Route path="products" element={<HandleProduct />} />
+          <Route path="order-track" element={<HandleOrderTract />} />
+          <Route path="profile" element={<AdminProfile />}  />
+          <Route path="mange-blogs" element={<HandleBlog />} />
+
+          {/* Admin Only Routes */}
+          <Route
+            path="products-category"
+            element={
+              <RoleBasedRoute allowedRoles={['admin']}>
+                <HandleProductCategory />
+              </RoleBasedRoute>
+            }
+          />
           <Route
             path="products-sub-category"
-            element={<HandleProductSubCategory />}
+            element={
+              <RoleBasedRoute allowedRoles={['admin']}>
+                <HandleProductSubCategory />
+              </RoleBasedRoute>
+            }
           />
-          <Route path="products" element={<HandleProduct />} />
-          <Route path="site-settings" element={<SiteSettings />} />
-          <Route path="seo-settings" element={<SeoSettings />} />
-          <Route path="profile" element={<AdminProfile />} />
-
-          {/* Landing Page Management */}
+          <Route
+            path="site-settings"
+            element={
+              <RoleBasedRoute allowedRoles={['admin']}>
+                <SiteSettings />
+              </RoleBasedRoute>
+            }
+          />
+          <Route
+            path="seo-settings"
+            element={
+              <RoleBasedRoute allowedRoles={['admin']}>
+                <SeoSettings />
+              </RoleBasedRoute>
+            }
+          />
           <Route
             path="landing-page/hero-section"
-            element={<HandleHeroSection />}
+            element={
+              <RoleBasedRoute allowedRoles={['admin']}>
+                <HandleHeroSection />
+              </RoleBasedRoute>
+            }
           />
           <Route
             path="landing-page/how-it-works"
-            element={<HandleHowItWorks />}
+            element={
+              <RoleBasedRoute allowedRoles={['admin']}>
+                <HandleHowItWorks />
+              </RoleBasedRoute>
+            }
           />
           <Route
             path="landing-page/why-chose-us"
-            element={<HandleWhyChoseUs />}
+            element={
+              <RoleBasedRoute allowedRoles={['admin']}>
+                <HandleWhyChoseUs />
+              </RoleBasedRoute>
+            }
           />
           <Route
             path="landing-page/your-goals-section"
-            element={<HandleYourGoalsSection />}
+            element={
+              <RoleBasedRoute allowedRoles={['admin']}>
+                <HandleYourGoalsSection />
+              </RoleBasedRoute>
+            }
           />
-          <Route path="landing-page/your-goals" element={<HandleGoals />} />
+          <Route
+            path="landing-page/your-goals"
+            element={
+              <RoleBasedRoute allowedRoles={['admin']}>
+                <HandleGoals />
+              </RoleBasedRoute>
+            }
+          />
+          <Route
+            path="contact"
+            element={
+              <RoleBasedRoute allowedRoles={['admin']}>
+                <HandleContact />
+              </RoleBasedRoute>
+            }
+          />
+          <Route
+            path="contact/faqs"
+            element={
+              <RoleBasedRoute allowedRoles={['admin']}>
+                <HandleFAQs />
+              </RoleBasedRoute>
+            }
+          />
+          <Route
+            path="payment-setup"
+            element={
+              <RoleBasedRoute allowedRoles={['admin']}>
+                <HandlePaymentSetup />
+              </RoleBasedRoute>
+            }
+          />
+          <Route
+            path="mange-account"
+            element={
+              <RoleBasedRoute allowedRoles={['admin']}>
+                <MangeAccount />
+              </RoleBasedRoute>
+            }
+          />
 
-          <Route path="contact" element={<HandleContact />} />
-          <Route path="contact/faqs" element={<HandleFAQs />} />
-          <Route path="payment-setup" element={<HandlePaymentSetup />} />
-          <Route path="order-track" element={<HandleOrderTract />} />
+          {/* Sales Routes - */}
+          <Route
+            path="sales-leads"
+            element={
+              <RoleBasedRoute allowedRoles={['sales', 'admin']}>
+                <SalesLead />
+              </RoleBasedRoute>
+            }
+          />
 
-          <Route path="mange-blogs" element={<HandleBlog />} />
+          {/* Accounts Routes - To be added later */}
+          {/* <Route
+            path="financial-dashboard"
+            element={
+              <RoleBasedRoute allowedRoles={['accounts', 'admin']}>
+                <FinancialDashboard />
+              </RoleBasedRoute>
+            }
+          /> */}
         </Route>
 
         {/* 404 Not Found Route */}
-        {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

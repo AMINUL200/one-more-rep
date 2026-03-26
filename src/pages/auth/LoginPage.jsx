@@ -100,7 +100,7 @@ const LoginPage = () => {
           // Force a small delay to ensure auth state updates
           setTimeout(() => {
             // Redirect based on role
-            if (result.data.data.user.role === "admin") {
+            if (result.data.data.user.role === "admin" || result.data.data.user.role === "accounts" || result.data.data.user.role === "sales" ) {
               console.log("Redirecting to admin dashboard...");
               navigate("/admin", { replace: true });
             } else {

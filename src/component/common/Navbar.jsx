@@ -29,6 +29,7 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
+  console.log("CateGory ::", categoryData)
 
   const [scrolled, setScrolled] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
@@ -186,7 +187,7 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
               <img
                 src={`${STORAGE_URL}/${contactData.site_web_logo}`}
                 alt={contactData?.site_name || "One Rep More"}
-                className="h-30 w-auto  object-contain rounded-full bg-card"
+                className="h-30 w-auto object-contain rounded-full bg-card"
               />
             ) : (
               <img
@@ -242,7 +243,7 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
                     <button
                       ref={productButtonRef}
                       onClick={handleProductClick}
-                      className={`nav-link flex items-center gap-1 text-sm font-semibold tracking-wide transition px-2 py-1 ${
+                      className={`nav-link flex items-center gap-1 text-2xl font-semibold tracking-wide transition px-2 py-1 ${
                         active || productDropdownOpen
                           ? "text-brand active"
                           : "text-primary"
@@ -257,11 +258,11 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
                       />
                     </button>
 
-                    {/* Dropdown (same as your code) */}
-                    {productDropdownOpen && categoryData?.length > 0 && (
+                    {/* Dropdown with Categories */}
+                    {productDropdownOpen && (
                       <div
                         ref={productDropdownRef}
-                        className="absolute top-full left-0 mt-2 rounded-lg shadow-xl animate-fadeIn bg-card border-theme"
+                        className="absolute top-full left-0 mt-2 rounded-lg shadow-xl animate-fadeIn bg-card border border-border"
                         style={{
                           minWidth: "265px",
                           maxHeight: "400px",
@@ -269,7 +270,45 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
                           zIndex: 100,
                         }}
                       >
-                        {/* KEEP YOUR EXISTING DROPDOWN CODE */}
+                        {categoryData && categoryData.length > 0 ? (
+                          <div className="py-2">
+                            {/* View All Products Option */}
+                            {/* <button
+                              onClick={() => {
+                                navigate("/products");
+                                setProductDropdownOpen(false);
+                              }}
+                              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-white/10 transition-colors text-primary font-semibold border-b border-border"
+                            >
+                              <span className="text-brand">📦</span>
+                              View All Products
+                            </button> */}
+
+                            {/* Categories List */}
+                            {categoryData.map((category) => (
+                              <button
+                                key={category.id || category.slug}
+                                onClick={() => handleProductItemClick(category.slug)}
+                                className="w-full flex items-center justify-between px-4 py-2.5 text-sm hover:bg-white/10 transition-colors text-primary group"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <span className="text-lg">
+                                    {getCategoryIcon(category.name)}
+                                  </span>
+                                  <span>{category.name}</span>
+                                </div>
+                                <ChevronRight
+                                  size={14}
+                                  className="text-muted opacity-0 group-hover:opacity-100 transition-opacity"
+                                />
+                              </button>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="py-8 text-center text-muted">
+                            <p>No categories available</p>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -280,7 +319,7 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
                 <button
                   key={item.id}
                   onClick={() => navigate(item.path)}
-                  className={`nav-link relative text-sm font-semibold tracking-wide transition ${
+                  className={`nav-link relative  tracking-wide transition text-2xl ${
                     active ? "text-brand active" : "text-primary"
                   }`}
                 >
@@ -348,10 +387,10 @@ const Navbar = ({ toggleMenu, categoryData, contactData }) => {
 
               {userDropdownOpen && (
                 <div
-                  className="absolute right-0 mt-3 w-60 rounded-lg shadow-xl animate-fadeIn bg-card border-theme"
+                  className="absolute right-0 mt-3 w-60 rounded-lg shadow-xl animate-fadeIn bg-card border border-border"
                   style={{ zIndex: 100 }}
                 >
-                  <div className="p-4 border-b border-theme">
+                  <div className="p-4 border-b border-border">
                     <p className="font-medium text-primary">{user?.name}</p>
                     <p className="text-xs text-muted">{user?.email}</p>
                   </div>
