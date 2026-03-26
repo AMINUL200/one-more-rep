@@ -41,7 +41,7 @@ const SiteSettings = () => {
     landline: "",
     email: "",
     fax: "",
-    whats_app: "", // Added whatsapp field
+    whats_app: "",
 
     // Address
     street_address: "",
@@ -123,7 +123,7 @@ const SiteSettings = () => {
           landline: data.landline || "",
           email: data.email || "",
           fax: data.fax || "",
-          whats_app: data.whats_app || "", // Added whatsapp field
+          whats_app: data.whats_app || "",
 
           // Address
           street_address: data.street_address || "",
@@ -242,24 +242,71 @@ const SiteSettings = () => {
 
     const submitData = new FormData();
 
-    // Append all form fields
-    Object.keys(formData).forEach((key) => {
-      if (key === "is_active") {
-        // Always send boolean value
-        submitData.append("is_active", formData.is_active ? 1 : 0);
-        return;
-      }
+    // Define all fields that should always be included (even if empty)
+    const textFields = [
+      // General
+      "site_name",
+      "site_logo_alt",
+      "punch_line",
+      
+      // Contact
+      "phone",
+      "landline",
+      "email",
+      "fax",
+      "whats_app",
+      
+      // Address
+      "street_address",
+      "city",
+      "state",
+      "country",
+      "zip",
+      
+      // Social Media
+      "facebook",
+      "twitter",
+      "linkedin",
+      "instagram",
+      "pinterest",
+      
+      // SEO
+      "sitemap_url",
+    ];
 
-      if (formData[key] !== null && formData[key] !== "") {
-        if (key.includes("logo") || key.includes("favicon")) {
-          if (formData[key] instanceof File) {
-            submitData.append(key, formData[key]);
-          }
-        } else {
-          submitData.append(key, formData[key]);
-        }
-      }
+    // Append all text fields (always include, even if empty)
+    textFields.forEach((field) => {
+      const value = formData[field] || "";
+      submitData.append(field, value);
     });
+
+    // Handle checkbox (always include)
+    submitData.append("is_active", formData.is_active ? 1 : 0);
+
+    // Handle file uploads (only if files are selected)
+    if (formData.site_web_logo instanceof File) {
+      submitData.append("site_web_logo", formData.site_web_logo);
+    }
+
+    if (formData.site_mobile_logo instanceof File) {
+      submitData.append("site_mobile_logo", formData.site_mobile_logo);
+    }
+
+    if (formData.site_favicon instanceof File) {
+      submitData.append("site_favicon", formData.site_favicon);
+    }
+
+    // If you want to also send empty strings for files that were removed
+    // (to delete existing logos), uncomment the following:
+    // if (formData.site_web_logo === null && logoPreview.web === null) {
+    //   submitData.append("site_web_logo", "");
+    // }
+    // if (formData.site_mobile_logo === null && logoPreview.mobile === null) {
+    //   submitData.append("site_mobile_logo", "");
+    // }
+    // if (formData.site_favicon === null && logoPreview.favicon === null) {
+    //   submitData.append("site_favicon", "");
+    // }
 
     // 👇 DEBUG HERE
     console.log("----- FormData Debug -----");
@@ -273,7 +320,11 @@ const SiteSettings = () => {
         ? `/admin/website-settings-update/${settings.id}`
         : `/admin/website-settings`;
 
-      const response = await api.post(url, submitData);
+      const response = await api.post(url, submitData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       if (response.data?.status) {
         toast.success(

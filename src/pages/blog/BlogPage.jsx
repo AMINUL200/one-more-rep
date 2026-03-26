@@ -13,173 +13,88 @@ import {
 } from 'lucide-react';
 import PageHelmet from '../../component/common/PageHelmet';
 import PageLoader from '../../component/common/PageLoader';
+import { api } from '../../utils/app';
 
 const BlogPage = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
 
-  // Dummy blog data
-  const dummyBlogs = [
-    {
-      id: 1,
-      title: "10 Essential Exercises for Building Core Strength",
-      slug: "essential-core-strength-exercises",
-      category: "Workout Tips",
-      author: "John Smith",
-      date: "2024-03-15",
-      read_time: "8 min read",
-      excerpt: "Discover the most effective exercises to build a strong core and improve your overall fitness. From planks to Russian twists, we cover everything you need to know.",
-      image: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=500&q=80",
-      content: "Full content here..."
-    },
-    {
-      id: 2,
-      title: "The Ultimate Guide to Protein Supplements",
-      slug: "ultimate-guide-protein-supplements",
-      category: "Nutrition",
-      author: "Sarah Johnson",
-      date: "2024-03-10",
-      read_time: "6 min read",
-      excerpt: "Confused about which protein supplement to choose? This comprehensive guide breaks down whey, casein, plant-based proteins, and helps you make an informed decision.",
-      image: "https://images.unsplash.com/photo-1579722820308-d74e571900a9?w=500&q=80",
-      content: "Full content here..."
-    },
-    {
-      id: 3,
-      title: "5 Common Gym Mistakes Beginners Make",
-      slug: "common-gym-mistakes-beginners",
-      category: "Training",
-      author: "Mike Wilson",
-      date: "2024-03-05",
-      read_time: "5 min read",
-      excerpt: "Starting your fitness journey? Avoid these common mistakes that can hinder your progress and potentially lead to injuries. Learn the right way to train.",
-      image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&q=80",
-      content: "Full content here..."
-    },
-    {
-      id: 4,
-      title: "How to Create a Sustainable Meal Plan",
-      slug: "create-sustainable-meal-plan",
-      category: "Nutrition",
-      author: "Emily Brown",
-      date: "2024-02-28",
-      read_time: "7 min read",
-      excerpt: "Meal planning doesn't have to be complicated. Learn how to create a sustainable nutrition plan that fits your lifestyle and helps you achieve your fitness goals.",
-      image: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=500&q=80",
-      content: "Full content here..."
-    },
-    {
-      id: 5,
-      title: "The Science of Muscle Recovery",
-      slug: "science-muscle-recovery",
-      category: "Science",
-      author: "Dr. James Chen",
-      date: "2024-02-20",
-      read_time: "10 min read",
-      excerpt: "Understanding how muscles recover is key to making progress. Explore the science behind muscle repair, optimal rest periods, and recovery techniques.",
-      image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&q=80",
-      content: "Full content here..."
-    },
-    {
-      id: 6,
-      title: "Cardio vs. Weight Training: What's Better?",
-      slug: "cardio-vs-weight-training",
-      category: "Workout Tips",
-      author: "Lisa Anderson",
-      date: "2024-02-15",
-      read_time: "6 min read",
-      excerpt: "The eternal debate in fitness. We analyze the benefits of both cardio and weight training, and help you determine the right balance for your goals.",
-      image: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?w=500&q=80",
-      content: "Full content here..."
-    },
-    {
-      id: 7,
-      title: "Essential Supplements for Beginners",
-      slug: "essential-supplements-beginners",
-      category: "Supplements",
-      author: "Tom Harris",
-      date: "2024-02-10",
-      read_time: "5 min read",
-      excerpt: "New to supplements? Start here. Learn about the most important supplements for beginners and how to incorporate them safely into your routine.",
-      image: "https://images.unsplash.com/photo-1579722821273-0f6c7b3e5b1d?w=500&q=80",
-      content: "Full content here..."
-    },
-    {
-      id: 8,
-      title: "Yoga for Athletes: Benefits and Poses",
-      slug: "yoga-for-athletes",
-      category: "Wellness",
-      author: "Priya Patel",
-      date: "2024-02-05",
-      read_time: "7 min read",
-      excerpt: "Discover how yoga can enhance athletic performance, improve flexibility, and prevent injuries. Includes essential poses for athletes.",
-      image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=500&q=80",
-      content: "Full content here..."
-    },
-    {
-      id: 9,
-      title: "The Truth About Detox Diets",
-      slug: "truth-about-detox-diets",
-      category: "Nutrition",
-      author: "Rachel Green",
-      date: "2024-01-30",
-      read_time: "6 min read",
-      excerpt: "Detox diets are popular but are they effective? We separate fact from fiction and provide evidence-based advice on cleansing your body.",
-      image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80",
-      content: "Full content here..."
-    }
-  ];
+  // API base URL
+  const STORAGE_URL = import.meta.env.VITE_STORAGE_URL;
 
-  // Simulate loading and set dummy data
+  // Fetch blogs from API
   useEffect(() => {
-    const loadBlogs = async () => {
+    const fetchBlogs = async () => {
       setLoading(true);
       try {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        const response = await api.get(`/blogs`);
         
-        setBlogs(dummyBlogs);
-        
-        // Extract unique categories
-        const uniqueCategories = [...new Set(dummyBlogs.map(blog => blog.category))];
-        setCategories(['all', ...uniqueCategories]);
+        if (response.data.status && response.data.data.blogs) {
+          setBlogs(response.data.data.blogs);
+        } else {
+          console.error('Invalid API response structure');
+          setBlogs([]);
+        }
       } catch (error) {
-        console.error('Error loading blogs:', error);
+        console.error('Error fetching blogs:', error);
+        setBlogs([]);
       } finally {
         setLoading(false);
       }
     };
 
-    loadBlogs();
+    fetchBlogs();
   }, []);
 
   // Get image URL
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) {
-      return "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80";
+  const getImageUrl = (webImage, mobileImage) => {
+    // Try mobile image first, then web image, then fallback
+    const imagePath = mobileImage || webImage;
+    
+    if (imagePath) {
+      // If image path already contains full URL, use it directly
+      if (imagePath.startsWith('http')) {
+        return imagePath;
+      }
+      // Otherwise, construct full URL
+      return `${STORAGE_URL}/${imagePath}`;
     }
-    return imagePath; // Dummy images are already full URLs
+    
+    // Fallback image
+    return "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80";
   };
 
   // Format date
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    });
+    if (!dateString) return 'Recent';
+    
+    try {
+      return new Date(dateString).toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+    } catch (error) {
+      return 'Recent';
+    }
   };
 
-  // Filter blogs based on search and category
+  // Calculate read time (rough estimate based on short description length)
+  const calculateReadTime = (shortDesc) => {
+    if (!shortDesc) return '3 min read';
+    const wordsPerMinute = 200;
+    const wordCount = shortDesc.split(/\s+/).length;
+    const readTime = Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+    return `${readTime} min read`;
+  };
+
+  // Filter blogs based on search
   const filteredBlogs = blogs.filter(blog => {
-    const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         blog.excerpt?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || blog.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesSearch = blog.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         blog.short_desc?.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
   });
 
   // Animation variants
@@ -234,36 +149,18 @@ const BlogPage = () => {
             </motion.p>
           </div>
 
-          {/* Search and Filter Bar */}
+          {/* Search Bar */}
           <div className="mb-12">
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-              {/* Search */}
-              <div className="relative w-full md:w-96">
+            <div className="flex justify-center">
+              <div className="relative w-full max-w-md">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted" size={20} />
                 <input
                   type="text"
-                  placeholder="Search articles..."
+                  placeholder="Search blogs..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 bg-card border border-theme rounded-xl focus:outline-none focus:border-primary transition-all text-primary"
                 />
-              </div>
-
-              {/* Categories */}
-              <div className="flex flex-wrap gap-2 justify-center">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={`px-4 py-2 rounded-lg font-medium capitalize transition-all ${
-                      selectedCategory === category
-                        ? 'bg-primary text-white'
-                        : 'bg-card border border-theme text-muted hover:border-primary hover:text-primary'
-                    }`}
-                  >
-                    {category === 'all' ? 'All Posts' : category}
-                  </button>
-                ))}
               </div>
             </div>
           </div>
@@ -281,25 +178,27 @@ const BlogPage = () => {
                   key={blog.id}
                   variants={itemVariants}
                   className="group card rounded-2xl overflow-hidden cursor-pointer"
-                  onClick={() => navigate(`/blogs/${blog.slug}`)}
+                  onClick={() => navigate(`/blogs/${blog.title_slug || blog.id}`)}
                 >
                   {/* Image Container */}
                   <div className="relative overflow-hidden h-56">
                     <img
-                      src={getImageUrl(blog.image)}
-                      alt={blog.title}
+                      src={getImageUrl(blog.web_image, blog.mobile_image)}
+                      alt={blog.image_alt || blog.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       onError={(e) => {
                         e.target.src = "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=500&q=80";
                       }}
                     />
                     
-                    {/* Category Badge */}
-                    {blog.category && (
+                    {/* YouTube Badge */}
+                    {blog.youtube_link && (
                       <div className="absolute top-4 left-4">
-                        <span className="px-3 py-1 bg-primary/90 text-white text-xs font-semibold rounded-full flex items-center gap-1">
-                          <Tag size={12} />
-                          {blog.category}
+                        <span className="px-3 py-1 bg-red-600/90 text-white text-xs font-semibold rounded-full flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+                          </svg>
+                          Video
                         </span>
                       </div>
                     )}
@@ -318,11 +217,11 @@ const BlogPage = () => {
                     <div className="flex items-center gap-4 text-sm text-muted mb-3">
                       <div className="flex items-center gap-1">
                         <Calendar size={14} />
-                        <span>{formatDate(blog.date)}</span>
+                        <span>{formatDate(blog.created_at)}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <User size={14} />
-                        <span>{blog.author}</span>
+                        <Clock size={14} />
+                        <span>{calculateReadTime(blog.short_desc)}</span>
                       </div>
                     </div>
 
@@ -331,23 +230,23 @@ const BlogPage = () => {
                       {blog.title}
                     </h3>
 
-                    {/* Excerpt */}
+                    {/* Short Description */}
                     <p className="text-muted text-sm mb-4 line-clamp-3">
-                      {blog.excerpt}
+                      {blog.short_desc || "Click to read more about this topic..."}
                     </p>
 
                     {/* Read More */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1 text-sm text-muted">
-                        <Clock size={14} />
-                        <span>{blog.read_time}</span>
+                        <User size={14} />
+                        <span>Admin</span>
                       </div>
                       
                       <button 
                         className="flex items-center gap-2 text-primary font-semibold group/btn"
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/blog/${blog.slug}`);
+                          navigate(`/blogs/${blog.title_slug || blog.id}`);
                         }}
                       >
                         Read More
@@ -366,63 +265,22 @@ const BlogPage = () => {
               </div>
               <h3 className="text-2xl font-bold text-primary mb-3">No Articles Found</h3>
               <p className="text-muted max-w-md mx-auto mb-8">
-                {searchTerm || selectedCategory !== 'all' 
-                  ? "No articles match your search criteria. Try different keywords or categories."
+                {searchTerm 
+                  ? "No articles match your search criteria. Try different keywords."
                   : "Check back soon for new articles and updates!"}
               </p>
-              {(searchTerm || selectedCategory !== 'all') && (
+              {searchTerm && (
                 <button
-                  onClick={() => {
-                    setSearchTerm('');
-                    setSelectedCategory('all');
-                  }}
+                  onClick={() => setSearchTerm('')}
                   className="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary-hover transition"
                 >
-                  Clear Filters
+                  Clear Search
                 </button>
               )}
             </div>
           )}
 
-          {/* Newsletter Section */}
-          <div className="mt-20">
-            <div className="card rounded-2xl p-8 md:p-12 text-center relative overflow-hidden">
-              {/* Background Pattern */}
-              <div className="absolute inset-0 opacity-5">
-                <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary rounded-full blur-3xl"></div>
-                <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-primary rounded-full blur-3xl"></div>
-              </div>
-
-              <div className="relative z-10 max-w-2xl mx-auto">
-                <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  <span className="text-primary">Subscribe to </span>
-                  <span className="text-gradient">Our Newsletter</span>
-                </h2>
-                <p className="text-muted text-lg mb-8">
-                  Get the latest fitness tips, workout guides, and exclusive offers delivered straight to your inbox.
-                </p>
-
-                <form className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="flex-1 px-6 py-4 bg-main border border-theme rounded-xl focus:outline-none focus:border-primary transition-all text-primary"
-                  />
-                  <button
-                    type="submit"
-                    className="px-8 py-4 bg-gradient-primary text-white font-semibold rounded-xl hover:shadow-primary transition-all flex items-center justify-center gap-2 group"
-                  >
-                    Subscribe
-                    <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                  </button>
-                </form>
-
-                <p className="text-xs text-muted mt-4">
-                  We respect your privacy. Unsubscribe at any time.
-                </p>
-              </div>
-            </div>
-          </div>
+         
         </div>
       </div>
     </>

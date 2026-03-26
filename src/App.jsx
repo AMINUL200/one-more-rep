@@ -49,6 +49,9 @@ import MangeAccount from "./pages/admin/account/MangeAccount";
 import Dashboard from "./pages/admin/dashboard/Dashboard";
 import SalesLead from "./pages/sales/SalesLead";
 import MangeOrders from "./pages/account/MangeOrders";
+import MangeCMSPage from "./pages/admin/cms/MangeCMSPage";
+import MangeAbout from "./pages/admin/about/MangeAbout";
+import MangeFellows from "./pages/admin/fellows/MangeFellows";
 
 // Protected Route Component for authenticated users only
 const ProtectedRoute = ({ children }) => {
@@ -385,6 +388,10 @@ const App = () => {
             }
           />
 
+          <Route path="mange-cms" element={<MangeCMSPage/>}/>
+          <Route path="mange-about" element={<MangeAbout/>}/>
+          <Route path="mange-fellows" element={<MangeFellows/>}/>
+
           {/* Sales Routes - */}
           <Route
             path="sales-leads"
@@ -407,7 +414,7 @@ const App = () => {
         </Route>
 
         {/* 404 Not Found Route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
       </Routes>
     </Router>
   );

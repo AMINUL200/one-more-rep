@@ -168,6 +168,24 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       icon: <UserCog className="w-5 h-5" />,
       path: "/admin/mange-account",
     },
+    {
+      id: "manage-cms",
+      label: "Manage CMS",
+      icon: <UserCog className="w-5 h-5" />,
+      path: "/admin/mange-cms",
+    },
+    {
+      id: "manage-about",
+      label: "Manage About",
+      icon: <UserCog className="w-5 h-5" />,
+      path: "/admin/mange-about",
+    },
+    {
+      id: "manage-fellows",
+      label: "Manage Fellows",
+      icon: <UserCog className="w-5 h-5" />,
+      path: "/admin/mange-fellows",
+    },
   ];
 
   // ==================== SALES ONLY MENU ITEMS ====================

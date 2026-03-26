@@ -8,19 +8,22 @@ import { useApp } from "../context/AppContext";
 const AppLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
-   const {
-    loading,
-    categoryData,
-    contactData
-   
-  } = useApp();
-  
+  const { loading, categoryData, contactData, cmsData } = useApp();
+
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar toggleMenu={toggleSidebar} categoryData={categoryData} contactData={contactData}/>
-      <SideBar toggleMenu={toggleSidebar} isOpen={sidebarOpen} categoryData={categoryData} />
+      <Navbar
+        toggleMenu={toggleSidebar}
+        categoryData={categoryData}
+        contactData={contactData}
+      />
+      <SideBar
+        toggleMenu={toggleSidebar}
+        isOpen={sidebarOpen}
+        categoryData={categoryData}
+      />
       <Outlet />
-      <Footer categoryData={categoryData} contactData={contactData} />
+      <Footer categoryData={categoryData} contactData={contactData} cmsData={cmsData} />
     </div>
   );
 };
