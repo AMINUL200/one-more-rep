@@ -12,6 +12,8 @@ import {
   User,
   LogOut,
   LayoutDashboard,
+  Newspaper,
+  Info,
 } from "lucide-react";
 
 const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
@@ -22,7 +24,7 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
   /* ================= ICON MAPPING FOR CATEGORIES ================= */
   const getCategoryIcon = (categoryName) => {
     const name = categoryName?.toLowerCase() || "";
-    
+
     if (name.includes("barbell")) return "💪";
     if (name.includes("plate")) return "⚖️";
     if (name.includes("strength")) return "🏋️";
@@ -32,7 +34,7 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
     if (name.includes("machine")) return "⚙️";
     if (name.includes("supplement") || name.includes("suppliment")) return "💊";
     if (name.includes("accessor")) return "🧤";
-    
+
     return "🏋️"; // Default icon
   };
 
@@ -48,22 +50,36 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
       id: "products",
       label: "Products",
       icon: <Package className="w-5 h-5" />,
-      dropdown: categoryData && categoryData.length > 0 
-        ? categoryData.map((category) => ({
-            id: category.id,
-            label: category.name,
-            path: `/products/${category.slug}`,
-            icon: getCategoryIcon(category.name),
-            image: category.image,
-          }))
-        : [], // Empty array if no categories
+      dropdown:
+        categoryData && categoryData.length > 0
+          ? categoryData.map((category) => ({
+              id: category.id,
+              label: category.name,
+              path: `/products/${category.slug}`,
+              icon: getCategoryIcon(category.name),
+              image: category.image,
+            }))
+          : [], // Empty array if no categories
     },
+   
     {
-      id: "contact",
-      label: "Contact Us",
-      path: "/contact",
-      icon: <Mail className="w-5 h-5" />,
-    },
+    id: "about",
+    label: "About Us",
+    path: "/about",
+    icon: <Info className="w-5 h-5" />, // Info icon for About Us
+  },
+  {
+    id: "blogs",
+    label: "Blogs",
+    path: "/blogs",
+    icon: <Newspaper className="w-5 h-5" />, // Newspaper icon for Blogs
+  },
+  {
+    id: "contact",
+    label: "Contact Us",
+    path: "/contact",
+    icon: <Mail className="w-5 h-5" />,
+  },
   ];
 
   // dummy auth (unchanged)
@@ -110,14 +126,12 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
             active
               ? "bg-brand text-primary font-semibold"
               : open
-              ? "bg-primary-light text-brand"
-              : "text-muted hover:bg-card hover:text-brand"
+                ? "bg-primary-light text-brand"
+                : "text-muted hover:bg-card hover:text-brand"
           }`}
         >
           <div className="flex items-center gap-2">
-            {item.icon && (
-              <span className="text-base">{item.icon}</span>
-            )}
+            {item.icon && <span className="text-base">{item.icon}</span>}
             <span>{item.label}</span>
           </div>
           {hasSub && (
@@ -158,8 +172,8 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
             active
               ? "bg-brand text-primary font-semibold"
               : open
-              ? "bg-primary-light text-brand"
-              : "text-muted hover:bg-card hover:text-brand"
+                ? "bg-primary-light text-brand"
+                : "text-muted hover:bg-card hover:text-brand"
           }`}
         >
           <div className="flex items-center gap-3">
@@ -186,11 +200,14 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
         )}
 
         {/* Show message if products dropdown is empty */}
-        {item.id === "products" && item.dropdown && item.dropdown.length === 0 && open && (
-          <div className="px-4 py-3 ml-8 text-sm text-muted italic">
-            No categories available
-          </div>
-        )}
+        {item.id === "products" &&
+          item.dropdown &&
+          item.dropdown.length === 0 &&
+          open && (
+            <div className="px-4 py-3 ml-8 text-sm text-muted italic">
+              No categories available
+            </div>
+          )}
       </div>
     );
   };
@@ -220,7 +237,7 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
             <span className="text-primary">ONE </span>
             <span className="text-brand">REP MORE</span>
           </h2>
-          <button 
+          <button
             onClick={toggleMenu}
             className="p-2 rounded-full hover:bg-border transition"
           >
@@ -258,9 +275,7 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
         ) : (
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-theme bg-card">
             <div className="flex items-center gap-3 mb-3">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-primary bg-brand"
-              >
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-primary bg-brand">
                 U
               </div>
               <div>
@@ -284,20 +299,20 @@ const SideBar = ({ toggleMenu, isOpen, categoryData }) => {
         .custom-scrollbar::-webkit-scrollbar {
           width: 4px;
         }
-        
+
         .custom-scrollbar::-webkit-scrollbar-track {
           background: var(--bg-border);
         }
-        
+
         .custom-scrollbar::-webkit-scrollbar-thumb {
           background: var(--color-primary);
           border-radius: 4px;
         }
-        
+
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: var(--color-primary-hover);
         }
-        
+
         .custom-scrollbar {
           scrollbar-width: thin;
           scrollbar-color: var(--color-primary) var(--bg-border);
