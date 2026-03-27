@@ -97,7 +97,7 @@ const PageLoader = () => {
             ONE <span className="text-brand">REP</span> MORE
           </h1>
           <p className="text-sm uppercase tracking-widest text-muted">
-            Premium Fitness Equipment
+           JUST FLAUNT
           </p>
         </div>
 

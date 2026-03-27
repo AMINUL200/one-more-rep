@@ -287,13 +287,7 @@ const MangeFellows = () => {
       }
     });
 
-    console.log("=== FormData Debug ===");
-
-    for (let pair of submitData.entries()) {
-      console.log(pair[0], pair[1]);
-    }
-
-    console.log("====================");
+    
 
     try {
       let response;
@@ -539,7 +533,7 @@ const MangeFellows = () => {
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text }}
                 >
-                  Video Title <span className="text-red-500">*</span>
+                  Video Title <span className="text-red-500"></span>
                 </label>
                 <div className="relative">
                   <FileText
@@ -574,7 +568,7 @@ const MangeFellows = () => {
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text }}
                 >
-                  Video File <span className="text-red-500">*</span>
+                  Video File <span className="text-red-500"></span>
                 </label>
                 <div className="relative">
                   <div
@@ -745,7 +739,7 @@ const MangeFellows = () => {
                   className="block text-sm font-medium mb-2"
                   style={{ color: colors.text }}
                 >
-                  Button Name <span className="text-red-500">*</span>
+                  Button Name <span className="text-red-500"></span>
                 </label>
                 <input
                   type="text"
