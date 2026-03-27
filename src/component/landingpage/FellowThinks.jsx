@@ -184,49 +184,7 @@ const FellowThinks = ({ fellowData }) => {
                         )}
 
                         {/* Overlay (only for video, optional hide for youtube) */}
-                        {fellow.video && (
-                          <>
-                            {/* Play/Pause Overlay */}
-                            <div
-                              className={`absolute inset-0 bg-black/60 transition-opacity duration-300 flex items-center justify-center ${
-                                hoveredVideo === fellow.id
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              }`}
-                            >
-                              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-primary">
-                                {playingVideo === fellow.id ? (
-                                  <Pause size={28} className="text-primary" />
-                                ) : (
-                                  <Play
-                                    size={28}
-                                    className="text-primary ml-1"
-                                  />
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Volume Control */}
-                            <div
-                              className={`absolute top-4 right-4 transition-opacity duration-300 ${
-                                hoveredVideo === fellow.id
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              }`}
-                            >
-                              <button
-                                onClick={(e) => toggleMute(fellow.id, e)}
-                                className="w-10 h-10 bg-black/70 rounded-full flex items-center justify-center"
-                              >
-                                {muted ? (
-                                  <VolumeX size={18} />
-                                ) : (
-                                  <Volume2 size={18} />
-                                )}
-                              </button>
-                            </div>
-                          </>
-                        )}
+                      
 
                         {/* Title Badge */}
                         <div className="absolute top-4 left-4">
@@ -236,22 +194,7 @@ const FellowThinks = ({ fellowData }) => {
                         </div>
                       </div>
 
-                      {/* Play/Pause Overlay */}
-                      <div
-                        className={`absolute inset-0 bg-black/60 transition-opacity duration-300 flex items-center justify-center ${
-                          hoveredVideo === fellow.id
-                            ? "opacity-100"
-                            : "opacity-0"
-                        }`}
-                      >
-                        <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-primary">
-                          {playingVideo === fellow.id ? (
-                            <Pause size={28} className="text-primary" />
-                          ) : (
-                            <Play size={28} className="text-primary ml-1" />
-                          )}
-                        </div>
-                      </div>
+                      
 
                       {/* Volume Control */}
                       <div

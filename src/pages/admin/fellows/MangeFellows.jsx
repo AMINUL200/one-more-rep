@@ -88,8 +88,8 @@ const MangeFellows = () => {
       const response = await api.get("/admin/short-videos");
       if (response.data?.status) {
         // If response is a single object, wrap it in an array
-        const data = Array.isArray(response.data.data) 
-          ? response.data.data 
+        const data = Array.isArray(response.data.data)
+          ? response.data.data
           : [response.data.data];
         setFellowsData(data);
       }
@@ -171,7 +171,7 @@ const MangeFellows = () => {
 
     try {
       await validateVideo(file);
-      
+
       // Create preview URL
       const previewUrl = URL.createObjectURL(file);
       setVideoPreview(previewUrl);
@@ -254,6 +254,7 @@ const MangeFellows = () => {
   };
 
   // Handle form submit
+  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -263,22 +264,46 @@ const MangeFellows = () => {
 
     const submitData = new FormData();
 
+    // Append all form fields, including empty values
     Object.keys(formData).forEach((key) => {
       if (key === "status") {
         submitData.append("status", formData.status ? "1" : "0");
-      } else if (key === "video" && formData[key] instanceof File) {
-        submitData.append("video", formData[key]);
-      } else if (formData[key] !== null && formData[key] !== "") {
-        submitData.append(key, formData[key]);
+      } else if (key === "video") {
+        // Handle video file
+        if (formData[key] instanceof File) {
+          submitData.append("video", formData[key]);
+        } else if (editingItem && !formData[key]) {
+          // During update, if video is removed, send empty string
+          submitData.append("video", "");
+        }
+      } else {
+        // For all other fields, send the value (including empty strings)
+        const value =
+          formData[key] !== null && formData[key] !== undefined
+            ? formData[key]
+            : "";
+        submitData.append(key, value);
       }
     });
+
+    console.log("=== FormData Debug ===");
+
+    for (let pair of submitData.entries()) {
+      console.log(pair[0], pair[1]);
+    }
+
+    console.log("====================");
 
     try {
       let response;
       if (editingItem) {
-        // submitData.append("_method", "PUT");
-        response = await api.post(`/admin/short-videos/${editingItem.id}`, submitData);
+        // Update - using POST with _method PUT
+        response = await api.post(
+          `/admin/short-videos/${editingItem.id}`,
+          submitData,
+        );
       } else {
+        // Create
         response = await api.post("/admin/short-videos", submitData);
       }
 
@@ -286,7 +311,7 @@ const MangeFellows = () => {
         toast.success(
           editingItem
             ? "Fellow updated successfully"
-            : "Fellow created successfully"
+            : "Fellow created successfully",
         );
         setShowForm(false);
         setEditingItem(null);
@@ -322,13 +347,13 @@ const MangeFellows = () => {
       button_url: item.button_url || "",
       status: item.status === "1" || item.status === 1,
     });
-    
+
     if (item.video) {
       setVideoPreview(getVideoUrl(item.video));
     } else {
       setVideoPreview(null);
     }
-    
+
     setVideoError(null);
     setFormErrors({});
     setShowForm(true);
@@ -344,6 +369,7 @@ const MangeFellows = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // Reset form
   // Reset form
   const resetForm = () => {
     if (videoPreview && !editingItem) {
@@ -380,9 +406,12 @@ const MangeFellows = () => {
   const handleStatusToggle = async (item) => {
     try {
       const newStatus = item.status === "1" || item.status === 1 ? "0" : "1";
-      const response = await api.patch(`/admin/short-videos/${item.id}/status`, {
-        status: newStatus,
-      });
+      const response = await api.patch(
+        `/admin/short-videos/${item.id}/status`,
+        {
+          status: newStatus,
+        },
+      );
       if (response.data?.status) {
         toast.success("Status updated successfully");
         fetchFellowsData();
@@ -442,7 +471,10 @@ const MangeFellows = () => {
         {/* Header */}
         <div className="mb-8 flex justify-between items-center flex-wrap gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold" style={{ color: colors.text }}>
+            <h1
+              className="text-3xl md:text-4xl font-bold"
+              style={{ color: colors.text }}
+            >
               Fellows Management
             </h1>
             <p className="text-lg mt-2" style={{ color: colors.textLight }}>
@@ -464,14 +496,25 @@ const MangeFellows = () => {
 
         {/* Add/Edit Form */}
         {showForm && (
-          <div className="mb-8 rounded-xl shadow-sm border p-6" style={{ backgroundColor: colors.cardBg, borderColor: colors.border }}>
+          <div
+            className="mb-8 rounded-xl shadow-sm border p-6"
+            style={{
+              backgroundColor: colors.cardBg,
+              borderColor: colors.border,
+            }}
+          >
             <div className="flex justify-between items-center mb-6">
               <div>
-                <h2 className="text-2xl font-bold" style={{ color: colors.text }}>
+                <h2
+                  className="text-2xl font-bold"
+                  style={{ color: colors.text }}
+                >
                   {editingItem ? "Edit Fellow" : "Add New Fellow"}
                 </h2>
                 <p className="text-sm mt-1" style={{ color: colors.textLight }}>
-                  {editingItem ? "Update fellow content" : "Create a new fellow video"}
+                  {editingItem
+                    ? "Update fellow content"
+                    : "Create a new fellow video"}
                 </p>
               </div>
               <button
@@ -489,11 +532,18 @@ const MangeFellows = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Video Title */}
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text }}
+                >
                   Video Title <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <FileText size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: colors.textLight }} />
+                  <FileText
+                    size={16}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                    style={{ color: colors.textLight }}
+                  />
                   <input
                     type="text"
                     name="video_title"
@@ -509,20 +559,29 @@ const MangeFellows = () => {
                   />
                 </div>
                 {formErrors.video_title && (
-                  <p className="mt-1 text-xs" style={{ color: colors.danger }}>{formErrors.video_title}</p>
+                  <p className="mt-1 text-xs" style={{ color: colors.danger }}>
+                    {formErrors.video_title}
+                  </p>
                 )}
               </div>
 
               {/* Video Upload */}
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text }}
+                >
                   Video File <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <div
                     className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-opacity-100 transition-all min-h-[200px] flex items-center justify-center"
-                    style={{ borderColor: videoError ? colors.danger : colors.border }}
-                    onClick={() => document.getElementById("video-upload").click()}
+                    style={{
+                      borderColor: videoError ? colors.danger : colors.border,
+                    }}
+                    onClick={() =>
+                      document.getElementById("video-upload").click()
+                    }
                   >
                     {videoPreview ? (
                       <div className="relative w-full">
@@ -532,13 +591,32 @@ const MangeFellows = () => {
                           controls
                           preload="metadata"
                         />
-                        <p className="text-xs mt-2" style={{ color: colors.textLight }}>Video ready for upload</p>
+                        <p
+                          className="text-xs mt-2"
+                          style={{ color: colors.textLight }}
+                        >
+                          Video ready for upload
+                        </p>
                       </div>
                     ) : (
                       <div>
-                        <Upload size={32} className="mx-auto mb-2" style={{ color: colors.textLight }} />
-                        <p className="text-sm" style={{ color: colors.textLight }}>Click to upload video</p>
-                        <p className="text-xs mt-1" style={{ color: colors.muted }}>Max size: 50MB • MP4, WebM, MOV</p>
+                        <Upload
+                          size={32}
+                          className="mx-auto mb-2"
+                          style={{ color: colors.textLight }}
+                        />
+                        <p
+                          className="text-sm"
+                          style={{ color: colors.textLight }}
+                        >
+                          Click to upload video
+                        </p>
+                        <p
+                          className="text-xs mt-1"
+                          style={{ color: colors.muted }}
+                        >
+                          Max size: 50MB • MP4, WebM, MOV
+                        </p>
                       </div>
                     )}
                   </div>
@@ -563,23 +641,47 @@ const MangeFellows = () => {
 
                   {uploadingVideo && (
                     <div className="absolute inset-0 bg-white/80 flex items-center justify-center rounded-lg">
-                      <Loader size={20} className="animate-spin" style={{ color: colors.primary }} />
+                      <Loader
+                        size={20}
+                        className="animate-spin"
+                        style={{ color: colors.primary }}
+                      />
                     </div>
                   )}
                 </div>
 
                 {videoError && (
-                  <div className="mt-2 p-2 rounded-lg" style={{ backgroundColor: `${colors.danger}10`, border: `1px solid ${colors.danger}30` }}>
+                  <div
+                    className="mt-2 p-2 rounded-lg"
+                    style={{
+                      backgroundColor: `${colors.danger}10`,
+                      border: `1px solid ${colors.danger}30`,
+                    }}
+                  >
                     <div className="flex items-start gap-2">
-                      <AlertCircle size={14} style={{ color: colors.danger }} className="mt-0.5" />
-                      <p className="text-xs" style={{ color: colors.danger }}>{videoError}</p>
+                      <AlertCircle
+                        size={14}
+                        style={{ color: colors.danger }}
+                        className="mt-0.5"
+                      />
+                      <p className="text-xs" style={{ color: colors.danger }}>
+                        {videoError}
+                      </p>
                     </div>
                   </div>
                 )}
 
                 {editingItem && editingItem.video && !videoPreview && (
-                  <div className="mt-2 p-2 border rounded-lg" style={{ borderColor: colors.border }}>
-                    <p className="text-xs font-medium mb-1" style={{ color: colors.textLight }}>Current video:</p>
+                  <div
+                    className="mt-2 p-2 border rounded-lg"
+                    style={{ borderColor: colors.border }}
+                  >
+                    <p
+                      className="text-xs font-medium mb-1"
+                      style={{ color: colors.textLight }}
+                    >
+                      Current video:
+                    </p>
                     <button
                       type="button"
                       onClick={() => handlePreviewVideo(editingItem.video)}
@@ -593,17 +695,26 @@ const MangeFellows = () => {
                 )}
 
                 {formErrors.video && (
-                  <p className="mt-1 text-xs" style={{ color: colors.danger }}>{formErrors.video}</p>
+                  <p className="mt-1 text-xs" style={{ color: colors.danger }}>
+                    {formErrors.video}
+                  </p>
                 )}
               </div>
 
               {/* YouTube Link */}
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text }}
+                >
                   YouTube Link <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <Youtube size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: colors.textLight }} />
+                  <Youtube
+                    size={16}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                    style={{ color: colors.textLight }}
+                  />
                   <input
                     type="url"
                     name="youtube_link"
@@ -619,13 +730,18 @@ const MangeFellows = () => {
                   />
                 </div>
                 {formErrors.youtube_link && (
-                  <p className="mt-1 text-xs" style={{ color: colors.danger }}>{formErrors.youtube_link}</p>
+                  <p className="mt-1 text-xs" style={{ color: colors.danger }}>
+                    {formErrors.youtube_link}
+                  </p>
                 )}
               </div>
 
               {/* Button Name */}
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text }}
+                >
                   Button Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -642,17 +758,26 @@ const MangeFellows = () => {
                   placeholder="e.g., Learn More, Watch Now"
                 />
                 {formErrors.button_name && (
-                  <p className="mt-1 text-xs" style={{ color: colors.danger }}>{formErrors.button_name}</p>
+                  <p className="mt-1 text-xs" style={{ color: colors.danger }}>
+                    {formErrors.button_name}
+                  </p>
                 )}
               </div>
 
               {/* Button URL */}
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: colors.text }}>
+                <label
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: colors.text }}
+                >
                   Button URL <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <Link2 size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: colors.textLight }} />
+                  <Link2
+                    size={16}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                    style={{ color: colors.textLight }}
+                  />
                   <input
                     type="text"
                     name="button_url"
@@ -668,7 +793,9 @@ const MangeFellows = () => {
                   />
                 </div>
                 {formErrors.button_url && (
-                  <p className="mt-1 text-xs" style={{ color: colors.danger }}>{formErrors.button_url}</p>
+                  <p className="mt-1 text-xs" style={{ color: colors.danger }}>
+                    {formErrors.button_url}
+                  </p>
                 )}
               </div>
 
@@ -691,7 +818,10 @@ const MangeFellows = () => {
               </div>
 
               {/* Form Actions */}
-              <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: colors.border }}>
+              <div
+                className="flex justify-end gap-3 pt-4 border-t"
+                style={{ borderColor: colors.border }}
+              >
                 <button
                   type="button"
                   onClick={() => {
@@ -700,7 +830,10 @@ const MangeFellows = () => {
                     resetForm();
                   }}
                   className="px-4 py-2 rounded-lg border transition-colors"
-                  style={{ borderColor: colors.border, color: colors.textLight }}
+                  style={{
+                    borderColor: colors.border,
+                    color: colors.textLight,
+                  }}
                 >
                   Cancel
                 </button>
@@ -736,27 +869,81 @@ const MangeFellows = () => {
           }}
         >
           <div className="max-w-[400px] md:max-w-[700px] lg:max-w-[1140px] overflow-x-auto">
-              <table className="w-full min-w-[700px]">
+            <table className="w-full min-w-[700px]">
               <thead>
                 <tr style={{ backgroundColor: `${colors.background}` }}>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: colors.textLight }}>ID</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: colors.textLight }}>Video Title</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: colors.textLight }}>Video</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: colors.textLight }}>YouTube Link</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: colors.textLight }}>Button</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: colors.textLight }}>Status</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold" style={{ color: colors.textLight }}>Created</th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold" style={{ color: colors.textLight }}>Actions</th>
-                  </tr>
+                  <th
+                    className="px-6 py-4 text-left text-sm font-semibold"
+                    style={{ color: colors.textLight }}
+                  >
+                    ID
+                  </th>
+                  <th
+                    className="px-6 py-4 text-left text-sm font-semibold"
+                    style={{ color: colors.textLight }}
+                  >
+                    Video Title
+                  </th>
+                  <th
+                    className="px-6 py-4 text-left text-sm font-semibold"
+                    style={{ color: colors.textLight }}
+                  >
+                    Video
+                  </th>
+                  <th
+                    className="px-6 py-4 text-left text-sm font-semibold"
+                    style={{ color: colors.textLight }}
+                  >
+                    YouTube Link
+                  </th>
+                  <th
+                    className="px-6 py-4 text-left text-sm font-semibold"
+                    style={{ color: colors.textLight }}
+                  >
+                    Button
+                  </th>
+                  <th
+                    className="px-6 py-4 text-left text-sm font-semibold"
+                    style={{ color: colors.textLight }}
+                  >
+                    Status
+                  </th>
+                  <th
+                    className="px-6 py-4 text-left text-sm font-semibold"
+                    style={{ color: colors.textLight }}
+                  >
+                    Created
+                  </th>
+                  <th
+                    className="px-6 py-4 text-right text-sm font-semibold"
+                    style={{ color: colors.textLight }}
+                  >
+                    Actions
+                  </th>
+                </tr>
               </thead>
               <tbody>
                 {currentItems.map((item) => (
-                  <tr key={item.id} className="border-t" style={{ borderColor: colors.border }}>
+                  <tr
+                    key={item.id}
+                    className="border-t"
+                    style={{ borderColor: colors.border }}
+                  >
                     <td className="px-6 py-4">
-                      <span className="font-mono text-sm" style={{ color: colors.textLight }}>#{item.id}</span>
+                      <span
+                        className="font-mono text-sm"
+                        style={{ color: colors.textLight }}
+                      >
+                        #{item.id}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="font-medium" style={{ color: colors.text }}>{item.video_title}</div>
+                      <div
+                        className="font-medium"
+                        style={{ color: colors.text }}
+                      >
+                        {item.video_title}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       {item.video ? (
@@ -769,7 +956,9 @@ const MangeFellows = () => {
                           <span className="text-sm">Preview</span>
                         </button>
                       ) : (
-                        <span style={{ color: colors.textLight }}>No video</span>
+                        <span style={{ color: colors.textLight }}>
+                          No video
+                        </span>
                       )}
                     </td>
                     <td className="px-6 py-4">
@@ -786,8 +975,18 @@ const MangeFellows = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div>
-                        <span className="font-medium" style={{ color: colors.text }}>{item.button_name}</span>
-                        <div className="text-xs mt-1" style={{ color: colors.textLight }}>{truncateText(item.button_url, 30)}</div>
+                        <span
+                          className="font-medium"
+                          style={{ color: colors.text }}
+                        >
+                          {item.button_name}
+                        </span>
+                        <div
+                          className="text-xs mt-1"
+                          style={{ color: colors.textLight }}
+                        >
+                          {truncateText(item.button_url, 30)}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -799,11 +998,18 @@ const MangeFellows = () => {
                             : "bg-red-100 text-red-700 hover:bg-red-200"
                         }`}
                       >
-                        {item.status === "1" || item.status === 1 ? "Active" : "Inactive"}
+                        {item.status === "1" || item.status === 1
+                          ? "Active"
+                          : "Inactive"}
                       </button>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm" style={{ color: colors.textLight }}>{formatDate(item.created_at)}</div>
+                      <div
+                        className="text-sm"
+                        style={{ color: colors.textLight }}
+                      >
+                        {formatDate(item.created_at)}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button
@@ -830,16 +1036,25 @@ const MangeFellows = () => {
           {/* Empty State */}
           {currentItems.length === 0 && (
             <div className="text-center py-12">
-              <Video size={48} className="mx-auto mb-4" style={{ color: colors.textLight }} />
+              <Video
+                size={48}
+                className="mx-auto mb-4"
+                style={{ color: colors.textLight }}
+              />
               <p style={{ color: colors.textLight }}>No fellows data found</p>
             </div>
           )}
 
           {/* Pagination */}
           {fellowsData.length > 0 && (
-            <div className="px-6 py-4 border-t flex flex-col sm:flex-row justify-between items-center gap-4" style={{ borderColor: colors.border }}>
+            <div
+              className="px-6 py-4 border-t flex flex-col sm:flex-row justify-between items-center gap-4"
+              style={{ borderColor: colors.border }}
+            >
               <div className="flex items-center gap-2">
-                <span className="text-sm" style={{ color: colors.textLight }}>Show:</span>
+                <span className="text-sm" style={{ color: colors.textLight }}>
+                  Show:
+                </span>
                 <select
                   value={itemsPerPage}
                   onChange={handleItemsPerPageChange}
@@ -850,25 +1065,41 @@ const MangeFellows = () => {
                     color: colors.text,
                   }}
                 >
-                  {itemsPerPageOptions.map(option => (
-                    <option key={option} value={option}>{option}</option>
+                  {itemsPerPageOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
                   ))}
                 </select>
-                <span className="text-sm" style={{ color: colors.textLight }}>entries</span>
+                <span className="text-sm" style={{ color: colors.textLight }}>
+                  entries
+                </span>
               </div>
 
               <div className="text-sm" style={{ color: colors.textLight }}>
-                Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, fellowsData.length)} of {fellowsData.length} entries
+                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                {Math.min(currentPage * itemsPerPage, fellowsData.length)} of{" "}
+                {fellowsData.length} entries
               </div>
 
               <div className="flex items-center gap-2">
-                <button onClick={goToFirstPage} disabled={currentPage === 1} className="p-2 rounded-lg border disabled:opacity-50 hover:bg-gray-50" style={{ borderColor: colors.border }}>
+                <button
+                  onClick={goToFirstPage}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-lg border disabled:opacity-50 hover:bg-gray-50"
+                  style={{ borderColor: colors.border }}
+                >
                   <ChevronLeft size={16} className="rotate-90" />
                 </button>
-                <button onClick={goToPreviousPage} disabled={currentPage === 1} className="p-2 rounded-lg border disabled:opacity-50 hover:bg-gray-50" style={{ borderColor: colors.border }}>
+                <button
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-lg border disabled:opacity-50 hover:bg-gray-50"
+                  style={{ borderColor: colors.border }}
+                >
                   <ChevronLeft size={16} />
                 </button>
-                
+
                 <div className="flex items-center gap-1">
                   {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                     let pageNum;
@@ -886,12 +1117,20 @@ const MangeFellows = () => {
                         key={pageNum}
                         onClick={() => goToPage(pageNum)}
                         className={`min-w-[36px] h-9 px-3 rounded-lg border transition-colors ${
-                          currentPage === pageNum ? "text-white" : "hover:bg-gray-50"
+                          currentPage === pageNum
+                            ? "text-white"
+                            : "hover:bg-gray-50"
                         }`}
                         style={{
-                          backgroundColor: currentPage === pageNum ? colors.primary : "transparent",
+                          backgroundColor:
+                            currentPage === pageNum
+                              ? colors.primary
+                              : "transparent",
                           borderColor: colors.border,
-                          color: currentPage === pageNum ? "#FFFFFF" : colors.textLight,
+                          color:
+                            currentPage === pageNum
+                              ? "#FFFFFF"
+                              : colors.textLight,
                         }}
                       >
                         {pageNum}
@@ -900,10 +1139,20 @@ const MangeFellows = () => {
                   })}
                 </div>
 
-                <button onClick={goToNextPage} disabled={currentPage === totalPages} className="p-2 rounded-lg border disabled:opacity-50 hover:bg-gray-50" style={{ borderColor: colors.border }}>
+                <button
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-lg border disabled:opacity-50 hover:bg-gray-50"
+                  style={{ borderColor: colors.border }}
+                >
                   <ChevronRight size={16} />
                 </button>
-                <button onClick={goToLastPage} disabled={currentPage === totalPages} className="p-2 rounded-lg border disabled:opacity-50 hover:bg-gray-50" style={{ borderColor: colors.border }}>
+                <button
+                  onClick={goToLastPage}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-lg border disabled:opacity-50 hover:bg-gray-50"
+                  style={{ borderColor: colors.border }}
+                >
                   <ChevronRight size={16} className="rotate-90" />
                 </button>
               </div>
@@ -914,8 +1163,14 @@ const MangeFellows = () => {
 
       {/* Video Preview Modal */}
       {showVideoModal && selectedVideo && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/80" onClick={() => setShowVideoModal(false)}>
-          <div className="relative max-w-4xl w-full mx-4" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50 bg-black/80"
+          onClick={() => setShowVideoModal(false)}
+        >
+          <div
+            className="relative max-w-4xl w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={() => setShowVideoModal(false)}
               className="absolute -top-10 right-0 p-2 text-white hover:text-gray-300 transition-colors"
@@ -943,16 +1198,27 @@ const MangeFellows = () => {
               <div className="p-2 bg-red-100 rounded-full">
                 <Trash2 size={20} className="text-red-600" />
               </div>
-              <h3 className="text-lg font-bold" style={{ color: colors.text }}>Delete Fellow</h3>
+              <h3 className="text-lg font-bold" style={{ color: colors.text }}>
+                Delete Fellow
+              </h3>
             </div>
             <p className="mb-4" style={{ color: colors.textLight }}>
-              Are you sure you want to delete the video "<strong>{deleteConfirm.video_title}</strong>"? This action cannot be undone.
+              Are you sure you want to delete the video "
+              <strong>{deleteConfirm.video_title}</strong>"? This action cannot
+              be undone.
             </p>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setDeleteConfirm(null)} className="px-4 py-2 border rounded-lg transition-colors" style={{ borderColor: colors.border, color: colors.textLight }}>
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                className="px-4 py-2 border rounded-lg transition-colors"
+                style={{ borderColor: colors.border, color: colors.textLight }}
+              >
                 Cancel
               </button>
-              <button onClick={() => handleDelete(deleteConfirm.id)} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
+              <button
+                onClick={() => handleDelete(deleteConfirm.id)}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+              >
                 Delete
               </button>
             </div>
