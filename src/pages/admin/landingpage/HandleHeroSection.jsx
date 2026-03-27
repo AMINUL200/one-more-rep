@@ -105,6 +105,7 @@ const HandleHeroSection = () => {
     try {
       const response = await api.get("/admin/banners");
       if (response.data?.status) {
+        console.log("list of hereo ::", response.data.data);
         // Sort by sort_order
         const sortedData = response.data.data.sort(
           (a, b) => a.sort_order - b.sort_order,
@@ -537,14 +538,22 @@ const HandleHeroSection = () => {
   };
 
   // Filter hero list based on search
-  const filteredHeroList = heroList.filter(
-    (hero) =>
-      hero.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hero.badge_text?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hero.description?.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  // Fix the filter function to handle null/undefined values
+  // const filteredHeroList = heroList.filter((hero) => {
+  //   // Check if any of the searchable fields contain the search term
+  //   const searchLower = searchTerm.toLowerCase();
+
+  //   const titleMatch = hero.title?.toLowerCase().includes(searchLower) || false;
+  //   const badgeMatch =
+  //     hero.badge_text?.toLowerCase().includes(searchLower) || false;
+  //   const descriptionMatch =
+  //     hero.description?.toLowerCase().includes(searchLower) || false;
+
+  //   return titleMatch || badgeMatch || descriptionMatch;
+  // });
 
   // Truncate text
+  // Truncate text - handle null/undefined
   const truncateText = (text, length = 50) => {
     if (!text) return "-";
     return text.length > length ? text.substring(0, length) + "..." : text;
@@ -899,7 +908,6 @@ const HandleHeroSection = () => {
                                 Max size: 2MB
                               </p>
                             </div>
-                            
                           )}
                         </div>
                         <MediaNote type="image" />
@@ -1446,7 +1454,7 @@ const HandleHeroSection = () => {
         )}
 
         {/* Search Bar */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <div className="relative">
             <Search
               size={20}
@@ -1466,7 +1474,7 @@ const HandleHeroSection = () => {
               }}
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Hero List Table */}
         <div
@@ -1540,7 +1548,7 @@ const HandleHeroSection = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredHeroList.length === 0 ? (
+                {heroList.length === 0 ? (
                   <tr>
                     <td
                       colSpan="10"
@@ -1551,11 +1559,12 @@ const HandleHeroSection = () => {
                     </td>
                   </tr>
                 ) : (
-                  filteredHeroList.map((hero) => (
+                  heroList.map((hero) => (
                     <tr
                       key={hero.id}
                       style={{ borderBottom: `1px solid ${colors.border}` }}
                     >
+                      {console.log("fileter hereo ::", heroList)}
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-1">
                           <button
@@ -1649,6 +1658,7 @@ const HandleHeroSection = () => {
                           <span style={{ color: colors.textLight }}>-</span>
                         )}
                       </td>
+                      {/* In the table body, update these sections */}
                       <td className="px-6 py-4">
                         <div
                           className="font-medium"
