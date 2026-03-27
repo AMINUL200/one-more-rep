@@ -77,6 +77,12 @@ const FellowThinks = ({ fellowData }) => {
     return match ? match[1] : null;
   };
 
+  // Check if button exists
+  const hasButton = (fellow) => {
+    return fellow.button_name && fellow.button_name.trim() !== "" && 
+           fellow.button_url && fellow.button_url.trim() !== "";
+  };
+
   if (!fellowData || fellowData.length === 0) {
     return null;
   }
@@ -97,11 +103,6 @@ const FellowThinks = ({ fellowData }) => {
       <div className="max-w-7xl mx-auto px-4 relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
-          {/* <div className="inline-block mb-4">
-            <span className="bg-primary-light text-brand px-4 py-2 rounded-full text-sm font-bold border border-primary/20">
-              TESTIMONIALS
-            </span>
-          </div> */}
           <h2 className="text-5xl font-bold mb-6">
             <span className="text-primary">What Our </span>
             <span className="text-brand">Fellows Think</span>
@@ -147,54 +148,47 @@ const FellowThinks = ({ fellowData }) => {
             {fellowData.map((fellow) => (
               <SwiperSlide key={fellow.id}>
                 <div
-                  className="group relative"
+                  className="group relative h-full"
                   onMouseEnter={() => handleVideoHover(fellow.id)}
                   onMouseLeave={() => handleVideoLeave(fellow.id)}
                 >
                   {/* Video Card */}
-                  <div className="bg-card rounded-2xl overflow-hidden border-2 border-theme transition-all duration-300 group-hover:border-primary group-hover:shadow-primary">
-                    {/* Video Container */}
+                  <div className="bg-card rounded-2xl overflow-hidden border-2 border-theme transition-all duration-300 group-hover:border-primary group-hover:shadow-primary relative h-full">
+                    {/* Video Container - Fixed aspect ratio */}
                     <div className="relative bg-black aspect-[9/16] overflow-hidden cursor-pointer">
-                      <div className="relative bg-black aspect-[9/16] overflow-hidden cursor-pointer">
-                        {/* ✅ If video exists */}
-                        {fellow.video ? (
-                          <video
-                            ref={(el) => (videoRefs.current[fellow.id] = el)}
-                            src={getVideoUrl(fellow.video)}
-                            className="w-full h-full object-cover"
-                            loop
-                            muted={muted}
-                            playsInline
-                          />
-                        ) : fellow.youtube_link ? (
-                          /* ✅ YouTube fallback */
-                          <iframe
-                            src={`https://www.youtube.com/embed/${getYouTubeId(fellow.youtube_link)}?autoplay=${
-                              hoveredVideo === fellow.id ? 1 : 0
-                            }&mute=1&controls=0&loop=1&playlist=${getYouTubeId(fellow.youtube_link)}`}
-                            className="w-full h-full object-cover pointer-events-none"
-                            allow="autoplay; encrypted-media"
-                            allowFullScreen
-                          />
-                        ) : (
-                          /* ❌ No media fallback */
-                          <div className="flex items-center justify-center h-full text-white">
-                            No Video Available
-                          </div>
-                        )}
-
-                        {/* Overlay (only for video, optional hide for youtube) */}
-                      
-
-                        {/* Title Badge */}
-                        <div className="absolute top-4 left-4">
-                          <span className="px-3 py-1 bg-black/70 text-primary text-xs font-bold rounded-full max-w-[150px] truncate">
-                            {fellow.video_title || "Fellow Story"}
-                          </span>
+                      {/* Video Content */}
+                      {fellow.video ? (
+                        <video
+                          ref={(el) => (videoRefs.current[fellow.id] = el)}
+                          src={getVideoUrl(fellow.video)}
+                          className="w-full h-full object-cover"
+                          loop
+                          muted={muted}
+                          playsInline
+                        />
+                      ) : fellow.youtube_link ? (
+                        /* YouTube fallback */
+                        <iframe
+                          src={`https://www.youtube.com/embed/${getYouTubeId(fellow.youtube_link)}?autoplay=${
+                            hoveredVideo === fellow.id ? 1 : 0
+                          }&mute=1&controls=0&loop=1&playlist=${getYouTubeId(fellow.youtube_link)}`}
+                          className="w-full h-full object-cover pointer-events-none"
+                          allow="autoplay; encrypted-media"
+                          allowFullScreen
+                        />
+                      ) : (
+                        /* No media fallback */
+                        <div className="flex items-center justify-center h-full text-white bg-gray-800">
+                          No Video Available
                         </div>
-                      </div>
+                      )}
 
-                      
+                      {/* Title Badge */}
+                      <div className="absolute top-4 left-4">
+                        <span className="px-3 py-1 bg-black/70 text-primary text-xs font-bold rounded-full max-w-[150px] truncate">
+                          {fellow.video_title || "Fellow Story"}
+                        </span>
+                      </div>
 
                       {/* Volume Control */}
                       <div
@@ -215,36 +209,31 @@ const FellowThinks = ({ fellowData }) => {
                           )}
                         </button>
                       </div>
-
-                      {/* Video Title Badge */}
-                      <div className="absolute top-4 left-4">
-                        <span className="px-3 py-1 bg-black/70 backdrop-blur-sm text-primary text-xs font-bold rounded-full max-w-[150px] truncate">
-                          {fellow.video_title || "Fellow Story"}
-                        </span>
-                      </div>
                     </div>
 
-                    {/* Button - Shows on Hover */}
-                    <div
-                      className={`p-2 transition-all duration-300 ${
-                        hoveredVideo === fellow.id
-                          ? "opacity-100 translate-y-0"
-                          : "opacity-0 translate-y-4"
-                      }`}
-                    >
-                      {fellow.button_name && fellow.button_url && (
-                        <Link
-                          to={fellow.button_url}
-                          className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-primary text-primary font-bold rounded-lg transition-all duration-300 hover:shadow-primary-hover group"
+                    {/* Button - Absolute positioned at bottom, slides up on hover */}
+                    {hasButton(fellow) && (
+                      <div className="absolute bottom-0 left-0 right-0 overflow-hidden">
+                        <div
+                          className={`p-4 transition-all duration-300 ease-out ${
+                            hoveredVideo === fellow.id
+                              ? "translate-y-0"
+                              : "translate-y-full"
+                          }`}
                         >
-                          {fellow.button_name}
-                          <ExternalLink
-                            size={16}
-                            className="group-hover:translate-x-1 transition-transform"
-                          />
-                        </Link>
-                      )}
-                    </div>
+                          <Link
+                            to={fellow.button_url}
+                            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-primary text-primary font-bold rounded-lg transition-all duration-300 hover:shadow-primary-hover group"
+                          >
+                            {fellow.button_name}
+                            <ExternalLink
+                              size={16}
+                              className="group-hover:translate-x-1 transition-transform"
+                            />
+                          </Link>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </SwiperSlide>
