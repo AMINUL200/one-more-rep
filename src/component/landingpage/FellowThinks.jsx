@@ -19,8 +19,9 @@ import { Link } from "react-router-dom";
 const FellowThinks = ({ fellowData }) => {
   const [playingVideo, setPlayingVideo] = useState(null);
   const [hoveredVideo, setHoveredVideo] = useState(null);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState({}); // Store mute state per video
   const videoRefs = useRef({});
+  const youtubeRefs = useRef({});
 
   // Get video URL
   const getVideoUrl = (videoPath) => {
@@ -31,21 +32,31 @@ const FellowThinks = ({ fellowData }) => {
   };
 
   // Handle video hover
-  const handleVideoHover = (videoId) => {
+  const handleVideoHover = (videoId, fellow) => {
     setHoveredVideo(videoId);
-    const videoElement = videoRefs.current[videoId];
-    if (videoElement && playingVideo !== videoId) {
-      // Pause all other videos
-      Object.keys(videoRefs.current).forEach((key) => {
-        if (videoRefs.current[key] && key !== videoId) {
-          videoRefs.current[key].pause();
-        }
-      });
-      videoElement.currentTime = 0;
-      videoElement.play().catch((err) => {
-        console.log("Video play failed:", err);
-      });
-      setPlayingVideo(videoId);
+    
+    if (fellow.video) {
+      // For uploaded videos
+      const videoElement = videoRefs.current[videoId];
+      if (videoElement && playingVideo !== videoId) {
+        // Pause all other videos
+        Object.keys(videoRefs.current).forEach((key) => {
+          if (videoRefs.current[key] && key !== videoId) {
+            videoRefs.current[key].pause();
+          }
+        });
+        videoElement.currentTime = 0;
+        videoElement.play().catch((err) => {
+          console.log("Video play failed:", err);
+        });
+        setPlayingVideo(videoId);
+      }
+    } else if (fellow.youtube_link) {
+      // For YouTube videos - we need to reload iframe to unmute
+      const iframe = youtubeRefs.current[videoId];
+      if (iframe && !muted[videoId]) {
+        // YouTube iframe will handle autoplay
+      }
     }
   };
 
@@ -59,21 +70,67 @@ const FellowThinks = ({ fellowData }) => {
     }
   };
 
-  // Toggle mute
+  // Toggle mute for uploaded videos
   const toggleMute = (videoId, e) => {
     e.stopPropagation();
     const videoElement = videoRefs.current[videoId];
     if (videoElement) {
-      videoElement.muted = !videoElement.muted;
-      setMuted(videoElement.muted);
+      const newMutedState = !videoElement.muted;
+      videoElement.muted = newMutedState;
+      setMuted(prev => ({ ...prev, [videoId]: newMutedState }));
     }
   };
 
+  // Toggle mute for YouTube videos
+  const toggleYoutubeMute = (videoId, e) => {
+    e.stopPropagation();
+    const iframe = youtubeRefs.current[videoId];
+    if (iframe && iframe.contentWindow) {
+      const newMutedState = !muted[videoId];
+      setMuted(prev => ({ ...prev, [videoId]: newMutedState }));
+      
+      // Post message to YouTube iframe to control mute
+      iframe.contentWindow.postMessage(
+        JSON.stringify({
+          event: 'command',
+          func: newMutedState ? 'mute' : 'unMute',
+        }),
+        '*'
+      );
+    }
+  };
+
+  // Get YouTube embed URL with mute state
+  const getYouTubeEmbedUrl = (url, videoId, isHovered, isMuted) => {
+    const youtubeId = getYouTubeId(url);
+    if (!youtubeId) return null;
+    
+    const autoplay = isHovered ? 1 : 0;
+    const mute = isMuted ? 1 : 0;
+    
+    return `https://www.youtube.com/embed/${youtubeId}?autoplay=${autoplay}&mute=${mute}&controls=0&loop=1&playlist=${youtubeId}&modestbranding=1&rel=0&showinfo=0&enablejsapi=1`;
+  };
+
+  // Updated function to get YouTube ID from various URL formats
   const getYouTubeId = (url) => {
     if (!url) return null;
-    const match = url.match(
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
-    );
+    
+    // Regular expression for standard YouTube URLs
+    const regExp = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/;
+    let match = url.match(regExp);
+    
+    // If not found, try for YouTube shorts URL
+    if (!match) {
+      const shortsRegExp = /youtube\.com\/shorts\/([^&\n?#]+)/;
+      match = url.match(shortsRegExp);
+    }
+    
+    // If still not found, try for embed URL
+    if (!match) {
+      const embedRegExp = /youtube\.com\/embed\/([^&\n?#]+)/;
+      match = url.match(embedRegExp);
+    }
+    
     return match ? match[1] : null;
   };
 
@@ -145,109 +202,121 @@ const FellowThinks = ({ fellowData }) => {
             }}
             className="pb-8"
           >
-            {fellowData.map((fellow) => (
-              <SwiperSlide key={fellow.id}>
-                <div
-                  className="group relative h-full"
-                  onMouseEnter={() => handleVideoHover(fellow.id)}
-                  onMouseLeave={() => handleVideoLeave(fellow.id)}
-                >
-                  {/* Video Card */}
-                  <div className="bg-card rounded-2xl overflow-hidden border-2 border-theme transition-all duration-300 group-hover:border-primary group-hover:shadow-primary relative h-full">
-                    {/* Video Container - Fixed aspect ratio */}
-                    <div className="relative bg-black aspect-[9/16] overflow-hidden cursor-pointer">
-                      {/* Video Content */}
-                      {fellow.video ? (
-                        <video
-                          ref={(el) => (videoRefs.current[fellow.id] = el)}
-                          src={getVideoUrl(fellow.video)}
-                          className="w-full h-full object-cover"
-                          loop
-                          muted={muted}
-                          playsInline
-                        />
-                      ) : fellow.youtube_link ? (
-                        /* YouTube fallback */
-                        <iframe
-                          src={`https://www.youtube.com/embed/${getYouTubeId(fellow.youtube_link)}?autoplay=${
-                            hoveredVideo === fellow.id ? 1 : 0
-                          }&mute=1&controls=0&loop=1&playlist=${getYouTubeId(fellow.youtube_link)}`}
-                          className="w-full h-full object-cover pointer-events-none"
-                          allow="autoplay; encrypted-media"
-                          allowFullScreen
-                        />
-                      ) : (
-                        /* No media fallback */
-                        <div className="flex items-center justify-center h-full text-white bg-gray-800">
-                          No Video Available
+            {fellowData.map((fellow) => {
+              const isVideoMuted = muted[fellow.id] !== undefined ? muted[fellow.id] : true;
+              
+              return (
+                <SwiperSlide key={fellow.id}>
+                  <div
+                    className="group relative h-full"
+                    onMouseEnter={() => handleVideoHover(fellow.id, fellow)}
+                    onMouseLeave={() => handleVideoLeave(fellow.id)}
+                  >
+                    {/* Video Card */}
+                    <div className="bg-card rounded-2xl overflow-hidden border-2 border-theme transition-all duration-300 group-hover:border-primary group-hover:shadow-primary relative h-full">
+                      {/* Video Container - Fixed aspect ratio */}
+                      <div className="relative bg-black aspect-[9/16] overflow-hidden cursor-pointer">
+                        {/* Video Content */}
+                        {fellow.video ? (
+                          <video
+                            ref={(el) => (videoRefs.current[fellow.id] = el)}
+                            src={getVideoUrl(fellow.video)}
+                            className="w-full h-full object-cover"
+                            loop
+                            muted={isVideoMuted}
+                            playsInline
+                          />
+                        ) : fellow.youtube_link ? (
+                          /* YouTube embed with dynamic mute control */
+                          <iframe
+                            ref={(el) => (youtubeRefs.current[fellow.id] = el)}
+                            src={getYouTubeEmbedUrl(fellow.youtube_link, fellow.id, hoveredVideo === fellow.id, isVideoMuted)}
+                            className="w-full h-full object-cover pointer-events-none"
+                            allow="autoplay; encrypted-media; picture-in-picture"
+                            allowFullScreen
+                            title={fellow.video_title || "Fellow Video"}
+                          />
+                        ) : (
+                          /* No media fallback */
+                          <div className="flex items-center justify-center h-full text-white bg-gray-800">
+                            No Video Available
+                          </div>
+                        )}
+
+                        {/* Title Badge */}
+                        <div className="absolute top-4 left-4 z-10">
+                          <span className="px-3 py-1 bg-black/70 text-primary text-xs font-bold rounded-full max-w-[150px] truncate">
+                            {fellow.video_title || "Fellow Story"}
+                          </span>
+                        </div>
+
+                        {/* Volume Control - Works for both uploaded and YouTube videos */}
+                        {(fellow.video || fellow.youtube_link) && (
+                          <div
+                            className={`absolute top-4 right-4 z-10 transition-all duration-300 ${
+                              hoveredVideo === fellow.id
+                                ? "opacity-100 scale-100"
+                                : "opacity-0 scale-90"
+                            }`}
+                          >
+                            <button
+                              onClick={(e) => {
+                                if (fellow.video) {
+                                  toggleMute(fellow.id, e);
+                                } else if (fellow.youtube_link) {
+                                  toggleYoutubeMute(fellow.id, e);
+                                }
+                              }}
+                              className="w-10 h-10 bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-primary transition-all duration-300 hover:scale-110"
+                            >
+                              {isVideoMuted ? (
+                                <VolumeX size={18} className="text-primary" />
+                              ) : (
+                                <Volume2 size={18} className="text-primary" />
+                              )}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Button - Absolute positioned at bottom, slides up on hover */}
+                      {hasButton(fellow) && (
+                        <div className="absolute bottom-0 left-0 right-0 overflow-hidden z-10">
+                          <div
+                            className={`p-4 transition-all duration-300 ease-out ${
+                              hoveredVideo === fellow.id
+                                ? "translate-y-0"
+                                : "translate-y-full"
+                            }`}
+                          >
+                            <Link
+                              to={fellow.button_url}
+                              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-primary text-primary font-bold rounded-lg transition-all duration-300 hover:shadow-primary-hover group"
+                            >
+                              {fellow.button_name}
+                              <ExternalLink
+                                size={16}
+                                className="group-hover:translate-x-1 transition-transform"
+                              />
+                            </Link>
+                          </div>
                         </div>
                       )}
-
-                      {/* Title Badge */}
-                      <div className="absolute top-4 left-4">
-                        <span className="px-3 py-1 bg-black/70 text-primary text-xs font-bold rounded-full max-w-[150px] truncate">
-                          {fellow.video_title || "Fellow Story"}
-                        </span>
-                      </div>
-
-                      {/* Volume Control */}
-                      <div
-                        className={`absolute top-4 right-4 transition-opacity duration-300 ${
-                          hoveredVideo === fellow.id
-                            ? "opacity-100"
-                            : "opacity-0"
-                        }`}
-                      >
-                        <button
-                          onClick={(e) => toggleMute(fellow.id, e)}
-                          className="w-10 h-10 bg-black/70 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-primary transition-colors"
-                        >
-                          {muted ? (
-                            <VolumeX size={18} className="text-primary" />
-                          ) : (
-                            <Volume2 size={18} className="text-primary" />
-                          )}
-                        </button>
-                      </div>
                     </div>
-
-                    {/* Button - Absolute positioned at bottom, slides up on hover */}
-                    {hasButton(fellow) && (
-                      <div className="absolute bottom-0 left-0 right-0 overflow-hidden">
-                        <div
-                          className={`p-4 transition-all duration-300 ease-out ${
-                            hoveredVideo === fellow.id
-                              ? "translate-y-0"
-                              : "translate-y-full"
-                          }`}
-                        >
-                          <Link
-                            to={fellow.button_url}
-                            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-primary text-primary font-bold rounded-lg transition-all duration-300 hover:shadow-primary-hover group"
-                          >
-                            {fellow.button_name}
-                            <ExternalLink
-                              size={16}
-                              className="group-hover:translate-x-1 transition-transform"
-                            />
-                          </Link>
-                        </div>
-                      </div>
-                    )}
                   </div>
-                </div>
-              </SwiperSlide>
-            ))}
+                </SwiperSlide>
+              );
+            })}
           </Swiper>
 
           {/* Custom Navigation Buttons */}
           {fellowData.length > 1 && (
             <>
-              <button className="swiper-button-prev-fellow absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-primary hover:bg-primary-hover text-primary p-4 rounded-full transition-all duration-300 hover:scale-110 shadow-primary">
+              <button className="swiper-button-prev-fellow absolute left-0 top-1/2 -translate-y-1/2 z-20 bg-primary hover:bg-primary-hover text-primary p-4 rounded-full transition-all duration-300 hover:scale-110 shadow-primary">
                 <ChevronLeft className="w-6 h-6" />
               </button>
 
-              <button className="swiper-button-next-fellow absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-primary hover:bg-primary-hover text-primary p-4 rounded-full transition-all duration-300 hover:scale-110 shadow-primary">
+              <button className="swiper-button-next-fellow absolute right-0 top-1/2 -translate-y-1/2 z-20 bg-primary hover:bg-primary-hover text-primary p-4 rounded-full transition-all duration-300 hover:scale-110 shadow-primary">
                 <ChevronRight className="w-6 h-6" />
               </button>
             </>
