@@ -26,13 +26,16 @@ import {
   ChevronsLeft,
   ChevronRight as ChevronRightIcon,
   ChevronsRight,
+  FileText,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import * as XLSX from 'xlsx';
 import { api } from "../../utils/app";
+import { useNavigate } from "react-router-dom";
 
 const MangeOrders = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -344,6 +347,12 @@ const MangeOrders = () => {
     }).format(amount);
   };
 
+
+    // Navigate to full order details page
+  const goToOrderDetailsPage = (orderId) => {
+    navigate(`/admin/account-order-details/${orderId}`);
+  };
+
   if (loading) {
     return (
       <div
@@ -636,6 +645,17 @@ const MangeOrders = () => {
                           >
                             <Eye size={18} />
                           </button>
+                           <button
+                              onClick={() => goToOrderDetailsPage(order.id)}
+                              className="p-2 rounded-lg transition-all hover:scale-105"
+                              title="Full Details"
+                              style={{
+                                color: colors.primary,
+                                backgroundColor: `${colors.primary}10`,
+                              }}
+                            >
+                              <FileText size={18} />
+                            </button>
                         </td>
                       </tr>
                     );

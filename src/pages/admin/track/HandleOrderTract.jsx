@@ -21,12 +21,16 @@ import {
   IndianRupee,
   RefreshCw,
   Loader,
+  FileText,
+  ArrowRight,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { api } from "../../../utils/app";
 
 const HandleOrderTract = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -133,10 +137,15 @@ const HandleOrderTract = () => {
     setFilteredOrders(filtered);
   }, [searchQuery, statusFilter, paymentFilter, orders]);
 
-  // View order details
+  // View order details in modal
   const viewOrderDetails = (order) => {
     setSelectedOrder(order);
     setShowModal(true);
+  };
+
+  // Navigate to full order details page
+  const goToOrderDetailsPage = (orderId) => {
+    navigate(`/admin/order-details/${orderId}`);
   };
 
   // Update order status
@@ -402,7 +411,7 @@ const HandleOrderTract = () => {
                     >
                       Actions
                     </th>
-                  </tr>
+                   </tr>
                 </thead>
                 <tbody>
                   {filteredOrders.map((order) => {
@@ -499,16 +508,32 @@ const HandleOrderTract = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <button
-                            onClick={() => viewOrderDetails(order)}
-                            className="p-2 rounded-lg transition-all hover:scale-105"
-                            style={{
-                              color: colors.primary,
-                              backgroundColor: `${colors.primary}10`,
-                            }}
-                          >
-                            <Eye size={18} />
-                          </button>
+                          <div className="flex items-center gap-2">
+                            {/* Quick View Button (Modal) */}
+                            <button
+                              onClick={() => viewOrderDetails(order)}
+                              className="p-2 rounded-lg transition-all hover:scale-105"
+                              title="Quick View"
+                              style={{
+                                color: colors.info,
+                                backgroundColor: `${colors.info}10`,
+                              }}
+                            >
+                              <Eye size={18} />
+                            </button>
+                            {/* Full Details Button (Navigate to Details Page) */}
+                            <button
+                              onClick={() => goToOrderDetailsPage(order.id)}
+                              className="p-2 rounded-lg transition-all hover:scale-105"
+                              title="Full Details"
+                              style={{
+                                color: colors.primary,
+                                backgroundColor: `${colors.primary}10`,
+                              }}
+                            >
+                              <FileText size={18} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -532,7 +557,7 @@ const HandleOrderTract = () => {
         </div>
       </div>
 
-      {/* Order Details Modal */}
+      {/* Order Details Modal (Quick View) */}
       <AnimatePresence>
         {showModal && selectedOrder && (
           <>
@@ -588,15 +613,33 @@ const HandleOrderTract = () => {
                         Placed on {formatDate(selectedOrder.created_at)}
                       </p>
                     </div>
-                    <button
-                      onClick={() => setShowModal(false)}
-                      className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                      <X size={20} style={{ color: colors.textLight }} />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      {/* View Full Details Button in Modal */}
+                      <button
+                        onClick={() => {
+                          setShowModal(false);
+                          goToOrderDetailsPage(selectedOrder.id);
+                        }}
+                        className="px-4 py-2 rounded-lg flex items-center gap-2 transition-all"
+                        style={{
+                          backgroundColor: colors.primary,
+                          color: "#FFFFFF",
+                        }}
+                      >
+                        <FileText size={16} />
+                        View Full Details
+                        <ArrowRight size={14} />
+                      </button>
+                      <button
+                        onClick={() => setShowModal(false)}
+                        className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <X size={20} style={{ color: colors.textLight }} />
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Modal Body */}
+                  {/* Modal Body - Quick View Content */}
                   <div className="p-6 space-y-6">
                     {/* Status Cards */}
                     <div className="grid md:grid-cols-2 gap-4">
@@ -805,33 +848,10 @@ const HandleOrderTract = () => {
                             )}
                           </div>
                         </div>
-
-                        {/* Payment Details */}
-                        {selectedOrder.payment && (
-                          <div
-                            className="mt-3 pt-3 border-t"
-                            style={{ borderColor: colors.border }}
-                          >
-                            <p
-                              className="text-xs"
-                              style={{ color: colors.textLight }}
-                            >
-                              Transaction ID:{" "}
-                              {selectedOrder.payment.transaction_id || "N/A"}
-                            </p>
-                            <p
-                              className="text-xs"
-                              style={{ color: colors.textLight }}
-                            >
-                              Payment ID:{" "}
-                              {selectedOrder.payment.payment_id || "N/A"}
-                            </p>
-                          </div>
-                        )}
                       </div>
                     </div>
 
-                    {/* Customer Information */}
+                    {/* Customer Information (Quick View) */}
                     <div
                       className="p-4 rounded-xl"
                       style={{
@@ -895,52 +915,6 @@ const HandleOrderTract = () => {
                       </div>
                     </div>
 
-                    {/* Delivery Address */}
-                    {(selectedOrder.address ||
-                      selectedOrder.city ||
-                      selectedOrder.state ||
-                      selectedOrder.pincode) && (
-                      <div
-                        className="p-4 rounded-xl"
-                        style={{
-                          backgroundColor: colors.background,
-                          border: `1px solid ${colors.border}`,
-                        }}
-                      >
-                        <h3
-                          className="font-semibold mb-4"
-                          style={{ color: colors.text }}
-                        >
-                          Delivery Address
-                        </h3>
-                        <div className="flex items-start gap-3">
-                          <MapPin
-                            size={16}
-                            style={{ color: colors.textLight }}
-                            className="mt-1"
-                          />
-                          <div>
-                            <p style={{ color: colors.text }}>
-                              {selectedOrder.address && (
-                                <>
-                                  {selectedOrder.address}
-                                  <br />
-                                </>
-                              )}
-                              {selectedOrder.city &&
-                                selectedOrder.state &&
-                                selectedOrder.pincode && (
-                                  <>
-                                    {selectedOrder.city}, {selectedOrder.state}{" "}
-                                    - {selectedOrder.pincode}
-                                  </>
-                                )}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
                     {/* Order Summary */}
                     <div
                       className="p-4 rounded-xl"
@@ -957,32 +931,12 @@ const HandleOrderTract = () => {
                       </h3>
                       <div className="space-y-2">
                         <div className="flex justify-between">
-                          <span style={{ color: colors.textLight }}>Subtotal</span>
+                          <span style={{ color: colors.textLight }}>Total</span>
                           <span
                             className="font-bold flex items-center"
                             style={{ color: colors.text }}
                           >
                             <IndianRupee size={14} />
-                            {parseFloat(
-                              selectedOrder.total_amount,
-                            ).toLocaleString("en-IN")}
-                          </span>
-                        </div>
-                        <div
-                          className="flex justify-between pt-2 border-t"
-                          style={{ borderColor: colors.border }}
-                        >
-                          <span
-                            className="font-bold"
-                            style={{ color: colors.text }}
-                          >
-                            Total
-                          </span>
-                          <span
-                            className="text-xl font-bold flex items-center"
-                            style={{ color: colors.primary }}
-                          >
-                            <IndianRupee size={18} />
                             {parseFloat(
                               selectedOrder.total_amount,
                             ).toLocaleString("en-IN")}

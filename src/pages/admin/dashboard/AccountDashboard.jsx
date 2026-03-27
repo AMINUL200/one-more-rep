@@ -13,7 +13,8 @@ import {
   FileText,
   Printer,
   Eye,
-  ChevronRight
+  ChevronRight,
+  ShoppingBagIcon
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
@@ -85,41 +86,17 @@ const AccountDashboard = () => {
   // Quick action buttons data
   const quickActions = [
     {
-      id: 'transactions',
-      label: 'View Transactions',
-      icon: <CreditCard size={18} />,
+      id: 'order-track',
+      label: 'View Orders',
+      icon: <ShoppingBagIcon size={18} />,
       color: colors.info,
       bgColor: '#EFF6FF',
-      onClick: () => navigate('/admin/transactions'),
-      description: 'View all financial transactions'
+      onClick: () => navigate('/admin/account-order-track'),
+      description: 'View all Orders'
     },
-    {
-      id: 'invoices',
-      label: 'Generate Invoice',
-      icon: <FileText size={18} />,
-      color: colors.success,
-      bgColor: '#D1FAE5',
-      onClick: () => navigate('/admin/invoices'),
-      description: 'Create new invoice'
-    },
-    {
-      id: 'reports',
-      label: 'Financial Reports',
-      icon: <TrendingUp size={18} />,
-      color: colors.purple,
-      bgColor: '#EDE9FE',
-      onClick: () => navigate('/admin/financial-reports'),
-      description: 'View financial reports'
-    },
-    {
-      id: 'payment-history',
-      label: 'Payment History',
-      icon: <Clock size={18} />,
-      color: colors.warning,
-      bgColor: '#FEF3C7',
-      onClick: () => navigate('/admin/payment-history'),
-      description: 'View payment history'
-    }
+   
+   
+    
   ];
 
   // Stat cards configuration

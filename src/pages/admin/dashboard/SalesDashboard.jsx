@@ -23,8 +23,10 @@ import { api } from '../../../utils/app';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const SalesDashboard = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState({
@@ -105,10 +107,10 @@ const SalesDashboard = () => {
 
   // Quick actions
   const quickActions = [
-    { icon: <UserPlus size={18} />, label: 'Add Lead', onClick: () => console.log('Add Lead') },
-    { icon: <MessageSquare size={18} />, label: 'Send Message', onClick: () => console.log('Send Message') },
-    { icon: <ShoppingCart size={18} />, label: 'New Order', onClick: () => console.log('New Order') },
-    { icon: <FileText size={18} />, label: 'Generate Report', onClick: () => console.log('Generate Report') },
+    { icon: <UserPlus size={18} />, label: 'View Lead', onClick: () => navigate("/admin/sales-leads") },
+    // { icon: <MessageSquare size={18} />, label: 'Send Message', onClick: () => console.log('Send Message') },
+    // { icon: <ShoppingCart size={18} />, label: 'New Order', onClick: () => console.log('New Order') },
+    // { icon: <FileText size={18} />, label: 'Generate Report', onClick: () => console.log('Generate Report') },
   ];
 
 

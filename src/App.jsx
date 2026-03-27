@@ -52,6 +52,8 @@ import MangeOrders from "./pages/account/MangeOrders";
 import MangeCMSPage from "./pages/admin/cms/MangeCMSPage";
 import MangeAbout from "./pages/admin/about/MangeAbout";
 import MangeFellows from "./pages/admin/fellows/MangeFellows";
+import TrackOrderDetails from "./pages/admin/track/TrackOrderDetails";
+import AccountsOrderDetails from "./pages/account/AccountsOrderDetails";
 
 // Protected Route Component for authenticated users only
 const ProtectedRoute = ({ children }) => {
@@ -279,6 +281,7 @@ const App = () => {
           <Route index element={<Dashboard />} />
           <Route path="products" element={<HandleProduct />} />
           <Route path="order-track" element={<HandleOrderTract />} />
+          <Route path="order-details/:id" element={<TrackOrderDetails/>}/> 
           <Route path="profile" element={<AdminProfile />}  />
           <Route path="mange-blogs" element={<HandleBlog />} />
 
@@ -411,6 +414,7 @@ const App = () => {
               </RoleBasedRoute>
             }
           />
+          <Route path="account-order-details/:id" element={<AccountsOrderDetails/>}/>
         </Route>
 
         {/* 404 Not Found Route */}
