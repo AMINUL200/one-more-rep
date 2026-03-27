@@ -490,7 +490,7 @@ const HandleHeroSection = () => {
   // Handle delete
   const handleDelete = async (id) => {
     try {
-      const response = await api.delete(`/admin/banners/delete/${id}`);
+      const response = await api.delete(`/admin/banners/${id}`);
       if (response.data?.status) {
         toast.success("Hero section deleted successfully");
         setDeleteConfirm(null);
