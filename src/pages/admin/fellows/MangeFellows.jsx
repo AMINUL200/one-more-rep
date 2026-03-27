@@ -87,6 +87,7 @@ const MangeFellows = () => {
     try {
       const response = await api.get("/admin/short-videos");
       if (response.data?.status) {
+        console.log("list of shorts:: ", response.data.data)
         // If response is a single object, wrap it in an array
         const data = Array.isArray(response.data.data)
           ? response.data.data
@@ -302,7 +303,9 @@ const MangeFellows = () => {
           `/admin/short-videos/${editingItem.id}`,
           submitData,
         );
+        console.log("updated res ::", response.data)
       } else {
+
         // Create
         response = await api.post("/admin/short-videos", submitData);
       }
